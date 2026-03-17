@@ -99,7 +99,7 @@ export default function App() {
             <div className="flex-shrink-0 flex items-center justify-center lg:justify-start flex-1 lg:flex-none">
               <img 
                 src="https://i.postimg.cc/XYchPMsm/image.png" 
-                alt="Malola Logo" 
+                alt="Malola | Moda Infantil y Mujer" 
                 className="h-16 md:h-24 w-auto object-contain"
                 referrerPolicy="no-referrer"
               />
@@ -282,7 +282,7 @@ export default function App() {
             <div>
               <img 
                 src="https://i.postimg.cc/XYchPMsm/image.png" 
-                alt="Malola Logo" 
+                alt="Malola | Moda Infantil y Mujer" 
                 className="h-16 md:h-20 w-auto object-contain mb-6"
                 referrerPolicy="no-referrer"
               />
@@ -346,7 +346,7 @@ export default function App() {
 
           {/* Bottom Footer */}
           <div className="border-t border-[#E5D9C5] pt-8 flex flex-col md:flex-row justify-between items-center text-xs">
-            <p>&copy; {new Date().getFullYear()} Malola Shop. Todos los derechos reservados.</p>
+            <p>&copy; {new Date().getFullYear()} Malola | Moda Infantil y Mujer. Todos los derechos reservados.</p>
             <div className="flex space-x-4 mt-4 md:mt-0">
               <a href="#" className="hover:text-[#B89F82] transition-colors">Política de Privacidad</a>
               <a href="#" className="hover:text-[#B89F82] transition-colors">Términos y Condiciones</a>
