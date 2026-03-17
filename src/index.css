@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-brand-brown: #5D4037;
+  --color-brand-gold: #bd690f;
+  --color-brand-cream: #FCF9F5;
+  --font-sans: 'Manrope', sans-serif;
+  --radius-custom: 4px;
+}
+
+@layer utilities {
+  .dropdown-hover:hover .dropdown-menu {
+    display: block;
+    opacity: 1;
+  }
+  .nav-link {
+    position: relative;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -4px;
+    left: 0;
+    background-color: var(--color-brand-brown);
+    transition: width 0.3s ease;
+  }
+  .nav-link:hover::after {
+    width: 100%;
+  }
+}
