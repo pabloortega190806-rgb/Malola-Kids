@@ -4,7 +4,12 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  color-scheme: light;
+  color-scheme: light only;
+}
+
+html, body {
+  background-color: #FCFBF9 !important;
+  color: #1f2937 !important;
 }
 
 @theme {
