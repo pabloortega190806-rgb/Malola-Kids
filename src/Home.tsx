@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const navigate = useNavigate();
 
   const slides = [
     {
@@ -150,6 +152,7 @@ export default function Home() {
             {brands.map((brand, index) => (
               <div 
                 key={index} 
+                onClick={() => navigate(`/marca/${brand.toLowerCase()}`)}
                 className="text-2xl md:text-4xl font-serif font-medium text-[#8B7355] opacity-80 hover:opacity-100 transition-opacity duration-300 cursor-pointer tracking-wide"
               >
                 {brand}

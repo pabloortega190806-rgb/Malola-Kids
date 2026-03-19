@@ -7,6 +7,7 @@ import PoliticaPrivacidad from './PoliticaPrivacidad';
 import PoliticaCookies from './PoliticaCookies';
 import CookieBanner from './CookieBanner';
 import WhatsAppButton from './WhatsAppButton';
+import Catalog from './Catalog';
 import { Analytics } from '@vercel/analytics/react';
 
 export default function App() {
@@ -114,6 +115,7 @@ export default function App() {
           <Route path="/aviso-legal" element={<AvisoLegal />} />
           <Route path="/politica-privacidad" element={<PoliticaPrivacidad />} />
           <Route path="/politica-cookies" element={<PoliticaCookies />} />
+          <Route path="/marca/:brandName" element={<Catalog />} />
         </Routes>
       </main>
 
