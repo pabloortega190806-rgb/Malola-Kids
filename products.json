@@ -1,0 +1,450 @@
+[
+  {
+    "code": "32530",
+    "name": "PELELE ATARI",
+    "description": "100% algodón",
+    "color": "Arena",
+    "original_price": 21.5,
+    "discounted_price": 21.5,
+    "brand": "Calamaro",
+    "category": "Calamaro Baby  0-4 años",
+    "sizes_stock": {
+      "1 Mes ( 54 cm)": 5,
+      "3 Meses (60 cm)": 5,
+      "6 Meses (67 cm)": 5,
+      "12 Meses (74 cm)": 5,
+      "18 Meses (81 cm)": 5,
+      "24 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "32531",
+    "name": "PETO ATARI",
+    "description": "100% algodón",
+    "color": "Arena",
+    "original_price": 19.9,
+    "discounted_price": 19.9,
+    "brand": "Calamaro",
+    "category": "Bebe niño 0-4 años",
+    "sizes_stock": {
+      "1 Mes ( 54 cm)": 5,
+      "3 Meses (60 cm)": 5,
+      "6 Meses (67 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "32554",
+    "name": "PELELE KERALA",
+    "description": "100% algodón",
+    "color": "Celeste",
+    "original_price": 23.99,
+    "discounted_price": 23.99,
+    "brand": "Calamaro",
+    "category": "Bebe niño 0-4 años",
+    "sizes_stock": {
+      "1 Mes ( 54 cm)": 5,
+      "3 Meses (60 cm)": 5,
+      "6 Meses (67 cm)": 5,
+      "12 Meses (74 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "11314",
+    "name": "CONJUNTO POLOLO KERALA",
+    "description": "100% algodón",
+    "color": "Celeste",
+    "original_price": 25,
+    "discounted_price": 25,
+    "brand": "Calamaro",
+    "category": "Bebe niño 0-4 años",
+    "sizes_stock": {
+      "6 Meses (67 cm)": 5,
+      "18 Meses (81 cm)": 5,
+      "36 Meses (95 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "32553",
+    "name": "PETO KERALA",
+    "description": "100% algodón",
+    "color": "Celeste",
+    "original_price": 17.9,
+    "discounted_price": 17.9,
+    "brand": "Calamaro",
+    "category": "Bebe niño 0-4 años",
+    "sizes_stock": {
+      "1 Mes ( 54 cm)": 5,
+      "3 Meses (60 cm)": 5,
+      "6 Meses (67 cm)": 5,
+      "12 Meses (74 cm)": 5,
+      "18 Meses (81 cm)": 5,
+      "24 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "11315",
+    "name": "CONJUNTO PETO KERALA",
+    "description": "100% algodón",
+    "color": "Celeste",
+    "original_price": 27.9,
+    "discounted_price": 27.9,
+    "brand": "Calamaro",
+    "category": "Bebe niño 0-4 años",
+    "sizes_stock": {
+      "6 Meses (67 cm)": 5,
+      "12 Meses (74 cm)": 5,
+      "18 Meses (81 cm)": 5,
+      "24 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "32550",
+    "name": "PETO KANPUR",
+    "description": "100% algodón",
+    "color": "Coral",
+    "original_price": 21.5,
+    "discounted_price": 21.5,
+    "brand": "Calamaro",
+    "category": "Bebe niño 0-4 años",
+    "sizes_stock": {
+      "1 Mes ( 54 cm)": 5,
+      "6 Meses (67 cm)": 5,
+      "18 Meses (81 cm)": 5,
+      "24 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "21327-B",
+    "name": "VESTIDO CON BRAGUITA KANPUR",
+    "description": "100% algodón",
+    "color": "Coral",
+    "original_price": 31.9,
+    "discounted_price": 31.9,
+    "brand": "Calamaro",
+    "category": "Bebé",
+    "sizes_stock": {
+      "12 Meses (74 cm)": 5,
+      "18 Meses (81 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "21327-N",
+    "name": "VESTIDO CON BRAGUITA KANPUR",
+    "description": "100% algodón",
+    "color": "Coral",
+    "original_price": 39.9,
+    "discounted_price": 39.9,
+    "brand": "Calamaro",
+    "category": "Niños",
+    "sizes_stock": {
+      "3 Años (95 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "32548",
+    "name": "PETO BUNDI",
+    "description": "78% algodón",
+    "color": "Rosa",
+    "original_price": 19.9,
+    "discounted_price": 19.9,
+    "brand": "Calamaro",
+    "category": "Bebe niño 0-4 años",
+    "sizes_stock": {
+      "1 Mes ( 54 cm)": 5,
+      "3 Años (95 cm)": 5,
+      "6 Meses (67 cm)": 5,
+      "12 Meses (74 cm)": 5,
+      "18 Meses (81 cm)": 5,
+      "24 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "32549",
+    "name": "PELELE BUNDI",
+    "description": "78% algodón",
+    "color": "Rosa",
+    "original_price": 21.5,
+    "discounted_price": 21.5,
+    "brand": "Calamaro",
+    "category": "Bebe niño 0-4 años",
+    "sizes_stock": {
+      "1 Mes ( 54 cm)": 5,
+      "3 Años (95 cm)": 5,
+      "6 Meses (67 cm)": 5,
+      "12 Meses (74 cm)": 5,
+      "18 Meses (81 cm)": 5,
+      "24 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "32497",
+    "name": "PELELE ALBORÁN",
+    "description": "100% algodón",
+    "color": "Blanco",
+    "original_price": 17.9,
+    "discounted_price": 17.9,
+    "brand": "Calamaro",
+    "category": "Bebe niño 0-4 años",
+    "sizes_stock": {
+      "1 Mes ( 54 cm)": 5,
+      "6 Meses (67 cm)": 5,
+      "18 Meses (81 cm)": 5,
+      "24 Meses (86 cm)": 5,
+      "3 Años (95 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "11277",
+    "name": "CONJUNTO POLOLO GOA",
+    "description": "100% algodón",
+    "color": "Nude",
+    "original_price": 22,
+    "discounted_price": 22,
+    "brand": "Calamaro",
+    "category": "Calamaro Baby  0-4 años",
+    "sizes_stock": {
+      "18 Meses (81 cm)": 5,
+      "24 Meses (86 cm)": 5,
+      "36 Meses (95 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "32541",
+    "name": "PETO MANDI",
+    "description": "100% algodón",
+    "color": "Arena",
+    "original_price": 17.9,
+    "discounted_price": 17.9,
+    "brand": "Calamaro",
+    "category": "Calamaro Baby  0-4 años",
+    "sizes_stock": {
+      "1 Mes ( 54 cm)": 5,
+      "3 Años (95 cm)": 5,
+      "36 Meses (95 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "22109",
+    "name": "JESUSITO MANDI",
+    "description": "100% algodón",
+    "color": "Arena",
+    "original_price": 26.9,
+    "discounted_price": 26.9,
+    "brand": "Calamaro",
+    "category": "Calamaro Baby  0-4 años",
+    "sizes_stock": {
+      "1 Mes ( 54 cm)": 5,
+      "3 Años (95 cm)": 5,
+      "6 Meses (67 cm)": 5,
+      "12 Meses (74 cm)": 5,
+      "18 Meses (81 cm)": 5,
+      "24 Meses (86 cm)": 5,
+      "36 Meses (95 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "11286",
+    "name": "CONJUNTO POLOLO MANDI",
+    "description": "100% algodón",
+    "color": "Arena",
+    "original_price": 25,
+    "discounted_price": 25,
+    "brand": "Calamaro",
+    "category": "Calamaro Baby  0-4 años",
+    "sizes_stock": {
+      "6 Meses (67 cm)": 5,
+      "12 Meses (74 cm)": 5,
+      "18 Meses (81 cm)": 5,
+      "24 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "77134",
+    "name": "LAZO PELO MANDI",
+    "description": "100% algodón",
+    "color": "Arena",
+    "original_price": 3.9,
+    "discounted_price": 3.9,
+    "brand": "Calamaro",
+    "category": "Calamaro Baby  0-4 años",
+    "sizes_stock": {
+      "Única": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "11313-B",
+    "name": "CONJUNTO POLOLO MATHURA",
+    "description": "100% algodón",
+    "color": "Verde",
+    "original_price": 25,
+    "discounted_price": 25,
+    "brand": "Calamaro",
+    "category": "Bebé",
+    "sizes_stock": {
+      "1 Mes ( 54 cm)": 5,
+      "3 Años (95 cm)": 5,
+      "6 Meses (67 cm)": 5,
+      "12 Meses (74 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "11313-N",
+    "name": "CONJUNTO POLOLO MATHURA",
+    "description": "100% algodón",
+    "color": "Verde",
+    "original_price": 29.9,
+    "discounted_price": 29.9,
+    "brand": "Calamaro",
+    "category": "Niños",
+    "sizes_stock": {
+      "3 Años (95 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "32551-B",
+    "name": "PETO MATHURA",
+    "description": "100% algodón",
+    "color": "Verde",
+    "original_price": 21.9,
+    "discounted_price": 21.9,
+    "brand": "Calamaro",
+    "category": "Bebé",
+    "sizes_stock": {
+      "6 Meses (67 cm)": 5,
+      "12 Meses (74 cm)": 5,
+      "18 Meses (81 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "33551-B",
+    "name": "PETO MATHURA",
+    "description": "100% algodón",
+    "color": "Verde",
+    "original_price": 21.9,
+    "discounted_price": 21.9,
+    "brand": "Calamaro",
+    "category": "Bebé",
+    "sizes_stock": {
+      "24 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "33551-N",
+    "name": "PETO MATHURA",
+    "description": "100% algodón",
+    "color": "Verde",
+    "original_price": 24.9,
+    "discounted_price": 24.9,
+    "brand": "Calamaro",
+    "category": "Niños",
+    "sizes_stock": {
+      "3 Años (95 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "11323",
+    "name": "CONJUNTO POLOLO DELHI",
+    "description": "100% algodón",
+    "color": "Melocotón",
+    "original_price": 25.9,
+    "discounted_price": 25.9,
+    "brand": "Calamaro",
+    "category": "Calamaro Baby  0-4 años",
+    "sizes_stock": {
+      "6 Meses (67 cm)": 5,
+      "12 Meses (74 cm)": 5,
+      "18 Meses (81 cm)": 5,
+      "24 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "21338-B",
+    "name": "VESTIDO CUADROS",
+    "description": "100% algodón",
+    "color": "Melocotón",
+    "original_price": 21.5,
+    "discounted_price": 21.5,
+    "brand": "Calamaro",
+    "category": "Bebé",
+    "sizes_stock": {
+      "12 Meses (74 cm)": 5,
+      "18 Meses (81 cm)": 5,
+      "24 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "32544",
+    "name": "PETO GAYA",
+    "description": "100% algodón",
+    "color": "Mostaza",
+    "original_price": 17.9,
+    "discounted_price": 17.9,
+    "brand": "Calamaro",
+    "category": "Calamaro Baby  0-4 años",
+    "sizes_stock": {
+      "1 Mes ( 54 cm)": 5,
+      "6 Meses (67 cm)": 5,
+      "18 Meses (81 cm)": 5,
+      "24 Meses (86 cm)": 5,
+      "36 Meses (95 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "21324-B",
+    "name": "VESTIDO GAYA",
+    "description": "100% algodón",
+    "color": "Mostaza",
+    "original_price": 24.5,
+    "discounted_price": 24.5,
+    "brand": "Calamaro",
+    "category": "Bebé",
+    "sizes_stock": {
+      "12 Meses (74 cm)": 5,
+      "18 Meses (81 cm)": 5,
+      "24 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "code": "32542",
+    "name": "PETO SIKAR",
+    "description": "95%algodón",
+    "color": "Coral",
+    "original_price": 19.5,
+    "discounted_price": 19.5,
+    "brand": "Calamaro",
+    "category": "Calamaro Baby  0-4 años",
+    "sizes_stock": {
+      "6 Meses (67 cm)": 5,
+      "12 Meses (74 cm)": 5,
+      "18 Meses (81 cm)": 5,
+      "24 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  }
+]

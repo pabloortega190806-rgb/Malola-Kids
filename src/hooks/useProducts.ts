@@ -45,8 +45,14 @@ export function useProducts(options: UseProductsOptions = {}) {
         const res = await fetch(`/api/products?${params.toString()}`);
         
         if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.error || 'Error al cargar los productos');
+          let errorMessage = 'Error al cargar los productos';
+          try {
+            const errorData = await res.json();
+            errorMessage = errorData.error || errorMessage;
+          } catch (e) {
+            errorMessage = `Error del servidor (${res.status}): No se pudo conectar a la base de datos o a la API.`;
+          }
+          throw new Error(errorMessage);
         }
         
         const json = await res.json();
@@ -54,7 +60,7 @@ export function useProducts(options: UseProductsOptions = {}) {
         setHasMore(json.pagination?.hasMore || false);
         setTotal(json.pagination?.total || 0);
       } catch (err: any) {
-        setError(err.message);
+        setError(err.message || 'Error de conexión. Verifica que el servidor y la base de datos estén funcionando.');
       } finally {
         setLoading(false);
       }

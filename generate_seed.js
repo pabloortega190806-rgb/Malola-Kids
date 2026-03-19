@@ -167,3 +167,7 @@ sql += values.join(',\n') + '\nON CONFLICT (code) DO UPDATE SET sizes_stock = EX
 
 fs.writeFileSync('catalog_seed.sql', sql);
 console.log('SQL generated successfully in catalog_seed.sql');
+
+const productsArray = Array.from(products.values());
+fs.writeFileSync('products.json', JSON.stringify(productsArray, null, 2));
+console.log('JSON generated successfully in products.json');

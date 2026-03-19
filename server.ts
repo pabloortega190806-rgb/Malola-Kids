@@ -2,6 +2,7 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import pg from "pg";
+import fs from "fs";
 
 const { Pool } = pg;
 
@@ -58,8 +59,41 @@ async function startServer() {
   // Endpoint para obtener el catálogo de productos de forma eficiente
   app.get("/api/products", async (req, res) => {
     const db = getDbPool();
+    
+    // Si no hay base de datos configurada, usar el archivo JSON local como fallback
     if (!db) {
-      return res.status(503).json({ error: "Base de datos no configurada. Por favor, configura DATABASE_URL en las variables de entorno." });
+      try {
+        const productsData = fs.readFileSync(path.join(process.cwd(), 'products.json'), 'utf8');
+        let products = JSON.parse(productsData);
+        
+        const limit = parseInt(req.query.limit as string) || 50;
+        const offset = parseInt(req.query.offset as string) || 0;
+        const category = req.query.category as string;
+        const brand = req.query.brand as string;
+
+        if (category) {
+          products = products.filter((p: any) => p.category === category);
+        }
+        if (brand) {
+          products = products.filter((p: any) => p.brand.toLowerCase().includes(brand.toLowerCase()));
+        }
+
+        const total = products.length;
+        const paginatedProducts = products.slice(offset, offset + limit);
+
+        return res.json({
+          data: paginatedProducts,
+          pagination: {
+            total,
+            limit,
+            offset,
+            hasMore: offset + limit < total
+          }
+        });
+      } catch (err) {
+        console.error("Error reading fallback JSON:", err);
+        return res.status(503).json({ error: "Base de datos no configurada y no se pudo cargar el catálogo local." });
+      }
     }
 
     try {

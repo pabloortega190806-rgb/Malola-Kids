@@ -21,12 +21,19 @@ export default function Catalog() {
         
         const response = await fetch(url);
         if (!response.ok) {
-          throw new Error('Error al cargar los productos');
+          let errorMessage = 'Error al cargar los productos';
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.error || errorMessage;
+          } catch (e) {
+            errorMessage = `Error del servidor (${response.status}): No se pudo conectar a la base de datos o a la API.`;
+          }
+          throw new Error(errorMessage);
         }
         const data = await response.json();
         setProducts(data.data || []);
       } catch (err: any) {
-        setError(err.message);
+        setError(err.message || 'Error de conexión. Verifica que el servidor y la base de datos estén funcionando.');
       } finally {
         setLoading(false);
       }
@@ -73,7 +80,20 @@ export default function Catalog() {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B89F82]"></div>
         </div>
       ) : error ? (
-        <div className="text-center text-red-500 py-12">{error}</div>
+        <div className="text-center py-20 px-4">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-8 max-w-2xl mx-auto shadow-sm">
+            <h3 className="text-red-800 font-serif font-bold text-xl mb-3">Error de conexión a la base de datos</h3>
+            <p className="text-red-600 mb-6">{error}</p>
+            <div className="bg-white rounded p-4 text-left border border-red-100">
+              <p className="text-sm text-red-800 font-medium mb-2">Si estás viendo esto en Vercel, asegúrate de que:</p>
+              <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
+                <li>La variable de entorno <strong>DATABASE_URL</strong> esté configurada en los Settings de Vercel.</li>
+                <li>La base de datos (Neon/Postgres) esté activa y accesible.</li>
+                <li>El backend se haya desplegado correctamente.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       ) : products.length === 0 ? (
         <div className="text-center py-20">
           <p className="text-xl text-[#7A5C53] mb-4">No se encontraron productos para {displayBrand}.</p>
