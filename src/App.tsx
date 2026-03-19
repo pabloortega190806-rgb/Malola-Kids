@@ -8,10 +8,15 @@ import PoliticaCookies from './PoliticaCookies';
 import CookieBanner from './CookieBanner';
 import WhatsAppButton from './WhatsAppButton';
 import Catalog from './Catalog';
+import ProductDetails from './ProductDetails';
 import { Analytics } from '@vercel/analytics/react';
+import { useCart } from './context/CartContext';
+import { CartDrawer } from './components/CartDrawer';
+import Checkout from './Checkout';
 
 export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { cartCount, setIsCartOpen } = useCart();
 
   return (
     <div className="min-h-screen bg-[#FCFBF9] font-sans text-[#5D4037]">
@@ -82,11 +87,16 @@ export default function App() {
               <button className="text-[#967A70] hover:text-[#B89F82] transition-colors">
                 <Search size={20} />
               </button>
-              <button className="text-[#967A70] hover:text-[#B89F82] transition-colors relative">
+              <button 
+                className="text-[#967A70] hover:text-[#B89F82] transition-colors relative"
+                onClick={() => setIsCartOpen(true)}
+              >
                 <ShoppingBag size={20} />
-                <span className="absolute -top-2 -right-2 bg-[#B89F82] text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                  0
-                </span>
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-[#B89F82] text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
               </button>
             </div>
           </div>
@@ -116,6 +126,8 @@ export default function App() {
           <Route path="/politica-privacidad" element={<PoliticaPrivacidad />} />
           <Route path="/politica-cookies" element={<PoliticaCookies />} />
           <Route path="/marca/:brandName" element={<Catalog />} />
+          <Route path="/producto/:code" element={<ProductDetails />} />
+          <Route path="/checkout" element={<Checkout />} />
         </Routes>
       </main>
 
@@ -204,6 +216,7 @@ export default function App() {
 
       <WhatsAppButton />
       <CookieBanner />
+      <CartDrawer />
       <Analytics />
     </div>
   );

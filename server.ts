@@ -59,6 +59,44 @@ async function startServer() {
   // Endpoint para obtener el catálogo de productos de forma eficiente
   app.get("/api/products", async (req, res) => {
     const db = getDbPool();
+    const publicProductsDir = path.join(process.cwd(), 'public', 'products');
+    let localFiles: string[] = [];
+    
+    if (fs.existsSync(publicProductsDir)) {
+      localFiles = fs.readdirSync(publicProductsDir);
+    }
+
+    const attachLocalImages = (products: any[]) => {
+      return products.map(product => {
+        if (product.gallery_urls && Array.isArray(product.gallery_urls) && product.gallery_urls.length > 0) {
+          product.local_images = product.gallery_urls;
+          return product;
+        }
+
+        const code = product.code;
+        const matchingFiles = localFiles.filter(file => {
+          const ext = path.extname(file).toLowerCase();
+          const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
+          return isImage && (file === `${code}${ext}` || file.startsWith(`${code}_`));
+        });
+
+        matchingFiles.sort((a, b) => {
+          const aName = path.basename(a, path.extname(a));
+          const bName = path.basename(b, path.extname(b));
+          if (aName === code) return -1;
+          if (bName === code) return 1;
+          return aName.localeCompare(bName);
+        });
+
+        if (matchingFiles.length > 0) {
+          product.local_images = matchingFiles.map(file => `/products/${file}`);
+          product.image_url = `/products/${matchingFiles[0]}`; // Override main image
+        } else {
+          product.local_images = [];
+        }
+        return product;
+      });
+    };
     
     // Si no hay base de datos configurada, usar el archivo JSON local como fallback
     if (!db) {
@@ -82,7 +120,7 @@ async function startServer() {
         const paginatedProducts = products.slice(offset, offset + limit);
 
         return res.json({
-          data: paginatedProducts,
+          data: attachLocalImages(paginatedProducts),
           pagination: {
             total,
             limit,
@@ -139,7 +177,7 @@ async function startServer() {
       const total = parseInt(countResult.rows[0].count);
 
       res.json({
-        data: result.rows,
+        data: attachLocalImages(result.rows),
         pagination: {
           total,
           limit,
@@ -151,6 +189,180 @@ async function startServer() {
       console.error("Error fetching products:", error);
       res.status(500).json({ error: "Error interno del servidor al obtener los productos" });
     }
+  });
+
+  // Endpoint para obtener un producto específico por código
+  app.get("/api/products/:code", async (req, res) => {
+    const code = req.params.code;
+    const db = getDbPool();
+    const publicProductsDir = path.join(process.cwd(), 'public', 'products');
+    let localFiles: string[] = [];
+    
+    if (fs.existsSync(publicProductsDir)) {
+      localFiles = fs.readdirSync(publicProductsDir);
+    }
+
+    const attachLocalImages = (product: any) => {
+      if (product.gallery_urls && Array.isArray(product.gallery_urls) && product.gallery_urls.length > 0) {
+        product.local_images = product.gallery_urls;
+        return product;
+      }
+
+      const matchingFiles = localFiles.filter(file => {
+        const ext = path.extname(file).toLowerCase();
+        const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
+        return isImage && (file === `${code}${ext}` || file.startsWith(`${code}_`));
+      });
+
+      matchingFiles.sort((a, b) => {
+        const aName = path.basename(a, path.extname(a));
+        const bName = path.basename(b, path.extname(b));
+        if (aName === code) return -1;
+        if (bName === code) return 1;
+        return aName.localeCompare(bName);
+      });
+
+      if (matchingFiles.length > 0) {
+        product.local_images = matchingFiles.map(file => `/products/${file}`);
+        product.image_url = `/products/${matchingFiles[0]}`;
+      } else {
+        product.local_images = [];
+      }
+      return product;
+    };
+
+    if (!db) {
+      try {
+        const productsData = fs.readFileSync(path.join(process.cwd(), 'products.json'), 'utf8');
+        const products = JSON.parse(productsData);
+        const product = products.find((p: any) => p.code === code);
+        
+        if (!product) {
+          return res.status(404).json({ error: "Producto no encontrado" });
+        }
+        
+        return res.json(attachLocalImages(product));
+      } catch (err) {
+        return res.status(503).json({ error: "Base de datos no configurada y no se pudo cargar el catálogo local." });
+      }
+    }
+
+    try {
+      const result = await db.query('SELECT * FROM products WHERE code = $1', [code]);
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Producto no encontrado" });
+      }
+      
+      res.json(attachLocalImages(result.rows[0]));
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      res.status(500).json({ error: "Error interno del servidor al obtener el producto" });
+    }
+  });
+
+  // Endpoint para obtener imágenes de un producto por código
+  app.get("/api/product-images/:code", async (req, res) => {
+    const code = req.params.code;
+    const publicProductsDir = path.join(process.cwd(), 'public', 'products');
+    
+    try {
+      if (!fs.existsSync(publicProductsDir)) {
+        return res.json({ images: [] });
+      }
+      
+      const files = fs.readdirSync(publicProductsDir);
+      const matchingFiles = files.filter(file => {
+        const ext = path.extname(file).toLowerCase();
+        const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
+        // The file name must start with the code, followed by a dot or an underscore
+        return isImage && (file === `${code}${ext}` || file.startsWith(`${code}_`));
+      });
+
+      // Sort files to prioritize the one without extra numbers/letters (e.g., 11286.jpg before 11286_1.jpg)
+      matchingFiles.sort((a, b) => {
+        const aName = path.basename(a, path.extname(a));
+        const bName = path.basename(b, path.extname(b));
+        
+        if (aName === code) return -1;
+        if (bName === code) return 1;
+        
+        return aName.localeCompare(bName);
+      });
+
+      const imageUrls = matchingFiles.map(file => `/products/${file}`);
+      res.json({ images: imageUrls });
+    } catch (err) {
+      console.error("Error reading product images:", err);
+      res.status(500).json({ error: "Error reading images" });
+    }
+  });
+
+  // Endpoint para validar el stock del carrito
+  app.post("/api/validate-cart", async (req, res) => {
+    const { items } = req.body;
+    
+    if (!items || !Array.isArray(items)) {
+      return res.status(400).json({ error: "Formato de carrito inválido" });
+    }
+
+    const db = getDbPool();
+    let productsData: any[] = [];
+
+    // Cargar productos (de DB o JSON)
+    if (!db) {
+      try {
+        const data = fs.readFileSync(path.join(process.cwd(), 'products.json'), 'utf8');
+        productsData = JSON.parse(data);
+      } catch (err) {
+        return res.status(503).json({ error: "No se pudo cargar el catálogo para validar." });
+      }
+    } else {
+      try {
+        const codes = items.map(item => item.code);
+        if (codes.length === 0) return res.json({ valid: true, issues: [] });
+        
+        const placeholders = codes.map((_, i) => `$${i + 1}`).join(',');
+        const result = await db.query(`SELECT * FROM products WHERE code IN (${placeholders})`, codes);
+        productsData = result.rows;
+      } catch (err) {
+        return res.status(500).json({ error: "Error al consultar la base de datos." });
+      }
+    }
+
+    const issues: { code: string; name: string; size: string; requested: number; available: number; issue: string }[] = [];
+
+    for (const item of items) {
+      const product = productsData.find(p => p.code === item.code);
+      if (!product) {
+        issues.push({
+          code: item.code,
+          name: "Producto desconocido",
+          size: item.size,
+          requested: item.quantity,
+          available: 0,
+          issue: "not_found"
+        });
+        continue;
+      }
+
+      const availableStock = Number(product.sizes_stock[item.size] || 0);
+      if (availableStock < item.quantity) {
+        issues.push({
+          code: item.code,
+          name: product.name,
+          size: item.size,
+          requested: item.quantity,
+          available: availableStock,
+          issue: availableStock === 0 ? "out_of_stock" : "insufficient_stock"
+        });
+      }
+    }
+
+    if (issues.length > 0) {
+      return res.status(400).json({ valid: false, issues });
+    }
+
+    return res.json({ valid: true });
   });
 
   // ==========================================

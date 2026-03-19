@@ -11,6 +11,7 @@ export interface Product {
   category: string;
   sizes_stock: Record<string, number>;
   image_url: string;
+  local_images?: string[];
   created_at: string;
 }
 

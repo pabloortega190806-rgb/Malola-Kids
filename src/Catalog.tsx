@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Filter, ChevronDown, ShoppingBag } from 'lucide-react';
+import { Filter, ChevronDown } from 'lucide-react';
 import { Product } from './hooks/useProducts';
+import { ProductCard } from './components/ProductCard';
 
 export default function Catalog() {
   const { brandName } = useParams<{ brandName: string }>();
@@ -100,59 +101,9 @@ export default function Catalog() {
           <Link to="/" className="text-[#B89F82] hover:underline font-medium">Volver a inicio</Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
           {products.map((product) => (
-            <div key={product.code} className="group flex flex-col bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 border border-[#F5F0EB]">
-              {/* Image Container */}
-              <div className="relative aspect-[3/4] overflow-hidden bg-[#FCFBF9]">
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
-                  referrerPolicy="no-referrer"
-                  onError={(e) => {
-                    // Fallback image if postimg placeholder fails
-                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
-                  }}
-                />
-                {/* Quick Add Button */}
-                <button className="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm text-[#5D4037] py-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 font-medium text-sm flex items-center justify-center hover:bg-[#B89F82] hover:text-white">
-                  <ShoppingBag size={16} className="mr-2" />
-                  Añadir al carrito
-                </button>
-              </div>
-
-              {/* Product Info */}
-              <div className="p-4 flex flex-col flex-grow">
-                <div className="text-xs text-[#967A70] mb-1 uppercase tracking-wider">{product.category}</div>
-                <h3 className="text-[#3E2A24] font-medium mb-1 line-clamp-2">{product.name}</h3>
-                <p className="text-sm text-[#7A5C53] mb-3 line-clamp-1">{product.color} | {product.description}</p>
-                
-                <div className="mt-auto flex items-baseline space-x-2">
-                  <span className="text-lg font-bold text-[#5D4037]">{Number(product.original_price).toFixed(2)} €</span>
-                </div>
-
-                {/* Sizes */}
-                <div className="mt-3 flex flex-wrap gap-1">
-                  {Object.entries(product.sizes_stock).map(([size, stock]) => {
-                    const stockNum = Number(stock);
-                    return (
-                      <span 
-                        key={size} 
-                        className={`text-[10px] px-2 py-1 border rounded-sm ${
-                          stockNum > 0 
-                            ? 'border-[#E5D9C5] text-[#7A5C53] bg-white' 
-                            : 'border-gray-100 text-gray-300 bg-gray-50 line-through'
-                        }`}
-                        title={stockNum > 0 ? `Stock: ${stockNum}` : 'Agotado'}
-                      >
-                        {size.split('(')[0].trim()}
-                      </span>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
+            <ProductCard key={product.code} product={product} />
           ))}
         </div>
       )}
