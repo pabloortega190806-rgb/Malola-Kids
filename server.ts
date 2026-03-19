@@ -3,6 +3,7 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import pg from "pg";
 import fs from "fs";
+import { list } from "@vercel/blob";
 
 const { Pool } = pg;
 
@@ -26,6 +27,90 @@ function getDbPool() {
   return pool;
 }
 
+let blobCache: any[] = [];
+let blobCacheTime = 0;
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+async function getAllBlobs() {
+  if (Date.now() - blobCacheTime < CACHE_TTL && blobCache.length > 0) {
+    return blobCache;
+  }
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return [];
+  
+  try {
+    let cursor;
+    let allBlobs: any[] = [];
+    do {
+      const result = await list({
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+        cursor,
+        limit: 1000,
+      });
+      allBlobs.push(...result.blobs);
+      cursor = result.cursor;
+    } while (cursor);
+    
+    blobCache = allBlobs;
+    blobCacheTime = Date.now();
+    console.log(`[Blob Cache] Loaded ${allBlobs.length} blobs from Vercel.`);
+    return allBlobs;
+  } catch (error) {
+    console.error("[Blob Cache] Error fetching blobs:", error);
+    return blobCache;
+  }
+}
+
+async function getProductImages(code: string | number, localFiles: string[]): Promise<{ images: string[], mainImage?: string }> {
+  const codeStr = String(code).trim();
+  try {
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      const blobs = await getAllBlobs();
+      const matchingFiles = blobs.filter(blob => {
+        const ext = path.extname(blob.pathname).toLowerCase();
+        const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
+        const nameWithoutExt = path.basename(blob.pathname, ext);
+        const remainder = nameWithoutExt.substring(codeStr.length);
+        return isImage && nameWithoutExt.startsWith(codeStr) && (remainder === '' || /^[-_.]/.test(remainder));
+      });
+
+      matchingFiles.sort((a, b) => {
+        const aName = path.basename(a.pathname, path.extname(a.pathname));
+        const bName = path.basename(b.pathname, path.extname(b.pathname));
+        return aName.localeCompare(bName);
+      });
+
+      if (matchingFiles.length > 0) {
+        const images = matchingFiles.map(file => `/api/proxy-image?url=${encodeURIComponent(file.url)}`);
+        return { images, mainImage: images[0] };
+      }
+    }
+    
+    // Fallback to local files
+    const matchingFiles = localFiles.filter(file => {
+      const ext = path.extname(file).toLowerCase();
+      const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
+      const nameWithoutExt = path.basename(file, ext);
+      const remainder = nameWithoutExt.substring(codeStr.length);
+      return isImage && nameWithoutExt.startsWith(codeStr) && (remainder === '' || /^[-_.]/.test(remainder));
+    });
+
+    matchingFiles.sort((a, b) => {
+      const aName = path.basename(a, path.extname(a));
+      const bName = path.basename(b, path.extname(b));
+      return aName.localeCompare(bName);
+    });
+
+    if (matchingFiles.length > 0) {
+      const images = matchingFiles.map(file => `/products/${file}`);
+      return { images, mainImage: images[0] };
+    }
+  } catch (e) {
+    console.error(`Error fetching images for ${codeStr}:`, e);
+  }
+  
+  return { images: [] };
+}
+
 async function startServer() {
   const app = express();
   const PORT = 3000;
@@ -37,6 +122,34 @@ async function startServer() {
   // ==========================================
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
+  });
+
+  // Endpoint para hacer proxy de imágenes privadas de Vercel Blob
+  app.get("/api/proxy-image", async (req, res) => {
+    const imageUrl = req.query.url as string;
+    if (!imageUrl) return res.status(400).json({ error: "Falta la URL de la imagen" });
+    
+    try {
+      const response = await fetch(imageUrl, {
+        headers: {
+          Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`
+        }
+      });
+      
+      if (!response.ok) {
+        return res.status(response.status).send(`Error fetching image: ${response.statusText}`);
+      }
+      
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      
+      res.setHeader("Content-Type", response.headers.get("content-type") || "image/jpeg");
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      res.send(buffer);
+    } catch (error) {
+      console.error("Proxy image error:", error);
+      res.status(500).send("Internal Server Error");
+    }
   });
 
   app.post("/api/seed", async (req, res) => {
@@ -66,36 +179,19 @@ async function startServer() {
       localFiles = fs.readdirSync(publicProductsDir);
     }
 
-    const attachLocalImages = (products: any[]) => {
-      return products.map(product => {
-        if (product.gallery_urls && Array.isArray(product.gallery_urls) && product.gallery_urls.length > 0) {
+    const attachBlobImages = async (products: any[]) => {
+      return Promise.all(products.map(async (product) => {
+        const { images, mainImage } = await getProductImages(product.code, localFiles);
+        if (images.length > 0) {
+          product.local_images = images;
+          product.image_url = mainImage;
+        } else if (product.gallery_urls && Array.isArray(product.gallery_urls) && product.gallery_urls.length > 0) {
           product.local_images = product.gallery_urls;
-          return product;
-        }
-
-        const code = product.code;
-        const matchingFiles = localFiles.filter(file => {
-          const ext = path.extname(file).toLowerCase();
-          const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
-          return isImage && (file === `${code}${ext}` || file.startsWith(`${code}_`));
-        });
-
-        matchingFiles.sort((a, b) => {
-          const aName = path.basename(a, path.extname(a));
-          const bName = path.basename(b, path.extname(b));
-          if (aName === code) return -1;
-          if (bName === code) return 1;
-          return aName.localeCompare(bName);
-        });
-
-        if (matchingFiles.length > 0) {
-          product.local_images = matchingFiles.map(file => `/products/${file}`);
-          product.image_url = `/products/${matchingFiles[0]}`; // Override main image
         } else {
           product.local_images = [];
         }
         return product;
-      });
+      }));
     };
     
     // Si no hay base de datos configurada, usar el archivo JSON local como fallback
@@ -118,9 +214,10 @@ async function startServer() {
 
         const total = products.length;
         const paginatedProducts = products.slice(offset, offset + limit);
+        const productsWithImages = await attachBlobImages(paginatedProducts);
 
         return res.json({
-          data: attachLocalImages(paginatedProducts),
+          data: productsWithImages,
           pagination: {
             total,
             limit,
@@ -175,9 +272,10 @@ async function startServer() {
       
       const countResult = await db.query(countQuery, countParams);
       const total = parseInt(countResult.rows[0].count);
+      const productsWithImages = await attachBlobImages(result.rows);
 
       res.json({
-        data: attachLocalImages(result.rows),
+        data: productsWithImages,
         pagination: {
           total,
           limit,
@@ -202,29 +300,13 @@ async function startServer() {
       localFiles = fs.readdirSync(publicProductsDir);
     }
 
-    const attachLocalImages = (product: any) => {
-      if (product.gallery_urls && Array.isArray(product.gallery_urls) && product.gallery_urls.length > 0) {
+    const attachBlobImages = async (product: any) => {
+      const { images, mainImage } = await getProductImages(product.code, localFiles);
+      if (images.length > 0) {
+        product.local_images = images;
+        product.image_url = mainImage;
+      } else if (product.gallery_urls && Array.isArray(product.gallery_urls) && product.gallery_urls.length > 0) {
         product.local_images = product.gallery_urls;
-        return product;
-      }
-
-      const matchingFiles = localFiles.filter(file => {
-        const ext = path.extname(file).toLowerCase();
-        const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
-        return isImage && (file === `${code}${ext}` || file.startsWith(`${code}_`));
-      });
-
-      matchingFiles.sort((a, b) => {
-        const aName = path.basename(a, path.extname(a));
-        const bName = path.basename(b, path.extname(b));
-        if (aName === code) return -1;
-        if (bName === code) return 1;
-        return aName.localeCompare(bName);
-      });
-
-      if (matchingFiles.length > 0) {
-        product.local_images = matchingFiles.map(file => `/products/${file}`);
-        product.image_url = `/products/${matchingFiles[0]}`;
       } else {
         product.local_images = [];
       }
@@ -241,7 +323,8 @@ async function startServer() {
           return res.status(404).json({ error: "Producto no encontrado" });
         }
         
-        return res.json(attachLocalImages(product));
+        const productWithImages = await attachBlobImages(product);
+        return res.json(productWithImages);
       } catch (err) {
         return res.status(503).json({ error: "Base de datos no configurada y no se pudo cargar el catálogo local." });
       }
@@ -253,7 +336,8 @@ async function startServer() {
         return res.status(404).json({ error: "Producto no encontrado" });
       }
       
-      res.json(attachLocalImages(result.rows[0]));
+      const productWithImages = await attachBlobImages(result.rows[0]);
+      res.json(productWithImages);
     } catch (error) {
       console.error("Error fetching product:", error);
       res.status(500).json({ error: "Error interno del servidor al obtener el producto" });
@@ -264,37 +348,14 @@ async function startServer() {
   app.get("/api/product-images/:code", async (req, res) => {
     const code = req.params.code;
     const publicProductsDir = path.join(process.cwd(), 'public', 'products');
+    let localFiles: string[] = [];
     
-    try {
-      if (!fs.existsSync(publicProductsDir)) {
-        return res.json({ images: [] });
-      }
-      
-      const files = fs.readdirSync(publicProductsDir);
-      const matchingFiles = files.filter(file => {
-        const ext = path.extname(file).toLowerCase();
-        const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
-        // The file name must start with the code, followed by a dot or an underscore
-        return isImage && (file === `${code}${ext}` || file.startsWith(`${code}_`));
-      });
-
-      // Sort files to prioritize the one without extra numbers/letters (e.g., 11286.jpg before 11286_1.jpg)
-      matchingFiles.sort((a, b) => {
-        const aName = path.basename(a, path.extname(a));
-        const bName = path.basename(b, path.extname(b));
-        
-        if (aName === code) return -1;
-        if (bName === code) return 1;
-        
-        return aName.localeCompare(bName);
-      });
-
-      const imageUrls = matchingFiles.map(file => `/products/${file}`);
-      res.json({ images: imageUrls });
-    } catch (err) {
-      console.error("Error reading product images:", err);
-      res.status(500).json({ error: "Error reading images" });
+    if (fs.existsSync(publicProductsDir)) {
+      localFiles = fs.readdirSync(publicProductsDir);
     }
+    
+    const { images } = await getProductImages(code, localFiles);
+    res.json({ images });
   });
 
   // Endpoint para validar el stock del carrito
