@@ -92,7 +92,7 @@ export default function Catalog() {
                   referrerPolicy="no-referrer"
                   onError={(e) => {
                     // Fallback image if postimg placeholder fails
-                    (e.target as HTMLImageElement).src = `https://picsum.photos/seed/${product.code}/400/600`;
+                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
                   }}
                 />
                 {/* Quick Add Button */}

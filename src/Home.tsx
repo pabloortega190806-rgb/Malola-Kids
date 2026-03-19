@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ShoppingBag } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Product } from './hooks/useProducts';
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const slides = [
@@ -27,33 +31,6 @@ export default function Home() {
     }
   ];
 
-  const categories = [
-    {
-      title: "Primera postura",
-      image: "https://images.unsplash.com/photo-1522771930-78848d92d3e8?q=80&w=2070&auto=format&fit=crop"
-    },
-    {
-      title: "Bebé niña (hasta 36 meses)",
-      image: "https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?q=80&w=2069&auto=format&fit=crop"
-    },
-    {
-      title: "Bebé niño (hasta 36 meses)",
-      image: "https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=2070&auto=format&fit=crop"
-    },
-    {
-      title: "Niña",
-      image: "https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?q=80&w=1972&auto=format&fit=crop"
-    },
-    {
-      title: "Niño",
-      image: "https://images.unsplash.com/photo-1602030028438-4cf153cbae9e?q=80&w=2000&auto=format&fit=crop"
-    },
-    {
-      title: "Complementos",
-      image: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2075&auto=format&fit=crop"
-    }
-  ];
-
   const brands = [
     "Mayoral",
     "Calamaro",
@@ -65,6 +42,27 @@ export default function Home() {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch('/api/products?limit=100');
+        if (!response.ok) {
+          throw new Error('Error al cargar los productos');
+        }
+        const data = await response.json();
+        setProducts(data.data || []);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
   }, []);
 
   return (
@@ -114,32 +112,79 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Categories Grid */}
+      {/* Products Grid */}
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-serif font-bold text-[#3E2A24] mb-4">Nuestras Categorías</h2>
+          <h2 className="text-3xl font-serif font-bold text-[#3E2A24] mb-4">Todos nuestros productos</h2>
           <div className="w-24 h-1 bg-[#D9C8B4] mx-auto"></div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {categories.map((category, index) => (
-            <div key={index} className="group relative h-80 overflow-hidden rounded-lg shadow-sm cursor-pointer">
-              <img
-                src={category.image}
-                alt={category.title}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col items-center transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                <h3 className="text-xl font-serif font-semibold text-white mb-2 text-center">{category.title}</h3>
-                <button className="text-white border-b border-white pb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 text-sm">
-                  Ver Colección
-                </button>
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B89F82]"></div>
+          </div>
+        ) : error ? (
+          <div className="text-center text-red-500 py-12">{error}</div>
+        ) : products.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-xl text-[#7A5C53] mb-4">No se encontraron productos.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {products.map((product) => (
+              <div key={product.code} className="group flex flex-col bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 border border-[#F5F0EB]">
+                {/* Image Container */}
+                <div className="relative aspect-[3/4] overflow-hidden bg-[#FCFBF9]">
+                  <img
+                    src={product.image_url}
+                    alt={product.name}
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+                    }}
+                  />
+                  {/* Quick Add Button */}
+                  <button className="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm text-[#5D4037] py-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 font-medium text-sm flex items-center justify-center hover:bg-[#B89F82] hover:text-white">
+                    <ShoppingBag size={16} className="mr-2" />
+                    Añadir al carrito
+                  </button>
+                </div>
+
+                {/* Product Info */}
+                <div className="p-4 flex flex-col flex-grow">
+                  <div className="text-xs text-[#967A70] mb-1 uppercase tracking-wider">{product.category}</div>
+                  <h3 className="text-[#3E2A24] font-medium mb-1 line-clamp-2">{product.name}</h3>
+                  <p className="text-sm text-[#7A5C53] mb-3 line-clamp-1">{product.color} | {product.description}</p>
+                  
+                  <div className="mt-auto flex items-baseline space-x-2">
+                    <span className="text-lg font-bold text-[#5D4037]">{Number(product.original_price).toFixed(2)} €</span>
+                  </div>
+
+                  {/* Sizes */}
+                  <div className="mt-3 flex flex-wrap gap-1">
+                    {Object.entries(product.sizes_stock).map(([size, stock]) => {
+                      const stockNum = Number(stock);
+                      return (
+                        <span 
+                          key={size} 
+                          className={`text-[10px] px-2 py-1 border rounded-sm ${
+                            stockNum > 0 
+                              ? 'border-[#E5D9C5] text-[#7A5C53] bg-white' 
+                              : 'border-gray-100 text-gray-300 bg-gray-50 line-through'
+                          }`}
+                          title={stockNum > 0 ? `Stock: ${stockNum}` : 'Agotado'}
+                        >
+                          {size.split('(')[0].trim()}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Featured Brands */}

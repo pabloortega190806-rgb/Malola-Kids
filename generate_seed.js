@@ -139,7 +139,7 @@ for (const line of lines) {
       brand,
       category: finalCategory,
       sizes_stock: {},
-      image_url: `https://i.postimg.cc/placeholder/${code}.jpg`
+      image_url: 'https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
     });
   }
 
