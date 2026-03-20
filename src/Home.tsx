@@ -13,21 +13,21 @@ export default function Home() {
 
   const slides = [
     {
-      image: "https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=2070&auto=format&fit=crop",
+      image: "/api/get-image/imagen para portada",
       title: "Nueva Colección Infantil",
       subtitle: "Moda de 0 a 9 años en tonos blancos y beige",
       buttonText: "Ver Colección",
       link: "/categoria/Niña%204-16%20años"
     },
     {
-      image: "https://images.unsplash.com/photo-1522771930-78848d92d3e8?q=80&w=2070&auto=format&fit=crop",
+      image: "https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=2070&auto=format&fit=crop",
       title: "Primera Postura",
       subtitle: "La mayor suavidad para sus primeros días",
       buttonText: "Descubrir",
       link: "/categoria/Primera%20Postura"
     },
     {
-      image: "https://images.unsplash.com/photo-1604467794349-0b74285de7e7?q=80&w=2070&auto=format&fit=crop",
+      image: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
       title: "Marcas Exclusivas",
       subtitle: "Mayoral, Calamaro y Prim Baby",
       buttonText: "Comprar Ahora",
