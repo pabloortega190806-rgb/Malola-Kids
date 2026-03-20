@@ -230,7 +230,7 @@ async function startServer() {
   // ==========================================
   // ADMIN ROUTES
   // ==========================================
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'malola2026';
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'MALOLAKIDS2026';
   const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'malola-admin-secret-token';
 
   app.post("/api/admin/login", (req, res) => {
