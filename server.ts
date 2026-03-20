@@ -4,6 +4,7 @@ import path from "path";
 import pg from "pg";
 import fs from "fs";
 import { list } from "@vercel/blob";
+import "dotenv/config";
 
 const { Pool } = pg;
 
@@ -62,53 +63,18 @@ async function getAllBlobs() {
 
 async function getProductImages(code: string | number, localFiles: string[]): Promise<{ images: string[], mainImage?: string }> {
   const codeStr = String(code).trim();
-  try {
-    if (process.env.BLOB_READ_WRITE_TOKEN) {
-      const blobs = await getAllBlobs();
-      const matchingFiles = blobs.filter(blob => {
-        const ext = path.extname(blob.pathname).toLowerCase();
-        const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
-        const nameWithoutExt = path.basename(blob.pathname, ext);
-        const remainder = nameWithoutExt.substring(codeStr.length);
-        return isImage && nameWithoutExt.startsWith(codeStr) && (remainder === '' || /^[-_.]/.test(remainder));
-      });
-
-      matchingFiles.sort((a, b) => {
-        const aName = path.basename(a.pathname, path.extname(a.pathname));
-        const bName = path.basename(b.pathname, path.extname(b.pathname));
-        return aName.localeCompare(bName);
-      });
-
-      if (matchingFiles.length > 0) {
-        const images = matchingFiles.map(file => `/api/proxy-image?url=${encodeURIComponent(file.url)}`);
-        return { images, mainImage: images[0] };
-      }
-    }
-    
-    // Fallback to local files
-    const matchingFiles = localFiles.filter(file => {
-      const ext = path.extname(file).toLowerCase();
-      const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
-      const nameWithoutExt = path.basename(file, ext);
-      const remainder = nameWithoutExt.substring(codeStr.length);
-      return isImage && nameWithoutExt.startsWith(codeStr) && (remainder === '' || /^[-_.]/.test(remainder));
-    });
-
-    matchingFiles.sort((a, b) => {
-      const aName = path.basename(a, path.extname(a));
-      const bName = path.basename(b, path.extname(b));
-      return aName.localeCompare(bName);
-    });
-
-    if (matchingFiles.length > 0) {
-      const images = matchingFiles.map(file => `/products/${file}`);
-      return { images, mainImage: images[0] };
-    }
-  } catch (e) {
-    console.error(`Error fetching images for ${codeStr}:`, e);
+  const baseCode = codeStr.split('-')[0]; // Extract base code, e.g., '21327' from '21327-B'
+  
+  // Use the new API endpoint to resolve the correct image URL
+  const images = [
+    `/api/get-image/${codeStr}`
+  ];
+  
+  if (codeStr !== baseCode) {
+    images.push(`/api/get-image/${baseCode}`);
   }
   
-  return { images: [] };
+  return { images, mainImage: images[0] };
 }
 
 async function startServer() {
@@ -120,8 +86,80 @@ async function startServer() {
   // ==========================================
   // API ROUTES
   // ==========================================
+  
+  // Debug endpoint to check environment variables
+  app.get("/api/debug-env", (req, res) => {
+    res.json({
+      hasBlobToken: !!process.env.BLOB_READ_WRITE_TOKEN,
+      blobTokenPrefix: process.env.BLOB_READ_WRITE_TOKEN ? process.env.BLOB_READ_WRITE_TOKEN.substring(0, 15) + '...' : null,
+      hasDbUrl: !!process.env.DATABASE_URL,
+      nodeEnv: process.env.NODE_ENV
+    });
+  });
+
+  app.get("/api/debug-list/:code", async (req, res) => {
+    try {
+      const { blobs } = await list({ prefix: req.params.code });
+      res.json(blobs.map(b => b.pathname));
+    } catch (e) {
+      res.status(500).json({ error: String(e) });
+    }
+  });
+
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
+  });
+
+  // Endpoint to resolve and redirect to the correct Vercel Blob image
+  app.get("/api/get-image/:code", async (req, res) => {
+    const { code } = req.params;
+    const index = parseInt(req.query.index as string) || 0;
+    
+    try {
+      if (process.env.BLOB_READ_WRITE_TOKEN) {
+        const { blobs } = await list({ prefix: code });
+        
+        // Filter for exact match or prefix match with separator
+        const matchingBlobs = blobs.filter(blob => {
+          const ext = path.extname(blob.pathname).toLowerCase();
+          const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
+          const nameWithoutExt = path.basename(blob.pathname, ext);
+          
+          return isImage && nameWithoutExt.startsWith(code) && 
+            (nameWithoutExt.substring(code.length) === '' || /^[-_. ]/.test(nameWithoutExt.substring(code.length)));
+        });
+
+        // Sort to ensure consistent order
+        matchingBlobs.sort((a, b) => {
+          const aName = path.basename(a.pathname, path.extname(a.pathname));
+          const bName = path.basename(b.pathname, path.extname(b.pathname));
+          return aName.localeCompare(bName);
+        });
+
+        if (matchingBlobs.length > index) {
+          const blobUrl = matchingBlobs[index].url;
+          // If it's a private blob, redirect to our proxy
+          if (blobUrl.includes('.private.blob.vercel-storage.com')) {
+            return res.redirect(`/api/proxy-image?url=${encodeURIComponent(blobUrl)}`);
+          }
+          // Otherwise redirect to the actual Vercel Blob URL
+          return res.redirect(blobUrl);
+        } else if (matchingBlobs.length > 0) {
+          // Fallback to first image if index is out of bounds
+          const blobUrl = matchingBlobs[0].url;
+          if (blobUrl.includes('.private.blob.vercel-storage.com')) {
+            return res.redirect(`/api/proxy-image?url=${encodeURIComponent(blobUrl)}`);
+          }
+          return res.redirect(blobUrl);
+        }
+      }
+      
+      // Fallback if not found or no token
+      res.redirect(`https://i.postimg.cc/placeholder/${code}.jpg`);
+    } catch (error) {
+      console.error(`Error fetching image for ${code}:`, error);
+      res.redirect(`https://i.postimg.cc/placeholder/${code}.jpg`);
+    }
   });
 
   // Endpoint para hacer proxy de imágenes privadas de Vercel Blob
@@ -347,15 +385,52 @@ async function startServer() {
   // Endpoint para obtener imágenes de un producto por código
   app.get("/api/product-images/:code", async (req, res) => {
     const code = req.params.code;
-    const publicProductsDir = path.join(process.cwd(), 'public', 'products');
-    let localFiles: string[] = [];
+    const codeStr = String(code).trim();
+    const baseCode = codeStr.split('-')[0];
     
-    if (fs.existsSync(publicProductsDir)) {
-      localFiles = fs.readdirSync(publicProductsDir);
+    try {
+      if (process.env.BLOB_READ_WRITE_TOKEN) {
+        const { blobs } = await list({ prefix: codeStr });
+        
+        const matchingBlobs = blobs.filter(blob => {
+          const ext = path.extname(blob.pathname).toLowerCase();
+          const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
+          const nameWithoutExt = path.basename(blob.pathname, ext);
+          
+          return isImage && nameWithoutExt.startsWith(codeStr) && 
+            (nameWithoutExt.substring(codeStr.length) === '' || /^[-_. ]/.test(nameWithoutExt.substring(codeStr.length)));
+        });
+
+        if (matchingBlobs.length > 0) {
+          const images = matchingBlobs.map((_, index) => `/api/get-image/${codeStr}?index=${index}`);
+          return res.json({ images });
+        }
+        
+        // Try base code if no exact match
+        if (codeStr !== baseCode) {
+          const { blobs: baseBlobs } = await list({ prefix: baseCode });
+          const baseMatchingBlobs = baseBlobs.filter(blob => {
+            const ext = path.extname(blob.pathname).toLowerCase();
+            const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
+            const nameWithoutExt = path.basename(blob.pathname, ext);
+            
+            return isImage && nameWithoutExt.startsWith(baseCode) && 
+              (nameWithoutExt.substring(baseCode.length) === '' || /^[-_. ]/.test(nameWithoutExt.substring(baseCode.length)));
+          });
+          
+          if (baseMatchingBlobs.length > 0) {
+            const images = baseMatchingBlobs.map((_, index) => `/api/get-image/${baseCode}?index=${index}`);
+            return res.json({ images });
+          }
+        }
+      }
+      
+      // Fallback
+      res.json({ images: [`/api/get-image/${codeStr}`] });
+    } catch (error) {
+      console.error(`Error fetching product images for ${code}:`, error);
+      res.json({ images: [`/api/get-image/${codeStr}`] });
     }
-    
-    const { images } = await getProductImages(code, localFiles);
-    res.json({ images });
   });
 
   // Endpoint para validar el stock del carrito
