@@ -23,10 +23,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const brands = [
     { name: 'Calamaro', path: '/marca/calamaro' },
-    { name: 'Juliana', path: '/marca/juliana' },
-    { name: 'Babidu', path: '/marca/babidu' },
-    { name: 'Igor', path: '/marca/igor' },
-    { name: 'Condor', path: '/marca/condor' },
+    { name: 'Mayoral', path: '/marca/mayoral' },
+    { name: 'Prim Baby', path: '/marca/prim baby' },
   ];
 
   return (

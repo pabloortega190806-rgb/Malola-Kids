@@ -51,7 +51,7 @@ export default function Contacto() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-[#3E2A24]">Teléfono / WhatsApp</p>
-                    <p className="text-[#5D4037] mt-1">+34 600 000 000</p>
+                    <p className="text-[#5D4037] mt-1">+34 633 51 39 86</p>
                     <p className="text-xs text-[#8C7A6B] mt-1">Lunes a Viernes: 10:00 - 14:00 y 17:00 - 20:00</p>
                   </div>
                 </div>
@@ -62,8 +62,8 @@ export default function Contacto() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-[#3E2A24]">Email</p>
-                    <a href="mailto:info@malolashop.com" className="text-[#5D4037] mt-1 hover:text-[#B89F82] transition-colors">
-                      info@malolashop.com
+                    <a href="mailto:Malola.alcala@gmail.com" className="text-[#5D4037] mt-1 hover:text-[#B89F82] transition-colors">
+                      Malola.alcala@gmail.com
                     </a>
                   </div>
                 </div>
@@ -75,8 +75,8 @@ export default function Contacto() {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-[#3E2A24]">Tienda Física</p>
                     <p className="text-[#5D4037] mt-1">
-                      Calle Principal, 123<br />
-                      28000 Madrid, España
+                      Calle Moguer 15<br />
+                      41500 Alcalá de Guadaíra, Sevilla
                     </p>
                   </div>
                 </div>

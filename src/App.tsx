@@ -93,10 +93,8 @@ export default function App() {
                 </button>
                 <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-100 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left scale-95 group-hover:scale-100 z-50">
                   <Link to="/marca/calamaro" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Calamaro</Link>
-                  <Link to="/marca/juliana" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Juliana</Link>
-                  <Link to="/marca/babidu" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Babidu</Link>
-                  <Link to="/marca/igor" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Igor</Link>
-                  <Link to="/marca/condor" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Condor</Link>
+                  <Link to="/marca/mayoral" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Mayoral</Link>
+                  <Link to="/marca/prim baby" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Prim Baby</Link>
                 </div>
               </div>
             </nav>
@@ -172,7 +170,7 @@ export default function App() {
                 <li><Link to="/envios-y-devoluciones" className="hover:text-[#B89F82] transition-colors">Envíos (5,50€ o Gratis &gt; 80€)</Link></li>
                 <li><Link to="/envios-y-devoluciones" className="hover:text-[#B89F82] transition-colors">Recogida en tienda (Gratis)</Link></li>
                 <li><Link to="/envios-y-devoluciones" className="hover:text-[#B89F82] transition-colors">Opción "Acumular Pedido"</Link></li>
-                <li><Link to="/envios-y-devoluciones" className="hover:text-[#B89F82] transition-colors">Devoluciones (15 días - GLS)</Link></li>
+                <li><Link to="/envios-y-devoluciones" className="hover:text-[#B89F82] transition-colors">Devoluciones (14 días - Vale Web)</Link></li>
                 <li><Link to="/guia-de-tallas" className="hover:text-[#B89F82] transition-colors">Guía de Tallas</Link></li>
               </ul>
             </div>
@@ -183,11 +181,11 @@ export default function App() {
               <ul className="space-y-4 text-sm">
                 <li className="flex items-start">
                   <MapPin size={18} className="mr-3 text-[#B89F82] flex-shrink-0 mt-0.5" />
-                  <span>Calle Principal, 123<br />28001 Madrid, España</span>
+                  <span>Calle Moguer 15<br />41500 Alcalá de Guadaíra, Sevilla</span>
                 </li>
                 <li className="flex items-center">
                   <Mail size={18} className="mr-3 text-[#B89F82] flex-shrink-0" />
-                  <a href="mailto:info@malolashop.com" className="hover:text-[#B89F82] transition-colors">info@malolashop.com</a>
+                  <a href="mailto:Malola.alcala@gmail.com" className="hover:text-[#B89F82] transition-colors">Malola.alcala@gmail.com</a>
                 </li>
                 <li>
                   <Link to="/contacto" className="text-[#B89F82] hover:text-[#A38A6D] transition-colors font-medium">Ir a la página de contacto</Link>

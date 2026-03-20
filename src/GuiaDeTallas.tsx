@@ -124,7 +124,7 @@ export default function GuiaDeTallas() {
         <div className="bg-[#F5F0EB] p-6 rounded-lg text-center mt-8">
           <p className="font-medium text-[#3E2A24] mb-2">¿Tienes dudas con alguna talla?</p>
           <p className="text-sm">
-            Escríbenos a <a href="mailto:info@malolashop.com" className="text-[#B89F82] hover:underline">info@malolashop.com</a> o contáctanos por WhatsApp y te asesoraremos encantados.
+            Escríbenos a <a href="mailto:Malola.alcala@gmail.com" className="text-[#B89F82] hover:underline">Malola.alcala@gmail.com</a> o contáctanos por WhatsApp y te asesoraremos encantados.
           </p>
         </div>
 

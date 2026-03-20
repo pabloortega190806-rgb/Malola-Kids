@@ -24,20 +24,96 @@ export default function EnviosYDevoluciones() {
         </section>
 
         <section className="mb-12">
-          <h2 className="text-2xl font-serif font-semibold text-[#3E2A24] mb-4">Política de Devoluciones</h2>
-          <p className="mb-4">
-            Si no estás completamente satisfecho con tu compra, tienes un plazo de <strong>15 días naturales</strong> desde la recepción del pedido para realizar una devolución.
+          <h2 className="text-3xl font-serif font-bold text-[#3E2A24] mb-6">Políticas de Devoluciones y Reembolsos</h2>
+          <p className="mb-8">
+            En <strong>Malola</strong>, nos esforzamos por garantizar la satisfacción de nuestros clientes y ofrecer una experiencia de compra positiva. A continuación, detallamos nuestras políticas de devoluciones y reembolsos:
           </p>
-          <h3 className="text-xl font-semibold text-[#3E2A24] mt-6 mb-3">Condiciones para la devolución:</h3>
-          <ul className="list-disc pl-6 space-y-2 mb-6">
-            <li>Las prendas deben estar en perfecto estado, sin usar, sin lavar y con todas sus etiquetas originales.</li>
-            <li>No se admiten devoluciones de ropa interior, baño o complementos por motivos de higiene.</li>
-            <li>Los gastos de envío de la devolución corren a cargo del cliente, salvo en caso de tara o defecto de fábrica.</li>
-          </ul>
+
+          <h3 className="text-2xl font-serif font-semibold text-[#3E2A24] mt-8 mb-4">1. Devoluciones por cambio de opinión (Derecho de Desistimiento)</h3>
           
-          <h3 className="text-xl font-semibold text-[#3E2A24] mt-6 mb-3">¿Cómo realizar una devolución?</h3>
-          <p className="mb-4">
-            Para procesar una devolución, por favor contáctanos a través de nuestro correo electrónico <a href="mailto:info@malolashop.com" className="text-[#B89F82] hover:underline">info@malolashop.com</a> indicando tu número de pedido y los artículos que deseas devolver. Te facilitaremos las instrucciones detalladas para enviar el paquete a través de GLS o la agencia de tu preferencia.
+          <ul className="list-disc pl-6 space-y-4 mb-8">
+            <li>
+              <strong>Plazo:</strong> Dispones de <strong>14 días naturales</strong> para realizar la devolución desde la fecha de recepción del producto.
+            </li>
+            <li>
+              <strong>Condiciones:</strong>
+              <ul className="list-[circle] pl-6 mt-2 space-y-2">
+                <li>La prenda debe estar en perfecto estado, no haber sido usada, lavada y conservar su etiqueta original y embalaje.</li>
+                <li>Por motivos de higiene, no se aceptan devoluciones de ropa interior ni artículos de baño.</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Método de Reembolso:</strong>
+              <ul className="list-[circle] pl-6 mt-2 space-y-2">
+                <li>Las devoluciones se realizarán mediante un <strong>Vale Web</strong> con un código para futuras compras online.</li>
+                <li><strong>No se realizan reembolsos en dinero efectivo</strong> bajo ninguna circunstancia.</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Gastos de envío:</strong>
+              <ul className="list-[circle] pl-6 mt-2 space-y-2">
+                <li>Los gastos de envío del retorno corren siempre a cargo del cliente.</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Procedimiento:</strong>
+              <ul className="list-[circle] pl-6 mt-2 space-y-2">
+                <li>
+                  Puedes enviarlo por tu cuenta a la siguiente dirección o entregar en horario comercial:<br />
+                  <strong>Calle Moguer 15, 41500 Alcalá de Guadaíra, Sevilla</strong>
+                </li>
+                <li>Por favor, incluye dentro del paquete una copia del pedido o tus datos de contacto (Nombre y Teléfono).</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Vale web:</strong>
+              <ul className="list-[circle] pl-6 mt-2 space-y-2">
+                <li>Una vez recibamos y verifiquemos la prenda, nos pondremos en contacto contigo.</li>
+                <li>Se emitirá un código de Vale Web válido por <strong>1 mes y medio</strong> (45 días) para gastar en nuestra web.</li>
+              </ul>
+            </li>
+          </ul>
+
+          <h3 className="text-2xl font-serif font-semibold text-[#3E2A24] mt-10 mb-4">2. Devoluciones por productos defectuosos o tara</h3>
+          
+          <ul className="list-disc pl-6 space-y-4 mb-8">
+            <li>
+              <strong>Cobertura:</strong> Si el artículo presenta una tara o defecto de fábrica, nos hacemos cargo de los gastos de envío asociados a la devolución.
+            </li>
+            <li>
+              <strong>Procedimiento:</strong>
+              <ul className="list-[circle] pl-6 mt-2 space-y-2">
+                <li>
+                  Contacta con nosotros a través de nuestro correo electrónico: <strong><a href="mailto:Malola.alcala@gmail.com" className="text-[#B89F82] hover:underline">Malola.alcala@gmail.com</a></strong>, indicando el problema y adjuntando imágenes del defecto.
+                </li>
+                <li>Recibirás instrucciones específicas para realizar la devolución sin coste para ti.</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Vale web:</strong>
+              <ul className="list-[circle] pl-6 mt-2 space-y-2">
+                <li>Una vez verificado el defecto, emitiremos un <strong>Vale Web</strong> con validez de <strong>1 mes y medio</strong> (45 días), que podrás usar en cualquier nuevo pedido en nuestra tienda.</li>
+                <li>No realizamos reembolsos en efectivo.</li>
+              </ul>
+            </li>
+          </ul>
+
+          <div className="bg-[#F5F0EB] p-6 rounded-xl border border-[#E5D9C5] mt-10 mb-8">
+            <h3 className="text-xl font-serif font-semibold text-[#3E2A24] mb-4">Puntos importantes a tener en cuenta</h3>
+            <ul className="list-disc pl-6 space-y-3 text-[#5D4037]">
+              <li>No se realizarán reembolsos en dinero bajo ninguna circunstancia. El método de compensación es siempre un Vale Web.</li>
+              <li>Todas las devoluciones por cambio de opinión (talla, color, no te gusta) corren con gastos de envío a cargo del cliente.</li>
+              <li>Los Vales Web, ya sea por cambio de opinión o por producto defectuoso, tendrán una validez de <strong>1 mes y medio</strong>.</li>
+              <li>Traemos novedades frecuentemente, por lo que siempre encontrarás algo que te guste para canjear tu vale.</li>
+            </ul>
+          </div>
+
+          <p className="mb-6">
+            Si tienes alguna duda o necesitas más información, nuestro equipo de atención al cliente estará encantado de ayudarte. Escríbenos a: <strong><a href="mailto:Malola.alcala@gmail.com" className="text-[#B89F82] hover:underline">Malola.alcala@gmail.com</a></strong>
+          </p>
+
+          <p className="text-lg font-medium text-[#3E2A24]">
+            ❤️ ¡Gracias por tu comprensión y confianza en <strong>Malola</strong>!
           </p>
         </section>
 
