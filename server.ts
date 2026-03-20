@@ -61,6 +61,108 @@ async function getAllBlobs() {
   }
 }
 
+async function findSimilarProductCodes(code: string): Promise<string[]> {
+  const db = getDbPool();
+  try {
+    if (db) {
+      const productResult = await db.query('SELECT name FROM products WHERE code = $1', [code]);
+      if (productResult.rows.length > 0) {
+        const productName = productResult.rows[0].name;
+        const similarProductsResult = await db.query('SELECT code FROM products WHERE name = $1 AND code != $2', [productName, code]);
+        return similarProductsResult.rows.map(r => r.code);
+      }
+    } else {
+      const productsData = fs.readFileSync(path.join(process.cwd(), 'products.json'), 'utf8');
+      const products = JSON.parse(productsData);
+      const product = products.find((p: any) => p.code === code);
+      if (product) {
+        return products.filter((p: any) => p.name === product.name && p.code !== code).map((p: any) => p.code);
+      }
+    }
+  } catch (err) {
+    console.error("Error finding similar products:", err);
+  }
+  return [];
+}
+
+async function findBlobsForCode(code: string): Promise<{ blobs: any[], matchedVariation: string }> {
+  const codeStr = String(code).trim();
+  const baseCode = codeStr.split(/[-_]/)[0];
+  
+  const variations = Array.from(new Set([
+    codeStr,
+    codeStr.replace(/-/g, '_'),
+    codeStr.replace(/_/g, '-')
+  ]));
+
+  const allBlobs = await getAllBlobs();
+
+  for (const variation of variations) {
+    const matchingBlobs = allBlobs.filter(blob => {
+      const ext = path.extname(blob.pathname).toLowerCase();
+      const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
+      const nameWithoutExt = path.basename(blob.pathname, ext);
+      return isImage && nameWithoutExt.startsWith(variation) && 
+        (nameWithoutExt.substring(variation.length) === '' || /^[-_. ]/.test(nameWithoutExt.substring(variation.length)));
+    });
+    if (matchingBlobs.length > 0) {
+      return { blobs: matchingBlobs, matchedVariation: variation };
+    }
+  }
+
+  if (codeStr !== baseCode) {
+    const matchingBlobs = allBlobs.filter(blob => {
+      const ext = path.extname(blob.pathname).toLowerCase();
+      const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
+      const nameWithoutExt = path.basename(blob.pathname, ext);
+      return isImage && nameWithoutExt.startsWith(baseCode) && 
+        (nameWithoutExt.substring(baseCode.length) === '' || /^[^0-9]/.test(nameWithoutExt.substring(baseCode.length)));
+    });
+    if (matchingBlobs.length > 0) {
+      return { blobs: matchingBlobs, matchedVariation: baseCode };
+    }
+  }
+
+  // Fallback to similar products by name
+  const similarCodes = await findSimilarProductCodes(codeStr);
+  for (const similarCode of similarCodes) {
+    const similarBaseCode = similarCode.split(/[-_]/)[0];
+    const similarVariations = Array.from(new Set([
+      similarCode,
+      similarCode.replace(/-/g, '_'),
+      similarCode.replace(/_/g, '-')
+    ]));
+
+    for (const variation of similarVariations) {
+      const matchingBlobs = allBlobs.filter(blob => {
+        const ext = path.extname(blob.pathname).toLowerCase();
+        const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
+        const nameWithoutExt = path.basename(blob.pathname, ext);
+        return isImage && nameWithoutExt.startsWith(variation) && 
+          (nameWithoutExt.substring(variation.length) === '' || /^[-_. ]/.test(nameWithoutExt.substring(variation.length)));
+      });
+      if (matchingBlobs.length > 0) {
+        return { blobs: matchingBlobs, matchedVariation: variation };
+      }
+    }
+    
+    if (similarCode !== similarBaseCode) {
+      const matchingBlobs = allBlobs.filter(blob => {
+        const ext = path.extname(blob.pathname).toLowerCase();
+        const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
+        const nameWithoutExt = path.basename(blob.pathname, ext);
+        return isImage && nameWithoutExt.startsWith(similarBaseCode) && 
+          (nameWithoutExt.substring(similarBaseCode.length) === '' || /^[^0-9]/.test(nameWithoutExt.substring(similarBaseCode.length)));
+      });
+      if (matchingBlobs.length > 0) {
+        return { blobs: matchingBlobs, matchedVariation: similarBaseCode };
+      }
+    }
+  }
+
+  return { blobs: [], matchedVariation: codeStr };
+}
+
 async function getProductImages(code: string | number, localFiles: string[]): Promise<{ images: string[], mainImage?: string }> {
   const codeStr = String(code).trim();
   const baseCode = codeStr.split('-')[0]; // Extract base code, e.g., '21327' from '21327-B'
@@ -117,17 +219,7 @@ async function startServer() {
     
     try {
       if (process.env.BLOB_READ_WRITE_TOKEN) {
-        const { blobs } = await list({ prefix: code });
-        
-        // Filter for exact match or prefix match with separator
-        const matchingBlobs = blobs.filter(blob => {
-          const ext = path.extname(blob.pathname).toLowerCase();
-          const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
-          const nameWithoutExt = path.basename(blob.pathname, ext);
-          
-          return isImage && nameWithoutExt.startsWith(code) && 
-            (nameWithoutExt.substring(code.length) === '' || /^[-_. ]/.test(nameWithoutExt.substring(code.length)));
-        });
+        const { blobs: matchingBlobs } = await findBlobsForCode(code);
 
         // Sort to ensure consistent order
         matchingBlobs.sort((a, b) => {
@@ -386,42 +478,14 @@ async function startServer() {
   app.get("/api/product-images/:code", async (req, res) => {
     const code = req.params.code;
     const codeStr = String(code).trim();
-    const baseCode = codeStr.split('-')[0];
     
     try {
       if (process.env.BLOB_READ_WRITE_TOKEN) {
-        const { blobs } = await list({ prefix: codeStr });
-        
-        const matchingBlobs = blobs.filter(blob => {
-          const ext = path.extname(blob.pathname).toLowerCase();
-          const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
-          const nameWithoutExt = path.basename(blob.pathname, ext);
-          
-          return isImage && nameWithoutExt.startsWith(codeStr) && 
-            (nameWithoutExt.substring(codeStr.length) === '' || /^[-_. ]/.test(nameWithoutExt.substring(codeStr.length)));
-        });
+        const { blobs: matchingBlobs, matchedVariation } = await findBlobsForCode(code);
 
         if (matchingBlobs.length > 0) {
-          const images = matchingBlobs.map((_, index) => `/api/get-image/${codeStr}?index=${index}`);
+          const images = matchingBlobs.map((_, index) => `/api/get-image/${matchedVariation}?index=${index}`);
           return res.json({ images });
-        }
-        
-        // Try base code if no exact match
-        if (codeStr !== baseCode) {
-          const { blobs: baseBlobs } = await list({ prefix: baseCode });
-          const baseMatchingBlobs = baseBlobs.filter(blob => {
-            const ext = path.extname(blob.pathname).toLowerCase();
-            const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
-            const nameWithoutExt = path.basename(blob.pathname, ext);
-            
-            return isImage && nameWithoutExt.startsWith(baseCode) && 
-              (nameWithoutExt.substring(baseCode.length) === '' || /^[-_. ]/.test(nameWithoutExt.substring(baseCode.length)));
-          });
-          
-          if (baseMatchingBlobs.length > 0) {
-            const images = baseMatchingBlobs.map((_, index) => `/api/get-image/${baseCode}?index=${index}`);
-            return res.json({ images });
-          }
         }
       }
       
