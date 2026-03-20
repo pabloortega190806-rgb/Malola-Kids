@@ -11,6 +11,27 @@ const { Pool } = pg;
 // Lazy initialization para la conexión a la base de datos
 let pool: pg.Pool | null = null;
 
+async function initDb() {
+  const db = getDbPool();
+  if (!db) return;
+  try {
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS page_views (
+        id SERIAL PRIMARY KEY,
+        path VARCHAR(255) NOT NULL,
+        user_agent TEXT,
+        referrer TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_page_views_created_at ON page_views(created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_page_views_path ON page_views(path);
+    `);
+    console.log("Database tables initialized successfully.");
+  } catch (err) {
+    console.error("Error initializing database tables:", err);
+  }
+}
+
 function getDbPool() {
   if (!pool) {
     const connectionString = process.env.DATABASE_URL;
@@ -184,6 +205,145 @@ async function startServer() {
   const PORT = 3000;
 
   app.use(express.json());
+
+  // Initialize DB tables
+  await initDb();
+
+  // Analytics tracking endpoint
+  app.post("/api/track-view", (req, res) => {
+    const db = getDbPool();
+    if (db) {
+      const { path } = req.body;
+      const userAgent = req.headers['user-agent'] || '';
+      const referrer = req.headers['referer'] || '';
+      
+      if (path) {
+        db.query(
+          'INSERT INTO page_views (path, user_agent, referrer) VALUES ($1, $2, $3)',
+          [path, userAgent, referrer]
+        ).catch(err => console.error("Error tracking page view:", err));
+      }
+    }
+    res.json({ success: true });
+  });
+
+  // ==========================================
+  // ADMIN ROUTES
+  // ==========================================
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'malola2026';
+  const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'malola-admin-secret-token';
+
+  app.post("/api/admin/login", (req, res) => {
+    const { password } = req.body;
+    if (password === ADMIN_PASSWORD) {
+      res.json({ success: true, token: ADMIN_TOKEN });
+    } else {
+      res.status(401).json({ success: false, error: "Contraseña incorrecta" });
+    }
+  });
+
+  // Middleware to check admin token
+  const requireAdmin = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const authHeader = req.headers.authorization;
+    if (authHeader === `Bearer ${ADMIN_TOKEN}`) {
+      next();
+    } else {
+      res.status(401).json({ success: false, error: "No autorizado" });
+    }
+  };
+
+  app.put("/api/products/:code", requireAdmin, async (req, res) => {
+    const db = getDbPool();
+    if (!db) return res.status(503).json({ error: "DB not configured" });
+    
+    const { code } = req.params;
+    const { name, description, color, original_price, discounted_price, brand, category, sizes_stock } = req.body;
+    
+    try {
+      const query = `
+        UPDATE products 
+        SET 
+          name = COALESCE($1, name),
+          description = COALESCE($2, description),
+          color = COALESCE($3, color),
+          original_price = COALESCE($4, original_price),
+          discounted_price = COALESCE($5, discounted_price),
+          brand = COALESCE($6, brand),
+          category = COALESCE($7, category),
+          sizes_stock = COALESCE($8, sizes_stock),
+          updated_at = CURRENT_TIMESTAMP
+        WHERE code = $9
+        RETURNING *
+      `;
+      
+      const values = [
+        name, 
+        description, 
+        color, 
+        original_price, 
+        discounted_price, 
+        brand, 
+        category, 
+        sizes_stock ? JSON.stringify(sizes_stock) : null,
+        code
+      ];
+      
+      const result = await db.query(query, values);
+      
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Producto no encontrado" });
+      }
+      
+      res.json({ success: true, product: result.rows[0] });
+    } catch (err: any) {
+      console.error("Error updating product:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get("/api/admin/analytics", requireAdmin, async (req, res) => {
+    const db = getDbPool();
+    if (!db) return res.status(503).json({ error: "DB not configured" });
+
+    try {
+      // Get views by day for the last 7 days
+      const viewsByDayResult = await db.query(`
+        SELECT 
+          TO_CHAR(DATE_TRUNC('day', created_at), 'YYYY-MM-DD') as date,
+          COUNT(*) as views
+        FROM page_views
+        WHERE created_at > CURRENT_DATE - INTERVAL '7 days'
+        GROUP BY DATE_TRUNC('day', created_at)
+        ORDER BY date ASC
+      `);
+
+      // Get top pages
+      const topPagesResult = await db.query(`
+        SELECT path, COUNT(*) as views
+        FROM page_views
+        GROUP BY path
+        ORDER BY views DESC
+        LIMIT 10
+      `);
+
+      // Get total views
+      const totalViewsResult = await db.query(`
+        SELECT COUNT(*) as total FROM page_views
+      `);
+
+      res.json({
+        success: true,
+        data: {
+          viewsByDay: viewsByDayResult.rows.map(r => ({ date: r.date, views: parseInt(r.views) })),
+          topPages: topPagesResult.rows.map(r => ({ path: r.path, views: parseInt(r.views) })),
+          totalViews: parseInt(totalViewsResult.rows[0].total)
+        }
+      });
+    } catch (err: any) {
+      console.error("Error fetching analytics:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
 
   // ==========================================
   // API ROUTES

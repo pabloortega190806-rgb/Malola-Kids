@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
-import { ChevronDown, Search, ShoppingBag, Menu, Instagram, MapPin, Mail, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
+import { ChevronDown, Search, ShoppingBag, Menu, Instagram, MapPin, Mail, X, User } from 'lucide-react';
 import Home from './Home';
 import AvisoLegal from './AvisoLegal';
 import PoliticaPrivacidad from './PoliticaPrivacidad';
@@ -20,6 +20,22 @@ import TerminosYCondiciones from './TerminosYCondiciones';
 import Contacto from './Contacto';
 import SearchPage from './SearchPage';
 import ScrollToTop from './components/ScrollToTop';
+import AdminDashboard from './AdminDashboard';
+
+function PageTracker() {
+  const location = useLocation();
+
+  useEffect(() => {
+    // Track page view on route change
+    fetch('/api/track-view', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path: location.pathname })
+    }).catch(err => console.error("Error tracking view:", err));
+  }, [location]);
+
+  return null;
+}
 
 export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -28,6 +44,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#FCFBF9] font-sans text-[#5D4037]">
       <ScrollToTop />
+      <PageTracker />
       {/* Top Banner */}
       <div className="bg-[#D9C8B4] text-[#3E2A24] text-center py-2 text-sm font-medium tracking-wide px-4">
         Envíos 5,50€ | Gratis a partir de 80€ | Recogida en tienda y opción "Acumular" GRATIS
@@ -101,6 +118,9 @@ export default function App() {
 
             {/* Icons */}
             <div className="flex items-center space-x-4">
+              <Link to="/admin" className="text-[#967A70] hover:text-[#B89F82] transition-colors" title="Acceso Propietaria">
+                <User size={20} />
+              </Link>
               <Link to="/buscar" className="text-[#967A70] hover:text-[#B89F82] transition-colors">
                 <Search size={20} />
               </Link>
@@ -138,6 +158,7 @@ export default function App() {
           <Route path="/categoria/:categoryName" element={<Catalog />} />
           <Route path="/producto/:code" element={<ProductDetails />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
       </main>
 
@@ -229,6 +250,7 @@ export default function App() {
               <Link to="/politica-cookies" className="hover:text-[#B89F82] transition-colors">Política de Cookies</Link>
               <Link to="/terminos-y-condiciones" className="hover:text-[#B89F82] transition-colors">Términos y Condiciones</Link>
               <Link to="/aviso-legal" className="hover:text-[#B89F82] transition-colors">Aviso Legal</Link>
+              <Link to="/admin" className="hover:text-[#B89F82] transition-colors font-medium">Acceso Propietaria</Link>
             </div>
           </div>
         </div>

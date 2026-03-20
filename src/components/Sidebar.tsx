@@ -110,6 +110,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     Contacto
                   </Link>
                 </li>
+                <li>
+                  <Link to="/admin" onClick={onClose} className="block py-2 text-[#7A5C53] hover:text-[#B89F82] transition-colors font-medium">
+                    Acceso Propietaria
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>

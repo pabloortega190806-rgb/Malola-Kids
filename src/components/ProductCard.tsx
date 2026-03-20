@@ -2,10 +2,16 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Product } from '../hooks/useProducts';
 import { useCart } from '../context/CartContext';
+import { useAdmin } from '../context/AdminContext';
+import { EditProductModal } from './EditProductModal';
+import { Edit } from 'lucide-react';
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product: initialProduct }: { product: Product }) {
+  const [product, setProduct] = useState(initialProduct);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { addItem } = useCart();
+  const { isAdmin } = useAdmin();
 
   const originalPrice = Number(product.original_price);
   const discountedPrice = Number(product.discounted_price);
@@ -103,8 +109,31 @@ export function ProductCard({ product }: { product: Product }) {
           >
             {selectedSize ? 'Añadir al carrito' : 'Selecciona una talla'}
           </button>
+          
+          {isAdmin && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsEditModalOpen(true);
+              }}
+              className="mt-2 w-full py-2 px-4 rounded-md font-medium transition-colors text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 flex items-center justify-center"
+            >
+              <Edit size={16} className="mr-2" />
+              Editar Producto
+            </button>
+          )}
         </div>
       </div>
+
+      {isAdmin && (
+        <EditProductModal
+          product={product}
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={(updatedProduct) => setProduct(updatedProduct)}
+        />
+      )}
     </Link>
   );
 }

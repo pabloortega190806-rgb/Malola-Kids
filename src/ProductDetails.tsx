@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Edit } from 'lucide-react';
 import { Product } from './hooks/useProducts';
 import { useCart } from './context/CartContext';
+import { useAdmin } from './context/AdminContext';
+import { EditProductModal } from './components/EditProductModal';
 
 export default function ProductDetails() {
   const { code } = useParams<{ code: string }>();
   const navigate = useNavigate();
   const { addItem } = useCart();
+  const { isAdmin } = useAdmin();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   
   const [product, setProduct] = useState<Product | null>(null);
   const [images, setImages] = useState<string[]>([]);
@@ -211,6 +215,16 @@ export default function ProductDetails() {
             {selectedSize ? 'Añadir al carrito' : 'Selecciona una talla'}
           </button>
 
+          {isAdmin && (
+            <button
+              onClick={() => setIsEditModalOpen(true)}
+              className="mt-4 w-full py-4 px-8 rounded-md font-medium transition-all text-lg bg-gray-100 text-gray-700 hover:bg-gray-200 flex items-center justify-center"
+            >
+              <Edit size={20} className="mr-2" />
+              Editar Producto
+            </button>
+          )}
+
           <div className="mt-12 prose prose-sm text-gray-500">
             <h3 className="text-gray-900 font-medium">Detalles del producto</h3>
             <p className="mt-2">
@@ -222,6 +236,15 @@ export default function ProductDetails() {
           </div>
         </div>
       </div>
+
+      {isAdmin && product && (
+        <EditProductModal
+          product={product}
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={(updatedProduct) => setProduct(updatedProduct)}
+        />
+      )}
     </div>
   );
 }
