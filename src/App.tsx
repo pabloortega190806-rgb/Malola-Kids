@@ -13,6 +13,13 @@ import { Analytics } from '@vercel/analytics/react';
 import { useCart } from './context/CartContext';
 import { CartDrawer } from './components/CartDrawer';
 import Checkout from './Checkout';
+import { Sidebar } from './components/Sidebar';
+import EnviosYDevoluciones from './EnviosYDevoluciones';
+import GuiaDeTallas from './GuiaDeTallas';
+import TerminosYCondiciones from './TerminosYCondiciones';
+import Contacto from './Contacto';
+import SearchPage from './SearchPage';
+import ScrollToTop from './components/ScrollToTop';
 
 export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -20,6 +27,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#FCFBF9] font-sans text-[#5D4037]">
+      <ScrollToTop />
       {/* Top Banner */}
       <div className="bg-[#D9C8B4] text-[#3E2A24] text-center py-2 text-sm font-medium tracking-wide px-4">
         Envíos 5,50€ | Gratis a partir de 80€ | Recogida en tienda y opción "Acumular" GRATIS
@@ -32,10 +40,10 @@ export default function App() {
             {/* Mobile Menu Button */}
             <div className="flex items-center lg:hidden">
               <button 
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                onClick={() => setIsMobileMenuOpen(true)}
                 className="text-[#967A70] hover:text-[#B89F82] transition-colors"
               >
-                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                <Menu size={24} />
               </button>
             </div>
 
@@ -54,7 +62,6 @@ export default function App() {
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex space-x-6">
               <Link to="/" className="text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">Inicio</Link>
-              <a href="#" className="text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">Primera Postura</a>
               
               {/* Dropdown Bebés */}
               <div className="relative group">
@@ -62,8 +69,8 @@ export default function App() {
                   Bebés <ChevronDown size={16} className="ml-1" />
                 </button>
                 <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-100 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left scale-95 group-hover:scale-100 z-50">
-                  <a href="#" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niña (hasta 36 meses)</a>
-                  <a href="#" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niño (hasta 36 meses)</a>
+                  <Link to="/categoria/Bebe%20niña%200-4%20años" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niña (hasta 4 años)</Link>
+                  <Link to="/categoria/Bebe%20niño%200-4%20años" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niño (hasta 4 años)</Link>
                 </div>
               </div>
 
@@ -73,20 +80,32 @@ export default function App() {
                   Infantil <ChevronDown size={16} className="ml-1" />
                 </button>
                 <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-100 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left scale-95 group-hover:scale-100 z-50">
-                  <a href="#" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niña</a>
-                  <a href="#" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niño</a>
+                  <Link to="/categoria/Niña%204-16%20años" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niña</Link>
+                  <Link to="/categoria/Niño%204-16%20años" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niño</Link>
                 </div>
               </div>
               
-              <a href="#" className="text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">Complementos</a>
-              <a href="#" className="text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">Marcas</a>
+              <Link to="/categoria/Complementos" className="text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">Complementos</Link>
+              {/* Dropdown Marcas */}
+              <div className="relative group">
+                <button className="flex items-center text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">
+                  Marcas <ChevronDown size={16} className="ml-1" />
+                </button>
+                <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-100 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left scale-95 group-hover:scale-100 z-50">
+                  <Link to="/marca/calamaro" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Calamaro</Link>
+                  <Link to="/marca/juliana" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Juliana</Link>
+                  <Link to="/marca/babidu" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Babidu</Link>
+                  <Link to="/marca/igor" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Igor</Link>
+                  <Link to="/marca/condor" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Condor</Link>
+                </div>
+              </div>
             </nav>
 
             {/* Icons */}
             <div className="flex items-center space-x-4">
-              <button className="text-[#967A70] hover:text-[#B89F82] transition-colors">
+              <Link to="/buscar" className="text-[#967A70] hover:text-[#B89F82] transition-colors">
                 <Search size={20} />
-              </button>
+              </Link>
               <button 
                 className="text-[#967A70] hover:text-[#B89F82] transition-colors relative"
                 onClick={() => setIsCartOpen(true)}
@@ -102,21 +121,8 @@ export default function App() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="lg:hidden bg-white border-t border-gray-100 absolute w-full left-0 shadow-lg">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              <Link to="/" className="block px-3 py-2 text-base font-medium text-[#5D4037] hover:text-[#B89F82] hover:bg-[#FCFBF9] rounded-md">Inicio</Link>
-              <a href="#" className="block px-3 py-2 text-base font-medium text-[#5D4037] hover:text-[#B89F82] hover:bg-[#FCFBF9] rounded-md">Primera Postura</a>
-              <a href="#" className="block px-3 py-2 text-base font-medium text-[#5D4037] hover:text-[#B89F82] hover:bg-[#FCFBF9] rounded-md">Bebé Niña (hasta 36 meses)</a>
-              <a href="#" className="block px-3 py-2 text-base font-medium text-[#5D4037] hover:text-[#B89F82] hover:bg-[#FCFBF9] rounded-md">Bebé Niño (hasta 36 meses)</a>
-              <a href="#" className="block px-3 py-2 text-base font-medium text-[#5D4037] hover:text-[#B89F82] hover:bg-[#FCFBF9] rounded-md">Niña</a>
-              <a href="#" className="block px-3 py-2 text-base font-medium text-[#5D4037] hover:text-[#B89F82] hover:bg-[#FCFBF9] rounded-md">Niño</a>
-              <a href="#" className="block px-3 py-2 text-base font-medium text-[#5D4037] hover:text-[#B89F82] hover:bg-[#FCFBF9] rounded-md">Complementos</a>
-              <a href="#" className="block px-3 py-2 text-base font-medium text-[#5D4037] hover:text-[#B89F82] hover:bg-[#FCFBF9] rounded-md">Marcas</a>
-            </div>
-          </div>
-        )}
+        {/* Sidebar Menu */}
+        <Sidebar isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
       </header>
 
       <main>
@@ -125,7 +131,13 @@ export default function App() {
           <Route path="/aviso-legal" element={<AvisoLegal />} />
           <Route path="/politica-privacidad" element={<PoliticaPrivacidad />} />
           <Route path="/politica-cookies" element={<PoliticaCookies />} />
+          <Route path="/envios-y-devoluciones" element={<EnviosYDevoluciones />} />
+          <Route path="/guia-de-tallas" element={<GuiaDeTallas />} />
+          <Route path="/terminos-y-condiciones" element={<TerminosYCondiciones />} />
+          <Route path="/contacto" element={<Contacto />} />
+          <Route path="/buscar" element={<SearchPage />} />
           <Route path="/marca/:brandName" element={<Catalog />} />
+          <Route path="/categoria/:categoryName" element={<Catalog />} />
           <Route path="/producto/:code" element={<ProductDetails />} />
           <Route path="/checkout" element={<Checkout />} />
         </Routes>
@@ -147,7 +159,7 @@ export default function App() {
                 Especialistas en moda infantil de 0 a 9 años. Colecciones cuidadosamente seleccionadas en tonos blancos y beige para los más pequeños de la casa.
               </p>
               <div className="flex space-x-4">
-                <a href="#" className="text-[#A38A6D] hover:text-[#B89F82] transition-colors">
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-[#A38A6D] hover:text-[#B89F82] transition-colors">
                   <Instagram size={20} />
                 </a>
               </div>
@@ -157,11 +169,11 @@ export default function App() {
             <div>
               <h4 className="text-lg font-serif font-semibold text-[#3E2A24] mb-6">Atención al Cliente</h4>
               <ul className="space-y-3 text-sm">
-                <li><a href="#" className="hover:text-[#B89F82] transition-colors">Envíos (5,50€ o Gratis &gt; 80€)</a></li>
-                <li><a href="#" className="hover:text-[#B89F82] transition-colors">Recogida en tienda (Gratis)</a></li>
-                <li><a href="#" className="hover:text-[#B89F82] transition-colors">Opción "Acumular Pedido"</a></li>
-                <li><a href="#" className="hover:text-[#B89F82] transition-colors">Devoluciones (15 días - GLS)</a></li>
-                <li><a href="#" className="hover:text-[#B89F82] transition-colors">Guía de Tallas</a></li>
+                <li><Link to="/envios-y-devoluciones" className="hover:text-[#B89F82] transition-colors">Envíos (5,50€ o Gratis &gt; 80€)</Link></li>
+                <li><Link to="/envios-y-devoluciones" className="hover:text-[#B89F82] transition-colors">Recogida en tienda (Gratis)</Link></li>
+                <li><Link to="/envios-y-devoluciones" className="hover:text-[#B89F82] transition-colors">Opción "Acumular Pedido"</Link></li>
+                <li><Link to="/envios-y-devoluciones" className="hover:text-[#B89F82] transition-colors">Devoluciones (15 días - GLS)</Link></li>
+                <li><Link to="/guia-de-tallas" className="hover:text-[#B89F82] transition-colors">Guía de Tallas</Link></li>
               </ul>
             </div>
 
@@ -177,6 +189,9 @@ export default function App() {
                   <Mail size={18} className="mr-3 text-[#B89F82] flex-shrink-0" />
                   <a href="mailto:info@malolashop.com" className="hover:text-[#B89F82] transition-colors">info@malolashop.com</a>
                 </li>
+                <li>
+                  <Link to="/contacto" className="text-[#B89F82] hover:text-[#A38A6D] transition-colors font-medium">Ir a la página de contacto</Link>
+                </li>
               </ul>
             </div>
 
@@ -184,7 +199,14 @@ export default function App() {
             <div>
               <h4 className="text-lg font-serif font-semibold text-[#3E2A24] mb-6">Newsletter</h4>
               <p className="text-sm mb-4">Suscríbete para recibir novedades y ofertas exclusivas.</p>
-              <form className="flex flex-col space-y-3">
+              <form 
+                className="flex flex-col space-y-3"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  alert('¡Gracias por suscribirte a nuestra newsletter!');
+                  (e.target as HTMLFormElement).reset();
+                }}
+              >
                 <input 
                   type="email" 
                   placeholder="Tu correo electrónico" 
@@ -207,7 +229,7 @@ export default function App() {
             <div className="flex flex-wrap gap-4 mt-4 md:mt-0 justify-center md:justify-end">
               <Link to="/politica-privacidad" className="hover:text-[#B89F82] transition-colors">Política de Privacidad</Link>
               <Link to="/politica-cookies" className="hover:text-[#B89F82] transition-colors">Política de Cookies</Link>
-              <a href="#" className="hover:text-[#B89F82] transition-colors">Términos y Condiciones</a>
+              <Link to="/terminos-y-condiciones" className="hover:text-[#B89F82] transition-colors">Términos y Condiciones</Link>
               <Link to="/aviso-legal" className="hover:text-[#B89F82] transition-colors">Aviso Legal</Link>
             </div>
           </div>

@@ -16,19 +16,22 @@ export default function Home() {
       image: "https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=2070&auto=format&fit=crop",
       title: "Nueva Colección Infantil",
       subtitle: "Moda de 0 a 9 años en tonos blancos y beige",
-      buttonText: "Ver Colección"
+      buttonText: "Ver Colección",
+      link: "/categoria/Niña%204-16%20años"
     },
     {
       image: "https://images.unsplash.com/photo-1522771930-78848d92d3e8?q=80&w=2070&auto=format&fit=crop",
       title: "Primera Postura",
       subtitle: "La mayor suavidad para sus primeros días",
-      buttonText: "Descubrir"
+      buttonText: "Descubrir",
+      link: "/categoria/Primera%20Postura"
     },
     {
       image: "https://images.unsplash.com/photo-1604467794349-0b74285de7e7?q=80&w=2070&auto=format&fit=crop",
       title: "Marcas Exclusivas",
       subtitle: "Mayoral, Calamaro y Prim Baby",
-      buttonText: "Comprar Ahora"
+      buttonText: "Comprar Ahora",
+      link: "/marca/calamaro"
     }
   ];
 
@@ -98,7 +101,10 @@ export default function Home() {
               <p className="text-lg md:text-xl text-white mb-8 max-w-2xl drop-shadow-md">
                 {slide.subtitle}
               </p>
-              <button className="bg-white text-[#B89F82] px-8 py-3 rounded-full font-semibold hover:bg-[#F5F0EB] transition-colors duration-300 shadow-lg flex items-center group">
+              <button 
+                onClick={() => navigate(slide.link)}
+                className="bg-white text-[#B89F82] px-8 py-3 rounded-full font-semibold hover:bg-[#F5F0EB] transition-colors duration-300 shadow-lg flex items-center group"
+              >
                 {slide.buttonText}
                 <ArrowRight size={18} className="ml-2 transform group-hover:translate-x-1 transition-transform" />
               </button>

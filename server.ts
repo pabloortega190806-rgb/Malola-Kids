@@ -299,6 +299,29 @@ async function startServer() {
     }
   });
 
+  // Endpoint para obtener todas las categorías únicas
+  app.get("/api/categories", async (req, res) => {
+    const db = getDbPool();
+    if (!db) {
+      try {
+        const productsData = fs.readFileSync(path.join(process.cwd(), 'products.json'), 'utf8');
+        const products = JSON.parse(productsData);
+        const categories = [...new Set(products.map((p: any) => p.category).filter(Boolean))];
+        return res.json(categories);
+      } catch (err) {
+        return res.status(503).json({ error: "Base de datos no configurada y no se pudo cargar el catálogo local." });
+      }
+    }
+
+    try {
+      const result = await db.query('SELECT DISTINCT category FROM products WHERE category IS NOT NULL ORDER BY category');
+      res.json(result.rows.map(row => row.category));
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+      res.status(500).json({ error: "Error al obtener las categorías" });
+    }
+  });
+
   // Endpoint para obtener el catálogo de productos de forma eficiente
   app.get("/api/products", async (req, res) => {
     const db = getDbPool();
@@ -334,12 +357,20 @@ async function startServer() {
         const offset = parseInt(req.query.offset as string) || 0;
         const category = req.query.category as string;
         const brand = req.query.brand as string;
+        const search = req.query.search as string;
 
         if (category) {
           products = products.filter((p: any) => p.category === category);
         }
         if (brand) {
           products = products.filter((p: any) => p.brand.toLowerCase().includes(brand.toLowerCase()));
+        }
+        if (search) {
+          products = products.filter((p: any) => 
+            p.name.toLowerCase().includes(search.toLowerCase()) || 
+            p.code.toLowerCase().includes(search.toLowerCase()) ||
+            (p.brand && p.brand.toLowerCase().includes(search.toLowerCase()))
+          );
         }
 
         const total = products.length;
@@ -367,6 +398,7 @@ async function startServer() {
       const offset = parseInt(req.query.offset as string) || 0;
       const category = req.query.category as string;
       const brand = req.query.brand as string;
+      const search = req.query.search as string;
 
       let query = 'SELECT * FROM products';
       const params: any[] = [];
@@ -380,6 +412,11 @@ async function startServer() {
       if (brand) {
         params.push(brand);
         conditions.push(`brand ILIKE $${params.length}`);
+      }
+
+      if (search) {
+        params.push(`%${search}%`);
+        conditions.push(`(name ILIKE $${params.length} OR code ILIKE $${params.length} OR brand ILIKE $${params.length})`);
       }
 
       if (conditions.length > 0) {

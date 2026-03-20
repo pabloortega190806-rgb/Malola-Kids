@@ -5,10 +5,11 @@ import { Product } from './hooks/useProducts';
 import { ProductCard } from './components/ProductCard';
 
 export default function Catalog() {
-  const { brandName } = useParams<{ brandName: string }>();
+  const { brandName, categoryName } = useParams<{ brandName?: string, categoryName?: string }>();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<string>('Novedades');
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -18,6 +19,9 @@ export default function Catalog() {
         let url = '/api/products?limit=100';
         if (brandName) {
           url += `&brand=${encodeURIComponent(brandName)}`;
+        }
+        if (categoryName) {
+          url += `&category=${encodeURIComponent(categoryName)}`;
         }
         
         const response = await fetch(url);
@@ -41,18 +45,32 @@ export default function Catalog() {
     };
 
     fetchProducts();
-  }, [brandName]);
+  }, [brandName, categoryName]);
 
-  const displayBrand = brandName ? brandName.charAt(0).toUpperCase() + brandName.slice(1) : 'Catálogo';
+  const sortedProducts = [...products].sort((a, b) => {
+    if (sortBy === 'Precio: Menor a Mayor') {
+      return parseFloat(a.discounted_price || a.original_price) - parseFloat(b.discounted_price || b.original_price);
+    } else if (sortBy === 'Precio: Mayor a Menor') {
+      return parseFloat(b.discounted_price || b.original_price) - parseFloat(a.discounted_price || a.original_price);
+    }
+    // Default: Novedades (assuming newer products have higher IDs or are fetched first, we can just return 0 or sort by created_at if available)
+    return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+  });
+
+  const displayTitle = brandName 
+    ? brandName.charAt(0).toUpperCase() + brandName.slice(1) 
+    : categoryName 
+      ? categoryName.charAt(0).toUpperCase() + categoryName.slice(1)
+      : 'Catálogo';
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-serif font-bold text-[#3E2A24] mb-4">{displayBrand}</h1>
+        <h1 className="text-4xl font-serif font-bold text-[#3E2A24] mb-4">{displayTitle}</h1>
         <div className="w-24 h-1 bg-[#D9C8B4] mx-auto mb-6"></div>
         <p className="text-[#7A5C53] max-w-2xl mx-auto">
-          Descubre nuestra selección exclusiva de {displayBrand}. Moda infantil diseñada con mimo y los mejores materiales para los más pequeños.
+          Descubre nuestra selección exclusiva de {displayTitle}. Moda infantil diseñada con mimo y los mejores materiales para los más pequeños.
         </p>
       </div>
 
@@ -65,10 +83,14 @@ export default function Catalog() {
         <div className="flex items-center space-x-4 text-sm">
           <span className="text-[#967A70]">{products.length} productos</span>
           <div className="relative">
-            <select className="appearance-none bg-transparent border border-[#E5D9C5] text-[#5D4037] py-2 pl-4 pr-10 rounded-md focus:outline-none focus:border-[#B89F82] cursor-pointer">
-              <option>Novedades</option>
-              <option>Precio: Menor a Mayor</option>
-              <option>Precio: Mayor a Menor</option>
+            <select 
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="appearance-none bg-transparent border border-[#E5D9C5] text-[#5D4037] py-2 pl-4 pr-10 rounded-md focus:outline-none focus:border-[#B89F82] cursor-pointer"
+            >
+              <option value="Novedades">Novedades</option>
+              <option value="Precio: Menor a Mayor">Precio: Menor a Mayor</option>
+              <option value="Precio: Mayor a Menor">Precio: Mayor a Menor</option>
             </select>
             <ChevronDown size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#967A70] pointer-events-none" />
           </div>
@@ -95,14 +117,14 @@ export default function Catalog() {
             </div>
           </div>
         </div>
-      ) : products.length === 0 ? (
+      ) : sortedProducts.length === 0 ? (
         <div className="text-center py-20">
-          <p className="text-xl text-[#7A5C53] mb-4">No se encontraron productos para {displayBrand}.</p>
+          <p className="text-xl text-[#7A5C53] mb-4">No se encontraron productos para {displayTitle}.</p>
           <Link to="/" className="text-[#B89F82] hover:underline font-medium">Volver a inicio</Link>
         </div>
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-          {products.map((product) => (
+          {sortedProducts.map((product) => (
             <ProductCard key={product.code} product={product} />
           ))}
         </div>

@@ -18,12 +18,13 @@ export interface Product {
 interface UseProductsOptions {
   category?: string;
   brand?: string;
+  search?: string;
   limit?: number;
   offset?: number;
 }
 
 export function useProducts(options: UseProductsOptions = {}) {
-  const { category, brand, limit = 50, offset = 0 } = options;
+  const { category, brand, search, limit = 50, offset = 0 } = options;
   
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,6 +43,7 @@ export function useProducts(options: UseProductsOptions = {}) {
         params.append('offset', offset.toString());
         if (category) params.append('category', category);
         if (brand) params.append('brand', brand);
+        if (search) params.append('search', search);
         
         const res = await fetch(`/api/products?${params.toString()}`);
         
@@ -68,7 +70,7 @@ export function useProducts(options: UseProductsOptions = {}) {
     }
 
     fetchProducts();
-  }, [category, brand, limit, offset]);
+  }, [category, brand, search, limit, offset]);
 
   return { products, loading, error, hasMore, total };
 }
