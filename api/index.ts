@@ -2,10 +2,18 @@ import express from "express";
 import pg from "pg";
 import fs from "fs";
 import path from "path";
-import { list } from "@vercel/blob";
+import { v2 as cloudinary } from "cloudinary";
+import multer from "multer";
 import "dotenv/config";
 
 const { Pool } = pg;
+
+// Configurar Cloudinary
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME || "daom5jnck",
+  api_key: process.env.CLOUDINARY_API_KEY || "159654824825549",
+  api_secret: process.env.CLOUDINARY_API_SECRET || "mqrpVaFqzeYW9HnprvElLH39dNg",
+});
 
 // Lazy initialization para la conexión a la base de datos
 let pool: pg.Pool | null = null;
@@ -27,36 +35,50 @@ function getDbPool() {
   return pool;
 }
 
-let blobCache: any[] = [];
-let blobCacheTime = 0;
+let imageCache: any[] = [];
+let imageCacheTime = 0;
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-async function getAllBlobs() {
-  if (Date.now() - blobCacheTime < CACHE_TTL && blobCache.length > 0) {
-    return blobCache;
+async function getAllCloudinaryImages() {
+  if (Date.now() - imageCacheTime < CACHE_TTL && imageCache.length > 0) {
+    return imageCache;
   }
-  if (!process.env.BLOB_READ_WRITE_TOKEN) return [];
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME || "daom5jnck";
+  if (!cloudName) return [];
   
   try {
-    let cursor;
-    let allBlobs: any[] = [];
-    do {
-      const result = await list({
-        token: process.env.BLOB_READ_WRITE_TOKEN,
-        cursor,
-        limit: 1000,
-      });
-      allBlobs.push(...result.blobs);
-      cursor = result.cursor;
-    } while (cursor);
+    let allResources: any[] = [];
+    let nextCursor = null;
     
-    blobCache = allBlobs;
-    blobCacheTime = Date.now();
-    console.log(`[Blob Cache] Loaded ${allBlobs.length} blobs from Vercel.`);
-    return allBlobs;
+    do {
+      const result: any = await cloudinary.api.resources({
+        type: 'upload',
+        max_results: 500,
+        next_cursor: nextCursor
+      });
+      
+      allResources.push(...result.resources);
+      nextCursor = result.next_cursor;
+    } while (nextCursor);
+    
+    // Mapear al formato que usábamos con Vercel Blob para minimizar cambios
+    imageCache = allResources.map(res => {
+      // Extraer solo el nombre del archivo sin las carpetas
+      const filename = res.public_id.split('/').pop();
+      // Eliminar el sufijo aleatorio de 6 caracteres que añade Cloudinary (ej: _cwojeb)
+      const cleanFilename = filename.replace(/_[a-z0-9]{6}$/i, '');
+      return {
+        pathname: cleanFilename + '.' + (res.format || 'jpg'),
+        url: res.secure_url
+      };
+    });
+    
+    imageCacheTime = Date.now();
+    console.log(`[Cloudinary Cache] Loaded ${allResources.length} images.`);
+    return imageCache;
   } catch (error) {
-    console.error("[Blob Cache] Error fetching blobs:", error);
-    return blobCache;
+    console.error("[Cloudinary Cache] Error fetching images:", error);
+    return imageCache;
   }
 }
 
@@ -86,15 +108,49 @@ async function findSimilarProductCodes(code: string): Promise<string[]> {
 
 async function findBlobsForCode(code: string): Promise<{ blobs: any[], matchedVariation: string }> {
   const codeStr = String(code).trim();
-  const baseCode = codeStr.split(/[-_]/)[0];
+  
+  // Clean the code if it already has the prefix
+  let cleanCodeStr = codeStr;
+  if (cleanCodeStr.startsWith('26-') || cleanCodeStr.startsWith('26_')) {
+    cleanCodeStr = cleanCodeStr.substring(3);
+  }
+
+  const baseCode = cleanCodeStr.split(/[-_]/)[0];
   
   const variations = Array.from(new Set([
-    codeStr,
-    codeStr.replace(/-/g, '_'),
-    codeStr.replace(/_/g, '-')
+    `26-${cleanCodeStr}`,
+    `26_${cleanCodeStr}`,
+    cleanCodeStr,
+    cleanCodeStr.replace(/-/g, '_'),
+    cleanCodeStr.replace(/_/g, '-')
   ]));
 
-  const allBlobs = await getAllBlobs();
+  // Mayoral specific variations
+  // e.g., 1643.76 -> 26-01643-076
+  if (cleanCodeStr.includes('.')) {
+    const parts = cleanCodeStr.split('.');
+    if (parts.length === 2) {
+      const part1 = parts[0].padStart(5, '0');
+      const part2 = parts[1].padStart(3, '0');
+      variations.push(`26-${part1}-${part2}`);
+      variations.push(`26_${part1}_${part2}`);
+    } else if (parts.length === 3) {
+      const part1 = (parts[0] + parts[1]).padStart(5, '0');
+      const part2 = parts[2].padStart(3, '0');
+      variations.push(`26-${part1}-${part2}`);
+      variations.push(`26_${part1}_${part2}`);
+    }
+  } else if (cleanCodeStr.includes('-')) {
+    const parts = cleanCodeStr.split('-');
+    if (parts.length === 2) {
+      const part1 = parts[0].padStart(5, '0');
+      const part2 = parts[1].padStart(3, '0');
+      variations.push(`26-${part1}-${part2}`);
+      variations.push(`26_${part1}_${part2}`);
+    }
+  }
+
+  const allBlobs = await getAllCloudinaryImages();
 
   for (const variation of variations) {
     const matchingBlobs = allBlobs.filter(blob => {
@@ -109,27 +165,42 @@ async function findBlobsForCode(code: string): Promise<{ blobs: any[], matchedVa
     }
   }
 
-  if (codeStr !== baseCode) {
-    const matchingBlobs = allBlobs.filter(blob => {
-      const ext = path.extname(blob.pathname).toLowerCase();
-      const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
-      const nameWithoutExt = path.basename(blob.pathname, ext);
-      return isImage && nameWithoutExt.startsWith(baseCode) && 
-        (nameWithoutExt.substring(baseCode.length) === '' || /^[^0-9]/.test(nameWithoutExt.substring(baseCode.length)));
-    });
-    if (matchingBlobs.length > 0) {
-      return { blobs: matchingBlobs, matchedVariation: baseCode };
+  if (cleanCodeStr !== baseCode) {
+    const baseVariations = Array.from(new Set([
+      `26-${baseCode}`,
+      `26_${baseCode}`,
+      baseCode
+    ]));
+
+    for (const variation of baseVariations) {
+      const matchingBlobs = allBlobs.filter(blob => {
+        const ext = path.extname(blob.pathname).toLowerCase();
+        const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
+        const nameWithoutExt = path.basename(blob.pathname, ext);
+        return isImage && nameWithoutExt.startsWith(variation) && 
+          (nameWithoutExt.substring(variation.length) === '' || /^[^0-9]/.test(nameWithoutExt.substring(variation.length)));
+      });
+      if (matchingBlobs.length > 0) {
+        return { blobs: matchingBlobs, matchedVariation: variation };
+      }
     }
   }
 
   // Fallback to similar products by name
-  const similarCodes = await findSimilarProductCodes(codeStr);
+  const similarCodes = await findSimilarProductCodes(cleanCodeStr);
   for (const similarCode of similarCodes) {
-    const similarBaseCode = similarCode.split(/[-_]/)[0];
+    let cleanSimilarCode = similarCode;
+    if (cleanSimilarCode.startsWith('26-') || cleanSimilarCode.startsWith('26_')) {
+      cleanSimilarCode = cleanSimilarCode.substring(3);
+    }
+    const similarBaseCode = cleanSimilarCode.split(/[-_]/)[0];
+    
     const similarVariations = Array.from(new Set([
-      similarCode,
-      similarCode.replace(/-/g, '_'),
-      similarCode.replace(/_/g, '-')
+      `26-${cleanSimilarCode}`,
+      `26_${cleanSimilarCode}`,
+      cleanSimilarCode,
+      cleanSimilarCode.replace(/-/g, '_'),
+      cleanSimilarCode.replace(/_/g, '-')
     ]));
 
     for (const variation of similarVariations) {
@@ -145,16 +216,24 @@ async function findBlobsForCode(code: string): Promise<{ blobs: any[], matchedVa
       }
     }
     
-    if (similarCode !== similarBaseCode) {
-      const matchingBlobs = allBlobs.filter(blob => {
-        const ext = path.extname(blob.pathname).toLowerCase();
-        const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
-        const nameWithoutExt = path.basename(blob.pathname, ext);
-        return isImage && nameWithoutExt.startsWith(similarBaseCode) && 
-          (nameWithoutExt.substring(similarBaseCode.length) === '' || /^[^0-9]/.test(nameWithoutExt.substring(similarBaseCode.length)));
-      });
-      if (matchingBlobs.length > 0) {
-        return { blobs: matchingBlobs, matchedVariation: similarBaseCode };
+    if (cleanSimilarCode !== similarBaseCode) {
+      const similarBaseVariations = Array.from(new Set([
+        `26-${similarBaseCode}`,
+        `26_${similarBaseCode}`,
+        similarBaseCode
+      ]));
+      
+      for (const variation of similarBaseVariations) {
+        const matchingBlobs = allBlobs.filter(blob => {
+          const ext = path.extname(blob.pathname).toLowerCase();
+          const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
+          const nameWithoutExt = path.basename(blob.pathname, ext);
+          return isImage && nameWithoutExt.startsWith(variation) && 
+            (nameWithoutExt.substring(variation.length) === '' || /^[^0-9]/.test(nameWithoutExt.substring(variation.length)));
+        });
+        if (matchingBlobs.length > 0) {
+          return { blobs: matchingBlobs, matchedVariation: variation };
+        }
       }
     }
   }
@@ -164,14 +243,42 @@ async function findBlobsForCode(code: string): Promise<{ blobs: any[], matchedVa
 
 async function getProductImages(code: string | number, localFiles: string[]): Promise<{ images: string[], mainImage?: string }> {
   const codeStr = String(code).trim();
-  const baseCode = codeStr.split('-')[0]; // Extract base code, e.g., '21327' from '21327-B'
+  
+  try {
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME || "daom5jnck";
+    if (cloudName) {
+      const { blobs: matchingBlobs, matchedVariation } = await findBlobsForCode(codeStr);
+
+      if (matchingBlobs.length > 0) {
+        // Sort to ensure consistent order
+        matchingBlobs.sort((a, b) => {
+          const aName = path.basename(a.pathname, path.extname(a.pathname));
+          const bName = path.basename(b.pathname, path.extname(b.pathname));
+          return aName.localeCompare(bName);
+        });
+
+        const images = matchingBlobs.map((_, index) => `/api/get-image/${matchedVariation}?index=${index}`);
+        return { images, mainImage: images[0] };
+      }
+    }
+  } catch (error) {
+    console.error(`Error fetching product images for ${code}:`, error);
+  }
+
+  // Clean the code if it already has the prefix
+  let cleanCodeStr = codeStr;
+  if (cleanCodeStr.startsWith('26-') || cleanCodeStr.startsWith('26_')) {
+    cleanCodeStr = cleanCodeStr.substring(3);
+  }
+
+  const baseCode = cleanCodeStr.split('-')[0]; // Extract base code, e.g., '21327' from '21327-B'
   
   // Use the new API endpoint to resolve the correct image URL
   const images = [
-    `/api/get-image/${codeStr}`
+    `/api/get-image/${cleanCodeStr}`
   ];
   
-  if (codeStr !== baseCode) {
+  if (cleanCodeStr !== baseCode) {
     images.push(`/api/get-image/${baseCode}`);
   }
   
@@ -207,7 +314,14 @@ const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'malola-admin-secret-token';
 
 app.post("/api/admin/login", (req, res) => {
   const { password } = req.body;
-  if (password === ADMIN_PASSWORD) {
+  
+  const providedPassword = (password || "").trim().toUpperCase();
+  const expectedPassword = "MALOLAKIDS2026";
+  
+  // Also accept whatever is in the environment variable just in case
+  const envPassword = (process.env.ADMIN_PASSWORD || "").trim().toUpperCase();
+  
+  if (providedPassword === expectedPassword || (envPassword && providedPassword === envPassword)) {
     res.json({ success: true, token: ADMIN_TOKEN });
   } else {
     res.status(401).json({ success: false, error: "Contraseña incorrecta" });
@@ -223,6 +337,51 @@ const requireAdmin = (req: express.Request, res: express.Response, next: express
     res.status(401).json({ success: false, error: "No autorizado" });
   }
 };
+
+const upload = multer({ storage: multer.memoryStorage() });
+
+app.post("/api/admin/upload-image", requireAdmin, upload.single("image"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: "No se proporcionó ninguna imagen" });
+    }
+
+    // Convertir el buffer a base64 para Cloudinary
+    const b64 = Buffer.from(req.file.buffer).toString("base64");
+    const dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+
+    let publicId = undefined;
+    if (req.body.code) {
+      let codeStr = String(req.body.code).trim();
+      if (codeStr.startsWith('26-') || codeStr.startsWith('26_')) {
+        codeStr = codeStr.substring(3);
+      }
+      publicId = `26-${codeStr}`;
+    }
+
+    const result = await cloudinary.uploader.upload(dataURI, {
+      folder: "malola_catalog",
+      resource_type: "image",
+      fetch_format: "auto",
+      quality: "auto",
+      // Si se proporciona un código de producto, usarlo como public_id con el prefijo 26-
+      public_id: publicId,
+      overwrite: true
+    });
+
+    // Invalidate cache
+    imageCacheTime = 0;
+
+    res.json({
+      success: true,
+      url: result.secure_url,
+      public_id: result.public_id
+    });
+  } catch (error: any) {
+    console.error("Error uploading image to Cloudinary:", error);
+    res.status(500).json({ success: false, error: error.message || "Error al subir la imagen" });
+  }
+});
 
 app.put("/api/products/:code", requireAdmin, async (req, res) => {
   const db = getDbPool();
@@ -324,10 +483,11 @@ app.get("/api/admin/analytics", requireAdmin, async (req, res) => {
 // Debug endpoint to check environment variables
 app.get("/api/debug-env", (req, res) => {
   res.json({
-    hasBlobToken: !!process.env.BLOB_READ_WRITE_TOKEN,
-    blobTokenPrefix: process.env.BLOB_READ_WRITE_TOKEN ? process.env.BLOB_READ_WRITE_TOKEN.substring(0, 15) + '...' : null,
+    hasCloudinary: !!process.env.CLOUDINARY_CLOUD_NAME,
+    cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
     hasDbUrl: !!process.env.DATABASE_URL,
-    nodeEnv: process.env.NODE_ENV
+    nodeEnv: process.env.NODE_ENV,
+    adminPassword: process.env.ADMIN_PASSWORD || 'MALOLAKIDS2026'
   });
 });
 
@@ -335,13 +495,27 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-// Endpoint to resolve and redirect to the correct Vercel Blob image
+app.get("/api/debug/images", async (req, res) => {
+  try {
+    const blobs = await getAllCloudinaryImages();
+    res.json({ 
+      count: blobs.length, 
+      sample: blobs,
+      cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME || "daom5jnck"
+    });
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Endpoint to resolve and redirect to the correct Cloudinary image
 app.get("/api/get-image/:code", async (req, res) => {
   const { code } = req.params;
   const index = parseInt(req.query.index as string) || 0;
   
   try {
-    if (process.env.BLOB_READ_WRITE_TOKEN) {
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME || "daom5jnck";
+    if (cloudName) {
       const { blobs: matchingBlobs } = await findBlobsForCode(code);
 
       // Sort to ensure consistent order
@@ -352,20 +526,10 @@ app.get("/api/get-image/:code", async (req, res) => {
       });
 
       if (matchingBlobs.length > index) {
-        const blobUrl = matchingBlobs[index].url;
-        // If it's a private blob, redirect to our proxy
-        if (blobUrl.includes('.private.blob.vercel-storage.com')) {
-          return res.redirect(`/api/proxy-image?url=${encodeURIComponent(blobUrl)}`);
-        }
-        // Otherwise redirect to the actual Vercel Blob URL
-        return res.redirect(blobUrl);
+        return res.redirect(matchingBlobs[index].url);
       } else if (matchingBlobs.length > 0) {
         // Fallback to first image if index is out of bounds
-        const blobUrl = matchingBlobs[0].url;
-        if (blobUrl.includes('.private.blob.vercel-storage.com')) {
-          return res.redirect(`/api/proxy-image?url=${encodeURIComponent(blobUrl)}`);
-        }
-        return res.redirect(blobUrl);
+        return res.redirect(matchingBlobs[0].url);
       }
     }
     
@@ -377,33 +541,7 @@ app.get("/api/get-image/:code", async (req, res) => {
   }
 });
 
-// Endpoint para hacer proxy de imágenes privadas de Vercel Blob
-app.get("/api/proxy-image", async (req, res) => {
-  const imageUrl = req.query.url as string;
-  if (!imageUrl) return res.status(400).json({ error: "Falta la URL de la imagen" });
-  
-  try {
-    const response = await fetch(imageUrl, {
-      headers: {
-        Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`
-      }
-    });
-    
-    if (!response.ok) {
-      return res.status(response.status).send(`Error fetching image: ${response.statusText}`);
-    }
-    
-    const arrayBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    
-    res.setHeader("Content-Type", response.headers.get("content-type") || "image/jpeg");
-    res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
-    res.send(buffer);
-  } catch (error) {
-    console.error("Proxy image error:", error);
-    res.status(500).send("Internal Server Error");
-  }
-});
+// Endpoint removed as Cloudinary URLs are public
 
 app.post("/api/seed", async (req, res) => {
   const db = getDbPool();
@@ -419,6 +557,32 @@ app.post("/api/seed", async (req, res) => {
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/categories", async (req, res) => {
+  const db = getDbPool();
+  if (!db) {
+    try {
+      const fs = await import("fs");
+      const path = await import("path");
+      const productsData = fs.readFileSync(path.join(process.cwd(), 'products.json'), 'utf8');
+      const products = JSON.parse(productsData);
+      const categories = Array.from(new Set(products.map((p: any) => p.category))).filter(Boolean);
+      return res.json(categories);
+    } catch (err) {
+      console.error("Error reading fallback products.json for categories:", err);
+      return res.status(500).json({ error: "Error interno del servidor" });
+    }
+  }
+
+  try {
+    const result = await db.query('SELECT DISTINCT category FROM products WHERE category IS NOT NULL ORDER BY category');
+    const categories = result.rows.map(row => row.category);
+    res.json(categories);
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    res.status(500).json({ error: "Error interno del servidor al obtener categorías" });
   }
 });
 
@@ -455,12 +619,28 @@ app.get("/api/products", async (req, res) => {
       const offset = parseInt(req.query.offset as string) || 0;
       const category = req.query.category as string;
       const brand = req.query.brand as string;
+      const gender = req.query.gender as string;
+      const age = req.query.age as string;
+      const search = req.query.search as string;
 
       if (category) {
         products = products.filter((p: any) => p.category === category);
       }
       if (brand) {
         products = products.filter((p: any) => p.brand.toLowerCase().includes(brand.toLowerCase()));
+      }
+      if (gender) {
+        products = products.filter((p: any) => p.category.toLowerCase().includes(gender.toLowerCase()));
+      }
+      if (age) {
+        products = products.filter((p: any) => p.category.toLowerCase().includes(age.toLowerCase()));
+      }
+      if (search) {
+        const keywords = search.toLowerCase().trim().split(/\s+/).filter(k => k.length > 0);
+        products = products.filter((p: any) => {
+          const searchableText = `${p.code} ${p.name} ${p.description || ''} ${p.brand || ''} ${p.category || ''} ${p.color || ''} ${JSON.stringify(p.sizes_stock || {})}`.toLowerCase();
+          return keywords.every(kw => searchableText.includes(kw));
+        });
       }
 
       const total = products.length;
@@ -487,6 +667,9 @@ app.get("/api/products", async (req, res) => {
     const offset = parseInt(req.query.offset as string) || 0;
     const category = req.query.category as string;
     const brand = req.query.brand as string;
+    const gender = req.query.gender as string;
+    const age = req.query.age as string;
+    const search = req.query.search as string;
 
     let query = 'SELECT * FROM products';
     const params: any[] = [];
@@ -500,6 +683,32 @@ app.get("/api/products", async (req, res) => {
     if (brand) {
       params.push(brand);
       conditions.push(`brand ILIKE $${params.length}`);
+    }
+
+    if (gender) {
+      params.push(`%${gender}%`);
+      conditions.push(`category ILIKE $${params.length}`);
+    }
+
+    if (age) {
+      params.push(`%${age}%`);
+      conditions.push(`category ILIKE $${params.length}`);
+    }
+
+    if (search) {
+      const keywords = search.trim().split(/\s+/).filter(k => k.length > 0);
+      keywords.forEach(kw => {
+        params.push(`%${kw}%`);
+        conditions.push(`(
+          code ILIKE $${params.length} OR 
+          name ILIKE $${params.length} OR 
+          description ILIKE $${params.length} OR 
+          brand ILIKE $${params.length} OR 
+          category ILIKE $${params.length} OR 
+          color ILIKE $${params.length} OR
+          sizes_stock::text ILIKE $${params.length}
+        )`);
+      });
     }
 
     if (conditions.length > 0) {
@@ -595,7 +804,8 @@ app.get("/api/product-images/:code", async (req, res) => {
   const code = req.params.code;
   const codeStr = String(code).trim();
   try {
-    if (process.env.BLOB_READ_WRITE_TOKEN) {
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME || "daom5jnck";
+    if (cloudName) {
       const { blobs: matchingBlobs, matchedVariation } = await findBlobsForCode(code);
 
       if (matchingBlobs.length > 0) {

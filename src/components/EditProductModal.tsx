@@ -24,12 +24,23 @@ export function EditProductModal({ product, isOpen, onClose, onSave }: EditProdu
   const [sizesStock, setSizesStock] = useState<Record<string, number>>({ ...product.sizes_stock });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(product.image_url || null);
 
   if (!isOpen) return null;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
   };
 
   const handleStockChange = (size: string, value: string) => {
@@ -45,6 +56,31 @@ export function EditProductModal({ product, isOpen, onClose, onSave }: EditProdu
     setError('');
 
     try {
+      let finalImageUrl = product.image_url;
+
+      if (imageFile) {
+        setUploadingImage(true);
+        const formDataUpload = new FormData();
+        formDataUpload.append('image', imageFile);
+        formDataUpload.append('code', product.code);
+
+        const uploadRes = await fetch('/api/admin/upload-image', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formDataUpload
+        });
+
+        const uploadData = await uploadRes.json();
+        if (uploadData.success) {
+          finalImageUrl = uploadData.url;
+        } else {
+          throw new Error(uploadData.error || 'Error al subir la imagen');
+        }
+        setUploadingImage(false);
+      }
+
       const res = await fetch(`/api/products/${product.code}`, {
         method: 'PUT',
         headers: {
@@ -55,19 +91,21 @@ export function EditProductModal({ product, isOpen, onClose, onSave }: EditProdu
           ...formData,
           original_price: Number(formData.original_price),
           discounted_price: Number(formData.discounted_price),
-          sizes_stock: sizesStock
+          sizes_stock: sizesStock,
+          image_url: finalImageUrl
         })
       });
 
       const data = await res.json();
       if (data.success) {
-        onSave(data.product);
+        onSave({ ...data.product, image_url: finalImageUrl });
         onClose();
       } else {
         setError(data.error || 'Error al actualizar el producto');
       }
-    } catch (err) {
-      setError('Error de conexión');
+    } catch (err: any) {
+      setError(err.message || 'Error de conexión');
+      setUploadingImage(false);
     } finally {
       setLoading(false);
     }
@@ -87,6 +125,21 @@ export function EditProductModal({ product, isOpen, onClose, onSave }: EditProdu
           {error && <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">{error}</div>}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Imagen del Producto</label>
+              <div className="flex items-center space-x-4">
+                {imagePreview && (
+                  <img src={imagePreview} alt="Preview" className="w-20 h-20 object-cover rounded-md border border-gray-200" />
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#F5F0EB] file:text-[#5D4037] hover:file:bg-[#E5D9C5]"
+                />
+              </div>
+            </div>
+
             <div className="col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
               <input

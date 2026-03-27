@@ -1,44 +1,95 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Product } from './hooks/useProducts';
-import { ProductCard } from './components/ProductCard';
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const slides = [
     {
-      image: "/api/get-image/imagen para portada",
+      image: "https://i.postimg.cc/hG8VP0ZJ/21327-B-1.jpg",
       title: "Nueva Colección Infantil",
-      subtitle: "Moda de 0 a 9 años en tonos blancos y beige",
+      subtitle: "Moda de 0 a 9 años en tonos alegres y divertidos",
       buttonText: "Ver Colección",
-      link: "/categoria/Niña%204-16%20años"
+      link: "/categoria/Niña%20(3-9%20años)",
+      position: "object-[center_30%]"
     },
     {
-      image: "https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=2070&auto=format&fit=crop",
+      image: "https://i.postimg.cc/fLwm301w/22109-1.jpg",
       title: "Primera Postura",
       subtitle: "La mayor suavidad para sus primeros días",
       buttonText: "Descubrir",
-      link: "/categoria/Primera%20Postura"
+      link: "/categoria/Bebé%20Niña%20(0-4%20años)",
+      position: "object-[center_40%]"
     },
     {
-      image: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+      image: "https://i.postimg.cc/ZqP6KLsB/32548-1.jpg",
+      title: "Aventuras al Aire Libre",
+      subtitle: "Conjuntos cómodos y frescos para jugar",
+      buttonText: "Explorar",
+      link: "/edad/3-9",
+      position: "object-[center_30%]"
+    },
+    {
+      image: "https://i.postimg.cc/NMgmyrZs/11313-N-1.jpg",
       title: "Marcas Exclusivas",
       subtitle: "Mayoral, Calamaro y Prim Baby",
       buttonText: "Comprar Ahora",
-      link: "/marca/calamaro"
+      link: "/marca/calamaro",
+      position: "object-[center_25%]"
     }
   ];
 
-  const brands = [
-    "Mayoral",
-    "Calamaro",
-    "Prim Baby"
+  const genderCategories = [
+    {
+      title: "Niña",
+      image: "https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?q=80&w=800&auto=format&fit=crop",
+      link: "/genero/niña"
+    },
+    {
+      title: "Niño",
+      image: "https://images.unsplash.com/photo-1503919545889-aef636e10ad4?q=80&w=800&auto=format&fit=crop",
+      link: "/genero/niño"
+    },
+    {
+      title: "Bebé",
+      image: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=800&auto=format&fit=crop",
+      link: "/genero/bebé"
+    }
+  ];
+
+  const ageCategories = [
+    {
+      title: "0 a 4 años",
+      subtitle: "Primera infancia",
+      image: "https://images.unsplash.com/photo-1522771930-78848d9293e8?q=80&w=1000&auto=format&fit=crop",
+      link: "/edad/0-4"
+    },
+    {
+      title: "3 a 9 años",
+      subtitle: "Infantil",
+      image: "https://images.unsplash.com/photo-1514090458221-65bb69cf63e6?q=80&w=1000&auto=format&fit=crop",
+      link: "/edad/3-9"
+    }
+  ];
+
+  const brandCategories = [
+    {
+      title: "Mayoral",
+      image: "https://images.unsplash.com/photo-1622290319146-7b63df48a635?q=80&w=800&auto=format&fit=crop",
+      link: "/marca/mayoral"
+    },
+    {
+      title: "Calamaro",
+      image: "https://images.unsplash.com/photo-1598539961915-040bb3be3f69?q=80&w=800&auto=format&fit=crop",
+      link: "/marca/calamaro"
+    },
+    {
+      title: "Prim Baby",
+      image: "https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=800&auto=format&fit=crop",
+      link: "/marca/prim baby"
+    }
   ];
 
   useEffect(() => {
@@ -46,34 +97,6 @@ export default function Home() {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await fetch('/api/products?limit=100');
-        if (!response.ok) {
-          let errorMessage = 'Error al cargar los productos';
-          try {
-            const errorData = await response.json();
-            errorMessage = errorData.error || errorMessage;
-          } catch (e) {
-            errorMessage = `Error del servidor (${response.status}): No se pudo conectar a la base de datos o a la API.`;
-          }
-          throw new Error(errorMessage);
-        }
-        const data = await response.json();
-        setProducts(data.data || []);
-      } catch (err: any) {
-        setError(err.message || 'Error de conexión. Verifica que el servidor y la base de datos estén funcionando.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
   }, []);
 
   return (
@@ -91,7 +114,7 @@ export default function Home() {
             <img
               src={slide.image}
               alt={slide.title}
-              className="absolute inset-0 w-full h-full object-cover"
+              className={`absolute inset-0 w-full h-full object-cover ${slide.position || 'object-center'}`}
               referrerPolicy="no-referrer"
             />
             <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4">
@@ -126,62 +149,98 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Products Grid */}
+      {/* Comprar por Género */}
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-serif font-bold text-[#3E2A24] mb-4">Todos nuestros productos</h2>
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-serif font-bold text-[#3E2A24] mb-4">Comprar por Género</h2>
           <div className="w-24 h-1 bg-[#D9C8B4] mx-auto"></div>
         </div>
-        
-        {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B89F82]"></div>
-          </div>
-        ) : error ? (
-          <div className="text-center py-20 px-4">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-8 max-w-2xl mx-auto shadow-sm">
-              <h3 className="text-red-800 font-serif font-bold text-xl mb-3">Error de conexión a la base de datos</h3>
-              <p className="text-red-600 mb-6">{error}</p>
-              <div className="bg-white rounded p-4 text-left border border-red-100">
-                <p className="text-sm text-red-800 font-medium mb-2">Si estás viendo esto en Vercel, asegúrate de que:</p>
-                <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
-                  <li>La variable de entorno <strong>DATABASE_URL</strong> esté configurada en los Settings de Vercel.</li>
-                  <li>La base de datos (Neon/Postgres) esté activa y accesible.</li>
-                  <li>El backend se haya desplegado correctamente.</li>
-                </ul>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+          {genderCategories.map((cat, index) => (
+            <Link 
+              key={index} 
+              to={cat.link}
+              className="group relative h-96 overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-500"
+            >
+              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-500 z-10" />
+              <img 
+                src={cat.image} 
+                alt={cat.title} 
+                className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                referrerPolicy="no-referrer"
+              />
+              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center">
+                <h3 className="text-3xl font-serif font-bold text-white tracking-wide drop-shadow-md">{cat.title}</h3>
+                <div className="mt-4 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                  <span className="bg-white text-[#5D4037] px-6 py-2 rounded-full text-sm font-medium">Ver colección</span>
+                </div>
               </div>
-            </div>
-          </div>
-        ) : products.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-xl text-[#7A5C53] mb-4">No se encontraron productos.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-            {products.map((product) => (
-              <ProductCard key={product.code} product={product} />
-            ))}
-          </div>
-        )}
+            </Link>
+          ))}
+        </div>
       </section>
 
-      {/* Featured Brands */}
-      <section className="py-16 bg-[#F5F0EB] border-y border-[#E5D9C5]">
+      {/* Comprar por Edad */}
+      <section className="py-20 bg-[#F5F0EB]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl font-serif font-bold text-[#3E2A24]">Trabajamos con las mejores marcas</h2>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-serif font-bold text-[#3E2A24] mb-4">Comprar por Edad</h2>
+            <div className="w-24 h-1 bg-[#D9C8B4] mx-auto"></div>
           </div>
-          <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24">
-            {brands.map((brand, index) => (
-              <div 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10">
+            {ageCategories.map((cat, index) => (
+              <Link 
                 key={index} 
-                onClick={() => navigate(`/marca/${brand.toLowerCase()}`)}
-                className="text-2xl md:text-4xl font-serif font-medium text-[#8B7355] opacity-80 hover:opacity-100 transition-opacity duration-300 cursor-pointer tracking-wide"
+                to={cat.link}
+                className="group relative h-[400px] overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-500"
               >
-                {brand}
-              </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10" />
+                <img 
+                  src={cat.image} 
+                  alt={cat.title} 
+                  className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute bottom-0 left-0 right-0 p-8 z-20">
+                  <p className="text-white/90 text-sm font-medium uppercase tracking-wider mb-2">{cat.subtitle}</p>
+                  <h3 className="text-4xl font-serif font-bold text-white mb-4">{cat.title}</h3>
+                  <div className="flex items-center text-white font-medium group-hover:text-[#D9C8B4] transition-colors">
+                    Explorar <ArrowRight size={18} className="ml-2 transform group-hover:translate-x-2 transition-transform" />
+                  </div>
+                </div>
+              </Link>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Comprar por Marca */}
+      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-serif font-bold text-[#3E2A24] mb-4">Nuestras Marcas</h2>
+          <div className="w-24 h-1 bg-[#D9C8B4] mx-auto"></div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+          {brandCategories.map((cat, index) => (
+            <Link 
+              key={index} 
+              to={cat.link}
+              className="group relative h-80 overflow-hidden rounded-2xl shadow-sm hover:shadow-lg transition-all duration-500 bg-white border border-[#E5D9C5]"
+            >
+              <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-500 z-10" />
+              <img 
+                src={cat.image} 
+                alt={cat.title} 
+                className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transform group-hover:scale-110 transition-all duration-700"
+                referrerPolicy="no-referrer"
+              />
+              <div className="absolute inset-0 z-20 flex items-center justify-center">
+                <div className="bg-white/90 backdrop-blur-sm px-8 py-4 rounded-xl shadow-sm transform group-hover:-translate-y-2 transition-transform duration-500">
+                  <h3 className="text-2xl font-serif font-bold text-[#5D4037] tracking-wide">{cat.title}</h3>
+                </div>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
     </>

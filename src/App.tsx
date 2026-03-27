@@ -86,8 +86,8 @@ export default function App() {
                   Bebés <ChevronDown size={16} className="ml-1" />
                 </button>
                 <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-100 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left scale-95 group-hover:scale-100 z-50">
-                  <Link to="/categoria/Bebe%20niña%200-4%20años" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niña (hasta 4 años)</Link>
-                  <Link to="/categoria/Bebe%20niño%200-4%20años" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niño (hasta 4 años)</Link>
+                  <Link to="/categoria/Bebé%20Niña%20(0-4%20años)" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niña (hasta 4 años)</Link>
+                  <Link to="/categoria/Bebé%20Niño%20(0-4%20años)" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niño (hasta 4 años)</Link>
                 </div>
               </div>
 
@@ -97,8 +97,8 @@ export default function App() {
                   Infantil <ChevronDown size={16} className="ml-1" />
                 </button>
                 <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-100 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left scale-95 group-hover:scale-100 z-50">
-                  <Link to="/categoria/Niña%204-16%20años" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niña</Link>
-                  <Link to="/categoria/Niño%204-16%20años" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niño</Link>
+                  <Link to="/categoria/Niña%20(3-9%20años)" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niña</Link>
+                  <Link to="/categoria/Niño%20(3-9%20años)" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niño</Link>
                 </div>
               </div>
               
@@ -156,6 +156,8 @@ export default function App() {
           <Route path="/buscar" element={<SearchPage />} />
           <Route path="/marca/:brandName" element={<Catalog />} />
           <Route path="/categoria/:categoryName" element={<Catalog />} />
+          <Route path="/genero/:genderName" element={<Catalog />} />
+          <Route path="/edad/:ageName" element={<Catalog />} />
           <Route path="/producto/:code" element={<ProductDetails />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/admin" element={<AdminDashboard />} />

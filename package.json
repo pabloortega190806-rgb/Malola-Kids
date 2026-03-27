@@ -10,18 +10,19 @@
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
     "start": "node server.ts",
-    "sync-images": "node sync_blob_images.js"
+    "upload-images": "node upload_to_cloudinary.js"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",
     "@tailwindcss/vite": "^4.1.14",
     "@vercel/analytics": "^2.0.1",
-    "@vercel/blob": "^2.3.1",
     "@vitejs/plugin-react": "^5.0.4",
+    "cloudinary": "^2.9.0",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "lucide-react": "^0.546.0",
     "motion": "^12.23.24",
+    "multer": "^2.1.1",
     "pg": "^8.20.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -31,6 +32,7 @@
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
+    "@types/multer": "^2.1.0",
     "@types/node": "^22.14.0",
     "@types/pg": "^8.18.0",
     "@types/react": "^19.2.14",

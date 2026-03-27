@@ -1,81 +1,105 @@
 [
   {
+    "code": "33551-B",
+    "name": "PETO MATHURA",
+    "description": "100% algodón",
+    "color": "Verde ",
+    "original_price": "21.90",
+    "discounted_price": "21.90",
+    "brand": "Calamaro",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "24 Meses (86 cm)": 5
+    },
+    "image_url": "https://i.postimg.cc/placeholder/33551-B.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-21T14:52:07.839Z"
+  },
+  {
     "code": "32530",
     "name": "PELELE ATARI",
     "description": "100% algodón",
     "color": "Arena",
-    "original_price": 21.5,
-    "discounted_price": 21.5,
+    "original_price": "21.50",
+    "discounted_price": "21.50",
     "brand": "Calamaro",
-    "category": "Calamaro Baby  0-4 años",
+    "category": "Bebé Niño (0-4 años)",
     "sizes_stock": {
-      "1 Mes ( 54 cm)": 5,
+      "1 Mes ( 54 cm)": 10,
       "3 Meses (60 cm)": 5,
       "6 Meses (67 cm)": 5,
       "12 Meses (74 cm)": 5,
       "18 Meses (81 cm)": 5,
       "24 Meses (86 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/32530.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-20T18:15:37.949Z"
   },
   {
     "code": "32531",
     "name": "PETO ATARI",
     "description": "100% algodón",
     "color": "Arena",
-    "original_price": 19.9,
-    "discounted_price": 19.9,
+    "original_price": "19.90",
+    "discounted_price": "19.90",
     "brand": "Calamaro",
-    "category": "Bebe niño 0-4 años",
+    "category": "Bebé Niño (0-4 años)",
     "sizes_stock": {
       "1 Mes ( 54 cm)": 5,
       "3 Meses (60 cm)": 5,
       "6 Meses (67 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/32531.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "32554",
     "name": "PELELE KERALA",
     "description": "100% algodón",
     "color": "Celeste",
-    "original_price": 23.99,
-    "discounted_price": 23.99,
+    "original_price": "23.99",
+    "discounted_price": "23.99",
     "brand": "Calamaro",
-    "category": "Bebe niño 0-4 años",
+    "category": "Bebé Niño (0-4 años)",
     "sizes_stock": {
       "1 Mes ( 54 cm)": 5,
       "3 Meses (60 cm)": 5,
       "6 Meses (67 cm)": 5,
       "12 Meses (74 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/32554.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "11314",
     "name": "CONJUNTO POLOLO KERALA",
     "description": "100% algodón",
     "color": "Celeste",
-    "original_price": 25,
-    "discounted_price": 25,
+    "original_price": "25.00",
+    "discounted_price": "25.00",
     "brand": "Calamaro",
-    "category": "Bebe niño 0-4 años",
+    "category": "Bebé Niño (0-4 años)",
     "sizes_stock": {
       "6 Meses (67 cm)": 5,
       "18 Meses (81 cm)": 5,
       "36 Meses (95 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/11314.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "32553",
     "name": "PETO KERALA",
     "description": "100% algodón",
     "color": "Celeste",
-    "original_price": 17.9,
-    "discounted_price": 17.9,
+    "original_price": "17.90",
+    "discounted_price": "17.90",
     "brand": "Calamaro",
-    "category": "Bebe niño 0-4 años",
+    "category": "Bebé Niño (0-4 años)",
     "sizes_stock": {
       "1 Mes ( 54 cm)": 5,
       "3 Meses (60 cm)": 5,
@@ -84,80 +108,90 @@
       "18 Meses (81 cm)": 5,
       "24 Meses (86 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/32553.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "11315",
     "name": "CONJUNTO PETO KERALA",
     "description": "100% algodón",
     "color": "Celeste",
-    "original_price": 27.9,
-    "discounted_price": 27.9,
+    "original_price": "27.90",
+    "discounted_price": "27.90",
     "brand": "Calamaro",
-    "category": "Bebe niño 0-4 años",
+    "category": "Bebé Niño (0-4 años)",
     "sizes_stock": {
       "6 Meses (67 cm)": 5,
       "12 Meses (74 cm)": 5,
       "18 Meses (81 cm)": 5,
       "24 Meses (86 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/11315.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "32550",
     "name": "PETO KANPUR",
     "description": "100% algodón",
     "color": "Coral",
-    "original_price": 21.5,
-    "discounted_price": 21.5,
+    "original_price": "21.50",
+    "discounted_price": "21.50",
     "brand": "Calamaro",
-    "category": "Bebe niño 0-4 años",
+    "category": "Bebé Niño (0-4 años)",
     "sizes_stock": {
       "1 Mes ( 54 cm)": 5,
       "6 Meses (67 cm)": 5,
       "18 Meses (81 cm)": 5,
       "24 Meses (86 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/32550.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "21327-B",
     "name": "VESTIDO CON BRAGUITA KANPUR",
     "description": "100% algodón",
     "color": "Coral",
-    "original_price": 31.9,
-    "discounted_price": 31.9,
+    "original_price": "31.90",
+    "discounted_price": "31.90",
     "brand": "Calamaro",
-    "category": "Bebé",
+    "category": "Bebé Niña (0-4 años)",
     "sizes_stock": {
       "12 Meses (74 cm)": 5,
       "18 Meses (81 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/21327-B.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "21327-N",
     "name": "VESTIDO CON BRAGUITA KANPUR",
     "description": "100% algodón",
     "color": "Coral",
-    "original_price": 39.9,
-    "discounted_price": 39.9,
+    "original_price": "39.90",
+    "discounted_price": "39.90",
     "brand": "Calamaro",
-    "category": "Niños",
+    "category": "Bebé Niña (0-4 años)",
     "sizes_stock": {
       "3 Años (95 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/21327-N.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "32548",
     "name": "PETO BUNDI",
     "description": "78% algodón",
     "color": "Rosa",
-    "original_price": 19.9,
-    "discounted_price": 19.9,
+    "original_price": "19.90",
+    "discounted_price": "19.90",
     "brand": "Calamaro",
-    "category": "Bebe niño 0-4 años",
+    "category": "Bebé Niño (0-4 años)",
     "sizes_stock": {
       "1 Mes ( 54 cm)": 5,
       "3 Años (95 cm)": 5,
@@ -166,17 +200,19 @@
       "18 Meses (81 cm)": 5,
       "24 Meses (86 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/32548.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "32549",
     "name": "PELELE BUNDI",
     "description": "78% algodón",
     "color": "Rosa",
-    "original_price": 21.5,
-    "discounted_price": 21.5,
+    "original_price": "21.50",
+    "discounted_price": "21.50",
     "brand": "Calamaro",
-    "category": "Bebe niño 0-4 años",
+    "category": "Bebé Niño (0-4 años)",
     "sizes_stock": {
       "1 Mes ( 54 cm)": 5,
       "3 Años (95 cm)": 5,
@@ -185,67 +221,75 @@
       "18 Meses (81 cm)": 5,
       "24 Meses (86 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/32549.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "32497",
     "name": "PELELE ALBORÁN",
     "description": "100% algodón",
     "color": "Blanco",
-    "original_price": 17.9,
-    "discounted_price": 17.9,
+    "original_price": "17.90",
+    "discounted_price": "17.90",
     "brand": "Calamaro",
-    "category": "Bebe niño 0-4 años",
+    "category": "Bebé Niño (0-4 años)",
     "sizes_stock": {
       "1 Mes ( 54 cm)": 5,
+      "3 Años (95 cm)": 5,
       "6 Meses (67 cm)": 5,
       "18 Meses (81 cm)": 5,
-      "24 Meses (86 cm)": 5,
-      "3 Años (95 cm)": 5
+      "24 Meses (86 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/32497.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "11277",
     "name": "CONJUNTO POLOLO GOA",
     "description": "100% algodón",
     "color": "Nude",
-    "original_price": 22,
-    "discounted_price": 22,
+    "original_price": "22.00",
+    "discounted_price": "22.00",
     "brand": "Calamaro",
-    "category": "Calamaro Baby  0-4 años",
+    "category": "Bebé Niño (0-4 años)",
     "sizes_stock": {
       "18 Meses (81 cm)": 5,
       "24 Meses (86 cm)": 5,
       "36 Meses (95 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/11277.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "32541",
     "name": "PETO MANDI",
     "description": "100% algodón",
     "color": "Arena",
-    "original_price": 17.9,
-    "discounted_price": 17.9,
+    "original_price": "17.90",
+    "discounted_price": "17.90",
     "brand": "Calamaro",
-    "category": "Calamaro Baby  0-4 años",
+    "category": "Bebé Niño (0-4 años)",
     "sizes_stock": {
       "1 Mes ( 54 cm)": 5,
       "3 Años (95 cm)": 5,
       "36 Meses (95 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/32541.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "22109",
     "name": "JESUSITO MANDI",
     "description": "100% algodón",
     "color": "Arena",
-    "original_price": 26.9,
-    "discounted_price": 26.9,
+    "original_price": "26.90",
+    "discounted_price": "26.90",
     "brand": "Calamaro",
-    "category": "Calamaro Baby  0-4 años",
+    "category": "Bebé Niña (0-4 años)",
     "sizes_stock": {
       "1 Mes ( 54 cm)": 5,
       "3 Años (95 cm)": 5,
@@ -255,156 +299,160 @@
       "24 Meses (86 cm)": 5,
       "36 Meses (95 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/22109.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "11286",
     "name": "CONJUNTO POLOLO MANDI",
     "description": "100% algodón",
     "color": "Arena",
-    "original_price": 25,
-    "discounted_price": 25,
+    "original_price": "25.00",
+    "discounted_price": "25.00",
     "brand": "Calamaro",
-    "category": "Calamaro Baby  0-4 años",
+    "category": "Bebé Niño (0-4 años)",
     "sizes_stock": {
       "6 Meses (67 cm)": 5,
       "12 Meses (74 cm)": 5,
       "18 Meses (81 cm)": 5,
       "24 Meses (86 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/11286.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "77134",
     "name": "LAZO PELO MANDI",
     "description": "100% algodón",
     "color": "Arena",
-    "original_price": 3.9,
-    "discounted_price": 3.9,
+    "original_price": "3.90",
+    "discounted_price": "3.90",
     "brand": "Calamaro",
-    "category": "Calamaro Baby  0-4 años",
+    "category": "Bebé Niña (0-4 años)",
     "sizes_stock": {
       "Única": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/77134.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "11313-B",
     "name": "CONJUNTO POLOLO MATHURA",
     "description": "100% algodón",
     "color": "Verde",
-    "original_price": 25,
-    "discounted_price": 25,
+    "original_price": "25.00",
+    "discounted_price": "25.00",
     "brand": "Calamaro",
-    "category": "Bebé",
+    "category": "Bebé Niño (0-4 años)",
     "sizes_stock": {
       "1 Mes ( 54 cm)": 5,
       "3 Años (95 cm)": 5,
       "6 Meses (67 cm)": 5,
       "12 Meses (74 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/11313-B.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "11313-N",
     "name": "CONJUNTO POLOLO MATHURA",
     "description": "100% algodón",
     "color": "Verde",
-    "original_price": 29.9,
-    "discounted_price": 29.9,
+    "original_price": "29.90",
+    "discounted_price": "29.90",
     "brand": "Calamaro",
-    "category": "Niños",
+    "category": "Bebé Niño (0-4 años)",
     "sizes_stock": {
       "3 Años (95 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/11313-N.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "32551-B",
     "name": "PETO MATHURA",
     "description": "100% algodón",
     "color": "Verde",
-    "original_price": 21.9,
-    "discounted_price": 21.9,
+    "original_price": "21.90",
+    "discounted_price": "21.90",
     "brand": "Calamaro",
-    "category": "Bebé",
+    "category": "Bebé Niño (0-4 años)",
     "sizes_stock": {
       "6 Meses (67 cm)": 5,
       "12 Meses (74 cm)": 5,
       "18 Meses (81 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    "code": "33551-B",
-    "name": "PETO MATHURA",
-    "description": "100% algodón",
-    "color": "Verde",
-    "original_price": 21.9,
-    "discounted_price": 21.9,
-    "brand": "Calamaro",
-    "category": "Bebé",
-    "sizes_stock": {
-      "24 Meses (86 cm)": 5
-    },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/32551-B.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "33551-N",
     "name": "PETO MATHURA",
     "description": "100% algodón",
     "color": "Verde",
-    "original_price": 24.9,
-    "discounted_price": 24.9,
+    "original_price": "24.90",
+    "discounted_price": "24.90",
     "brand": "Calamaro",
-    "category": "Niños",
+    "category": "Bebé Niño (0-4 años)",
     "sizes_stock": {
       "3 Años (95 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/33551-N.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "11323",
     "name": "CONJUNTO POLOLO DELHI",
     "description": "100% algodón",
     "color": "Melocotón",
-    "original_price": 25.9,
-    "discounted_price": 25.9,
+    "original_price": "25.90",
+    "discounted_price": "25.90",
     "brand": "Calamaro",
-    "category": "Calamaro Baby  0-4 años",
+    "category": "Bebé Niño (0-4 años)",
     "sizes_stock": {
       "6 Meses (67 cm)": 5,
       "12 Meses (74 cm)": 5,
       "18 Meses (81 cm)": 5,
       "24 Meses (86 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/11323.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "21338-B",
     "name": "VESTIDO CUADROS",
     "description": "100% algodón",
     "color": "Melocotón",
-    "original_price": 21.5,
-    "discounted_price": 21.5,
+    "original_price": "21.50",
+    "discounted_price": "21.50",
     "brand": "Calamaro",
-    "category": "Bebé",
+    "category": "Bebé Niña (0-4 años)",
     "sizes_stock": {
       "12 Meses (74 cm)": 5,
       "18 Meses (81 cm)": 5,
       "24 Meses (86 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/21338-B.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "32544",
     "name": "PETO GAYA",
     "description": "100% algodón",
     "color": "Mostaza",
-    "original_price": 17.9,
-    "discounted_price": 17.9,
+    "original_price": "17.90",
+    "discounted_price": "17.90",
     "brand": "Calamaro",
-    "category": "Calamaro Baby  0-4 años",
+    "category": "Bebé Niño (0-4 años)",
     "sizes_stock": {
       "1 Mes ( 54 cm)": 5,
       "6 Meses (67 cm)": 5,
@@ -412,39 +460,1835 @@
       "24 Meses (86 cm)": 5,
       "36 Meses (95 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/32544.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "21324-B",
     "name": "VESTIDO GAYA",
     "description": "100% algodón",
     "color": "Mostaza",
-    "original_price": 24.5,
-    "discounted_price": 24.5,
+    "original_price": "24.50",
+    "discounted_price": "24.50",
     "brand": "Calamaro",
-    "category": "Bebé",
+    "category": "Bebé Niña (0-4 años)",
     "sizes_stock": {
       "12 Meses (74 cm)": 5,
       "18 Meses (81 cm)": 5,
       "24 Meses (86 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/21324-B.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
   },
   {
     "code": "32542",
     "name": "PETO SIKAR",
     "description": "95%algodón",
     "color": "Coral",
-    "original_price": 19.5,
-    "discounted_price": 19.5,
+    "original_price": "19.50",
+    "discounted_price": "19.50",
     "brand": "Calamaro",
-    "category": "Calamaro Baby  0-4 años",
+    "category": "Bebé Niño (0-4 años)",
     "sizes_stock": {
       "6 Meses (67 cm)": 5,
       "12 Meses (74 cm)": 5,
       "18 Meses (81 cm)": 5,
       "24 Meses (86 cm)": 5
     },
-    "image_url": "https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    "image_url": "https://i.postimg.cc/placeholder/32542.jpg",
+    "created_at": "2026-03-19T00:03:50.371Z",
+    "updated_at": "2026-03-19T00:03:50.371Z"
+  },
+  {
+    "code": "1009.93",
+    "name": "CAMISETA M/C LENTICULAR - PEACH",
+    "description": "100% algodón",
+    "color": "Peach",
+    "original_price": "13.99",
+    "discounted_price": "13.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "18 Meses (86 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1010.10",
+    "name": "CAMISETA M/C VEHICULO - NATA",
+    "description": "100% algodón",
+    "color": "Nata",
+    "original_price": "13.99",
+    "discounted_price": "13.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "18 Meses (86 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1011.87",
+    "name": "CAMISETA M/C APLIQUE - NATA-COCHE",
+    "description": "100% algodón",
+    "color": "Nata-coche",
+    "original_price": "12.90",
+    "discounted_price": "12.90",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "18 Meses (86 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1089.30",
+    "name": "TOP CANALE - BLUSH",
+    "description": "100% algodón",
+    "color": "Blush",
+    "original_price": "14.99",
+    "discounted_price": "14.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "118.41",
+    "name": "CAMISA M/L LINO C/CAMISERO - CAÑAMO",
+    "description": "100% algodón",
+    "color": "Cañamo",
+    "original_price": "18.99",
+    "discounted_price": "18.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "18 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1202.35",
+    "name": "PANTALON CORTO - HUESO",
+    "description": "100% algodón",
+    "color": "Hueso",
+    "original_price": "18.99",
+    "discounted_price": "18.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1211.69",
+    "name": "CONJ. BERMUDA RAYAS - AVELLANA",
+    "description": "100% algodón",
+    "color": "Avellana",
+    "original_price": "35.99",
+    "discounted_price": "35.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "18 Meses (86 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1212.73",
+    "name": "CONJ. BERMUDA - LAGO",
+    "description": "100% algodón",
+    "color": "Lago",
+    "original_price": "35.99",
+    "discounted_price": "35.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "18 Meses (86 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1227.97",
+    "name": "CONJ. BERMUDA LINO APLIQUE - JADE",
+    "description": "100% algodón",
+    "color": "Jade",
+    "original_price": "31.99",
+    "discounted_price": "31.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "18 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1228.68",
+    "name": "CONJ. BERMUDA SEERSUCKER - MOCCA",
+    "description": "100% algodón",
+    "color": "Mocca",
+    "original_price": "28.99",
+    "discounted_price": "28.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "18 Meses (86 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1523.61",
+    "name": "PANTALON LINO RELAXED - ANACARDO",
+    "description": "100% algodón",
+    "color": "Anacardo",
+    "original_price": "24.99",
+    "discounted_price": "24.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "18 Meses (86 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1658.67",
+    "name": "PETO LINO SUITING - JADE",
+    "description": "100% algodón",
+    "color": "Jade",
+    "original_price": "26.50",
+    "discounted_price": "26.50",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "18 Meses (86 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1663.23",
+    "name": "CONJ. PETO BAMBULA 3 PIEZAS - ARCILLA",
+    "description": "100% algodón",
+    "color": "Arcilla",
+    "original_price": "39.99",
+    "discounted_price": "39.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "18 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1665.31",
+    "name": "CONJ. PUNTO ESTRUCTURA - JADE",
+    "description": "100% algodón",
+    "color": "Jade",
+    "original_price": "24.90",
+    "discounted_price": "24.90",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "18 Meses (86 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1748.33",
+    "name": "CONJ. LEGGINGS - CIELO",
+    "description": "100% algodón",
+    "color": "Cielo",
+    "original_price": "24.90",
+    "discounted_price": "24.90",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1915.56",
+    "name": "VESTIDO BORDADO - BLANCO",
+    "description": "100% algodón",
+    "color": "Blanco",
+    "original_price": "31.90",
+    "discounted_price": "31.90",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "18 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1919.50",
+    "name": "VESTIDO CON BOLSO - PORCELANA",
+    "description": "100% algodón",
+    "color": "Porcelana",
+    "original_price": "26.99",
+    "discounted_price": "26.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "18 Meses (86 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1921.64",
+    "name": "VESTIDO ESTAMPADO - PEONIA",
+    "description": "100% algodón",
+    "color": "Peonia",
+    "original_price": "24.90",
+    "discounted_price": "24.90",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "18 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1924.76",
+    "name": "VESTIDO PANELES - FLAMINGO",
+    "description": "100% algodón",
+    "color": "Flamingo",
+    "original_price": "26.90",
+    "discounted_price": "26.90",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "18 Meses (86 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "3013.11",
+    "name": "CAMISETA M/C APLIQUE - CRUDO",
+    "description": "100% algodón",
+    "color": "Crudo",
+    "original_price": "16.90",
+    "discounted_price": "16.90",
+    "brand": "Mayoral",
+    "category": "Niña (3-9 años)",
+    "sizes_stock": {
+      "4 Años (104 cm)": 5,
+      "6 Años (116 cm)": 5,
+      "8 Años (128 cm)": 5,
+      "5 Años ( 110 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "3060.72",
+    "name": "CAMISETA M/C BORDADO - NATA",
+    "description": "100% algodón",
+    "color": "Nata",
+    "original_price": "13.99",
+    "discounted_price": "13.99",
+    "brand": "Mayoral",
+    "category": "Niño (3-9 años)",
+    "sizes_stock": {
+      "6 Años (116 cm)": 5,
+      "8 Años (128 cm)": 5,
+      "5 Años ( 110 cm)": 5,
+      "7 Años ( 122 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "3225.59",
+    "name": "CONJ. SHORT PUNTO FANTASIA - MANDARINA",
+    "description": "100% algodón",
+    "color": "Mandarina",
+    "original_price": "34.50",
+    "discounted_price": "34.50",
+    "brand": "Mayoral",
+    "category": "Niña (3-9 años)",
+    "sizes_stock": {
+      "6 Años (116 cm)": 5,
+      "8 Años (128 cm)": 5,
+      "7 Años ( 122 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "3227.68",
+    "name": "CONJ. SHORT RAYAS - LILAC",
+    "description": "100% algodón",
+    "color": "Lilac",
+    "original_price": "26.50",
+    "discounted_price": "26.50",
+    "brand": "Mayoral",
+    "category": "Niña (3-9 años)",
+    "sizes_stock": {
+      "6 Años (116 cm)": 5,
+      "8 Años (128 cm)": 5,
+      "5 Años ( 110 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "3229.72",
+    "name": "CONJ. PANTALON CORTO ESTAMPADO - CRUDO",
+    "description": "100% algodón",
+    "color": "Crudo",
+    "original_price": "31.99",
+    "discounted_price": "31.99",
+    "brand": "Mayoral",
+    "category": "Niña (3-9 años)",
+    "sizes_stock": {
+      "4 Años (104 cm)": 5,
+      "5 Años ( 110 cm)": 5,
+      "7 Años ( 122 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "3.585.916",
+    "name": "PANTALON LARGO LINO BORDADO - PORCELANA",
+    "description": "100% algodón",
+    "color": "Porcelana",
+    "original_price": "28.50",
+    "discounted_price": "28.50",
+    "brand": "Mayoral",
+    "category": "Niña (3-9 años)",
+    "sizes_stock": {
+      "4 Años (104 cm)": 5,
+      "6 Años (116 cm)": 5,
+      "8 Años (128 cm)": 5,
+      "5 Años ( 110 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "3601.18",
+    "name": "CONJ. PUNTO - ALGA",
+    "description": "100% algodón",
+    "color": "Alga",
+    "original_price": "29.99",
+    "discounted_price": "29.99",
+    "brand": "Mayoral",
+    "category": "Niño (3-9 años)",
+    "sizes_stock": {
+      "6 Años (116 cm)": 5,
+      "8 Años (128 cm)": 5,
+      "5 Años ( 110 cm)": 5,
+      "7 Años ( 122 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "3888.39",
+    "name": "MONO PUNTO CROCHET - GARBANZO",
+    "description": "100% algodón",
+    "color": "Garbanzo",
+    "original_price": "34.90",
+    "discounted_price": "34.90",
+    "brand": "Mayoral",
+    "category": "Niña (3-9 años)",
+    "sizes_stock": {
+      "4 Años (104 cm)": 5,
+      "6 Años (116 cm)": 5,
+      "9 Años (134 cm)": 5,
+      "5 Años ( 110 cm)": 5,
+      "7 Años ( 122 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "3935.67",
+    "name": "VESTIDO CROCHET - HUESO",
+    "description": "100% algodón",
+    "color": "Hueso",
+    "original_price": "29.90",
+    "discounted_price": "29.90",
+    "brand": "Mayoral",
+    "category": "Niña (3-9 años)",
+    "sizes_stock": {
+      "6 Años (116 cm)": 5,
+      "8 Años (128 cm)": 5,
+      "5 Años ( 110 cm)": 5,
+      "7 Años ( 122 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "3936.36",
+    "name": "VESTIDO RAYAS - LILAC",
+    "description": "100% algodón",
+    "color": "Lilac",
+    "original_price": "34.00",
+    "discounted_price": "34.00",
+    "brand": "Mayoral",
+    "category": "Niña (3-9 años)",
+    "sizes_stock": {
+      "4 Años (104 cm)": 5,
+      "6 Años (116 cm)": 5,
+      "8 Años (128 cm)": 5,
+      "9 Años (134 cm)": 5,
+      "5 Años ( 110 cm)": 5,
+      "7 Años ( 122 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1206.46",
+    "name": "CONJ. SHORT 3 PIEZAS - LILAC",
+    "description": "100% algodón",
+    "color": "Lilac",
+    "original_price": "27.99",
+    "discounted_price": "27.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "18 Meses (86 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1209.60",
+    "name": "CONJ. SHORT GRAFICA - HIBISCO",
+    "description": "100% algodón",
+    "color": "Hibisco",
+    "original_price": "21.99",
+    "discounted_price": "21.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "18 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1655.24",
+    "name": "CONJ. BAÑO 2 PIEZAS - LILAC",
+    "description": "100% algodón",
+    "color": "Lilac",
+    "original_price": "21.90",
+    "discounted_price": "21.90",
+    "brand": "Mayoral",
+    "category": "Baño",
+    "sizes_stock": {
+      "3 Años (98 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1657.78",
+    "name": "CULETIN CON PAÑOLETA - TURQUESA",
+    "description": "100% algodón",
+    "color": "Turquesa",
+    "original_price": "18.99",
+    "discounted_price": "18.99",
+    "brand": "Mayoral",
+    "category": "Baño",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "18 Meses (86 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1657.79",
+    "name": "CULETIN CON PAÑOLETA - ROJO",
+    "description": "100% algodón",
+    "color": "Rojo",
+    "original_price": "18.99",
+    "discounted_price": "18.99",
+    "brand": "Mayoral",
+    "category": "Baño",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "18 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1661.76",
+    "name": "CONJ. BAÑO CAMISETA - PEACH",
+    "description": "100% algodón",
+    "color": "Peach",
+    "original_price": "18.99",
+    "discounted_price": "18.99",
+    "brand": "Mayoral",
+    "category": "Baño",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1661.78",
+    "name": "CONJ. BAÑO CAMISETA - ATOLON",
+    "description": "100% algodón",
+    "color": "Atolon",
+    "original_price": "18.99",
+    "discounted_price": "18.99",
+    "brand": "Mayoral",
+    "category": "Baño",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "18 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1666.35",
+    "name": "CONJ. PUNTO ESTRUCTURA - CAPRI",
+    "description": "100% algodón",
+    "color": "Capri",
+    "original_price": "27.99",
+    "discounted_price": "27.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "18 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1667.81",
+    "name": "CONJ. PUNTO PRINT CON BUCKET - MATCHA",
+    "description": "100% algodón",
+    "color": "Matcha",
+    "original_price": "26.99",
+    "discounted_price": "26.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "18 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1668.23",
+    "name": "CONJ. PUNTO PLAY - ARCILLA",
+    "description": "100% algodón",
+    "color": "Arcilla",
+    "original_price": "24.99",
+    "discounted_price": "24.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "18 Meses (86 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1670.44",
+    "name": "CONJ. PUNTO \"FRIENDS\" - PEACH",
+    "description": "100% algodón",
+    "color": "Peach",
+    "original_price": "21.99",
+    "discounted_price": "21.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "3 Años (98 cm)": 5,
+      "18 Meses (86 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1925.55",
+    "name": "VESTIDO PUNTO GRANITO - ROJO",
+    "description": "100% algodón",
+    "color": "Rojo",
+    "original_price": "19.99",
+    "discounted_price": "19.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "18 Meses (86 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1926.56",
+    "name": "VESTIDO COMBINADO GUIPUR - MIMOSA",
+    "description": "100% algodón",
+    "color": "Mimosa",
+    "original_price": "28.99",
+    "discounted_price": "28.99",
+    "brand": "Mayoral",
+    "category": "Niña (3-9 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "3233.80",
+    "name": "CONJ. SHORT PICULINAS - PACIFICO",
+    "description": "100% algodón",
+    "color": "Pacifico",
+    "original_price": "26.90",
+    "discounted_price": "26.90",
+    "brand": "Mayoral",
+    "category": "Niña (3-9 años)",
+    "sizes_stock": {
+      "7 Años ( 122 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "3602.23",
+    "name": "CONJ. PUNTO \"GOOD VIBES\" - PEACH",
+    "description": "100% algodón",
+    "color": "Peach",
+    "original_price": "24.99",
+    "discounted_price": "24.99",
+    "brand": "Mayoral",
+    "category": "Niño (3-9 años)",
+    "sizes_stock": {
+      "6 Años (116 cm)": 5,
+      "8 Años (128 cm)": 5,
+      "5 Años ( 110 cm)": 5,
+      "7 Años ( 122 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "3735.49",
+    "name": "BIKINI ESTAMPADO - OCEANO",
+    "description": "100% algodón",
+    "color": "Oceano",
+    "original_price": "21.90",
+    "discounted_price": "21.90",
+    "brand": "Mayoral",
+    "category": "Baño",
+    "sizes_stock": {
+      "4 Años (104 cm)": 5,
+      "6 Años (116 cm)": 5,
+      "8 Años (128 cm)": 5,
+      "5 Años ( 110 cm)": 5,
+      "7 Años ( 122 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "3889.58",
+    "name": "MONO PUNTO CUT OUT - OASIS",
+    "description": "100% algodón",
+    "color": "Oasis",
+    "original_price": "24.99",
+    "discounted_price": "24.99",
+    "brand": "Mayoral",
+    "category": "Niña (3-9 años)",
+    "sizes_stock": {
+      "6 Años (116 cm)": 5,
+      "8 Años (128 cm)": 5,
+      "9 Años (134 cm)": 5,
+      "7 Años ( 122 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "3942.53",
+    "name": "VESTIDO ESTAMPADO BANDA - OCEANO",
+    "description": "100% algodón",
+    "color": "Oceano",
+    "original_price": "28.99",
+    "discounted_price": "28.99",
+    "brand": "Mayoral",
+    "category": "Niña (3-9 años)",
+    "sizes_stock": {
+      "3 Años (98 cm)": 5,
+      "4 Años (104 cm)": 5,
+      "6 Años (116 cm)": 5,
+      "5 Años ( 110 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "10164.95",
+    "name": "TOALLA - HIPOPOTAMO",
+    "description": "100% algodón",
+    "color": "Hipopotamo",
+    "original_price": "21.99",
+    "discounted_price": "21.99",
+    "brand": "Mayoral",
+    "category": "Baño",
+    "sizes_stock": {
+      "2 Años (92cm)": 5,
+      "2 Años (92 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "10164.96",
+    "name": "TOALLA - COCODRILO",
+    "description": "100% algodón",
+    "color": "Cocodrilo",
+    "original_price": "21.99",
+    "discounted_price": "21.99",
+    "brand": "Mayoral",
+    "category": "Baño",
+    "sizes_stock": {
+      "2 Años (92cm)": 5,
+      "2 Años (92 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "10164.97",
+    "name": "TOALLA - PEZ",
+    "description": "100% algodón",
+    "color": "Pez",
+    "original_price": "21.99",
+    "discounted_price": "21.99",
+    "brand": "Mayoral",
+    "category": "Baño",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "10165.68",
+    "name": "TOALLA - LILAC",
+    "description": "100% algodón",
+    "color": "Lilac",
+    "original_price": "21.99",
+    "discounted_price": "21.99",
+    "brand": "Mayoral",
+    "category": "Baño",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "10165.69",
+    "name": "TOALLA - TURQUESA",
+    "description": "100% algodón",
+    "color": "Turquesa",
+    "original_price": "21.99",
+    "discounted_price": "21.99",
+    "brand": "Mayoral",
+    "category": "Baño",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1275.36",
+    "name": "CONJ. PANTALON CORTO CAMISETA - TOPO",
+    "description": "100% algodón",
+    "color": "Topo",
+    "original_price": "22.99",
+    "discounted_price": "22.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "12 Meses (80 cm)": 5,
+      "4-6 Meses (70 cm)": 5,
+      "6-9 Meses (75 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1286.48",
+    "name": "CONJ. SHORT GASA - CERAMICA",
+    "description": "100% algodón",
+    "color": "Ceramica",
+    "original_price": "24.99",
+    "discounted_price": "24.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "0-1 Meses (55 cm)": 5,
+      "1-2 Meses (60 cm)": 5,
+      "2-4 Meses (65 cm)": 5,
+      "4-6 Meses (70 cm)": 5,
+      "6-9 Meses (75 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1602.62",
+    "name": "CONJ. PELELE - AQUA",
+    "description": "100% algodón",
+    "color": "Aqua",
+    "original_price": "24.99",
+    "discounted_price": "24.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "2-4 Meses (65 cm)": 5,
+      "4-6 Meses (70 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1614.18",
+    "name": "PELELE Y GORRO PLANA - CIELO",
+    "description": "100% algodón",
+    "color": "Cielo",
+    "original_price": "21.99",
+    "discounted_price": "21.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "18 Meses (86 cm)": 5,
+      "0-1 Meses (55 cm)": 5,
+      "1-2 Meses (60 cm)": 5,
+      "2-4 Meses (65 cm)": 5,
+      "4-6 Meses (70 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1614.19",
+    "name": "PELELE Y GORRO PLANA - TERRACOTA",
+    "description": "100% algodón",
+    "color": "Terracota",
+    "original_price": "22.99",
+    "discounted_price": "22.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "0-1 Meses (55 cm)": 5,
+      "2-4 Meses (65 cm)": 5,
+      "4-6 Meses (70 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1621.32",
+    "name": "CONJ. PETO CAMISETA - TOPO",
+    "description": "100% algodón",
+    "color": "Topo",
+    "original_price": "27.99",
+    "discounted_price": "27.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "0-1 Meses (55 cm)": 5,
+      "1-2 Meses (60 cm)": 5,
+      "2-4 Meses (65 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1626.58",
+    "name": "CONJ. PUNTO 4 PIEZAS - ALGA",
+    "description": "100% algodón",
+    "color": "Alga",
+    "original_price": "32.99",
+    "discounted_price": "32.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "4-6 Meses (70 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1629.73",
+    "name": "PELELE PETO - PLATA",
+    "description": "100% algodón",
+    "color": "Plata",
+    "original_price": "22.99",
+    "discounted_price": "22.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "0-0 Meses (50 cm)": 5,
+      "0-1 Meses (55 cm)": 5,
+      "1-2 Meses (60 cm)": 5,
+      "2-4 Meses (65 cm)": 5,
+      "4-6 Meses (70 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1630.73",
+    "name": "CONJ. PUNTO 4 PIEZAS - PLATA",
+    "description": "100% algodón",
+    "color": "Plata",
+    "original_price": "29.99",
+    "discounted_price": "29.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "0-0 Meses (50 cm)": 5,
+      "0-1 Meses (55 cm)": 5,
+      "1-2 Meses (60 cm)": 5,
+      "2-4 Meses (65 cm)": 5,
+      "4-6 Meses (70 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1637.66",
+    "name": "CONJ. PETO TRICOT - CERAMICA",
+    "description": "100% algodón",
+    "color": "Ceramica",
+    "original_price": "34.99",
+    "discounted_price": "34.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "2-4 Meses (65 cm)": 5,
+      "4-6 Meses (70 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1640.47",
+    "name": "SET 2 BODIES Y 2 SHORTS - ALGA",
+    "description": "100% algodón",
+    "color": "Alga",
+    "original_price": "35.99",
+    "discounted_price": "35.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "12 Meses (80 cm)": 5,
+      "18 Meses (86 cm)": 5,
+      "4-6 Meses (70 cm)": 5,
+      "6-9 Meses (75 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1642.56",
+    "name": "CONJ. PANT. CORTO 4 PIEZAS - TRIGO",
+    "description": "100% algodón",
+    "color": "Trigo",
+    "original_price": "37.99",
+    "discounted_price": "37.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "12 Meses (80 cm)": 5,
+      "4-6 Meses (70 cm)": 5,
+      "6-9 Meses (75 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1651.23",
+    "name": "PELELE PETO CORTO - TRIGO",
+    "description": "100% algodón",
+    "color": "Trigo",
+    "original_price": "29.99",
+    "discounted_price": "29.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "12 Meses (80 cm)": 5,
+      "1-2 Meses (60 cm)": 5,
+      "2-4 Meses (65 cm)": 5,
+      "4-6 Meses (70 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1727.79",
+    "name": "SET REGALO PIJAMA CORTO - BLANCO",
+    "description": "100% algodón",
+    "color": "Blanco",
+    "original_price": "24.99",
+    "discounted_price": "24.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "0-1 Meses (55 cm)": 5,
+      "1-2 Meses (60 cm)": 5,
+      "2-4 Meses (65 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1805.42",
+    "name": "VESTIDO GASA - ROSA BABY",
+    "description": "100% algodón",
+    "color": "Rosa baby",
+    "original_price": "27.99",
+    "discounted_price": "27.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "0-1 Meses (55 cm)": 5,
+      "2-4 Meses (65 cm)": 5,
+      "4-6 Meses (70 cm)": 5,
+      "6-9 Meses (75 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "9046.59",
+    "name": "SET 6 CALCETINES - ROSAS",
+    "description": "100% algodón",
+    "color": "Rosas",
+    "original_price": "13.99",
+    "discounted_price": "13.99",
+    "brand": "Mayoral",
+    "category": "Complementos",
+    "sizes_stock": {
+      "0m": 5,
+      "6m": 5,
+      "12m": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "9046.61",
+    "name": "SET 6 CALCETINES - VERDES",
+    "description": "100% algodón",
+    "color": "Verdes",
+    "original_price": "13.99",
+    "discounted_price": "13.99",
+    "brand": "Mayoral",
+    "category": "Complementos",
+    "sizes_stock": {
+      "0m": 5,
+      "3m": 5,
+      "6m": 5,
+      "12m": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1607.11",
+    "name": "PELELE PETO Y GORRO - SUNNY",
+    "description": "100% algodón",
+    "color": "Sunny",
+    "original_price": "26.99",
+    "discounted_price": "26.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "12 Meses (80 cm)": 5,
+      "1-2 Meses (60 cm)": 5,
+      "2-4 Meses (65 cm)": 5,
+      "4-6 Meses (70 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1611.14",
+    "name": "PETO Y GORRO - TERRACOTA",
+    "description": "100% algodón",
+    "color": "Terracota",
+    "original_price": "26.90",
+    "discounted_price": "26.90",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "4-6 Meses (70 cm)": 5,
+      "6-9 Meses (75 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1614.20",
+    "name": "PELELE Y GORRO PLANA - MANZANA",
+    "description": "100% algodón",
+    "color": "Manzana",
+    "original_price": "22.90",
+    "discounted_price": "22.90",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "12 Meses (80 cm)": 5,
+      "0-1 Meses (55 cm)": 5,
+      "1-2 Meses (60 cm)": 5,
+      "2-4 Meses (65 cm)": 5,
+      "4-6 Meses (70 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1617.24",
+    "name": "CONJ. BAÑO Y GORRO - VELERO",
+    "description": "100% algodón",
+    "color": "Velero",
+    "original_price": "26.50",
+    "discounted_price": "26.50",
+    "brand": "Mayoral",
+    "category": "Baño",
+    "sizes_stock": {
+      "4-6 Meses (70 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1624.52",
+    "name": "CONJ. PETO Y GORRO PUNTO - MANZANA",
+    "description": "100% algodón",
+    "color": "Manzana",
+    "original_price": "26.90",
+    "discounted_price": "26.90",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "12 Meses (80 cm)": 5,
+      "18 Meses (86 cm)": 5,
+      "4-6 Meses (70 cm)": 5,
+      "6-9 Meses (75 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1627.76",
+    "name": "CONJ. PUNTO 4 PIEZAS - ROJO",
+    "description": "100% algodón",
+    "color": "Rojo",
+    "original_price": "31.90",
+    "discounted_price": "31.90",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "12 Meses (80 cm)": 5,
+      "6-9 Meses (75 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1632.24",
+    "name": "PELELE CON GORRO - ROSA",
+    "description": "100% algodón",
+    "color": "Rosa",
+    "original_price": "22.99",
+    "discounted_price": "22.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "12 Meses (80 cm)": 5,
+      "2-4 Meses (65 cm)": 5,
+      "6-9 Meses (75 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1639.71",
+    "name": "CONJ. PUNTO 4 PIEZAS - SUNNY",
+    "description": "100% algodón",
+    "color": "Sunny",
+    "original_price": "35.90",
+    "discounted_price": "35.90",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "12 Meses (80 cm)": 5,
+      "18 Meses (86 cm)": 5,
+      "6-9 Meses (75 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1643.76",
+    "name": "CONJ. PUNTO 4 PIEZAS SISA - ROJO",
+    "description": "100% algodón",
+    "color": "Rojo",
+    "original_price": "33.90",
+    "discounted_price": "33.90",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "12 Meses (80 cm)": 5,
+      "18 Meses (86 cm)": 5,
+      "6-9 Meses (75 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1645.06",
+    "name": "PETO CORTO - ARROZ",
+    "description": "100% algodón",
+    "color": "Arroz",
+    "original_price": "15.99",
+    "discounted_price": "15.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "32-4 m": 5,
+      "0-1 Meses (55 cm)": 5,
+      "1-2 Meses (60 cm)": 5,
+      "4-6 Meses (70 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1650.29",
+    "name": "PETO CORTO Y GORRO - CLARO",
+    "description": "100% algodón",
+    "color": "Claro",
+    "original_price": "26.90",
+    "discounted_price": "26.90",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "2-4 Meses (65 cm)": 5,
+      "4-6 Meses (70 cm)": 5,
+      "6-9 Meses (75 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1737.82",
+    "name": "BAÑADOR Y GORRO - HAWAII",
+    "description": "100% algodón",
+    "color": "Hawaii",
+    "original_price": "24.90",
+    "discounted_price": "24.90",
+    "brand": "Mayoral",
+    "category": "Baño",
+    "sizes_stock": {
+      "4-6 Meses (70 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1814.31",
+    "name": "VESTIDO SERSUCKER - LAGOON",
+    "description": "100% algodón",
+    "color": "Lagoon",
+    "original_price": "31.90",
+    "discounted_price": "31.90",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "12 Meses (80 cm)": 5,
+      "6-9 Meses (75 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1820.31",
+    "name": "CONJ. FALDA - LAGOON",
+    "description": "100% algodón",
+    "color": "Lagoon",
+    "original_price": "28.90",
+    "discounted_price": "28.90",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "12 Meses (80 cm)": 5,
+      "2-4 Meses (65 cm)": 5,
+      "4-6 Meses (70 cm)": 5,
+      "6-9 Meses (75 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "9088.54",
+    "name": "MOCHILA PLAYA - VELERO",
+    "description": "100% algodón",
+    "color": "Velero",
+    "original_price": "17.90",
+    "discounted_price": "17.90",
+    "brand": "Mayoral",
+    "category": "Baño",
+    "sizes_stock": {
+      "Única": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "9124.94",
+    "name": "COLCHONETA - ANTRACITA",
+    "description": "100% algodón",
+    "color": "Antracita",
+    "original_price": "26.50",
+    "discounted_price": "26.50",
+    "brand": "Mayoral",
+    "category": "Complementos",
+    "sizes_stock": {
+      "Única": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "9124.96",
+    "name": "COLCHONETA - DUSTY BLUE",
+    "description": "100% algodón",
+    "color": "Dusty blue",
+    "original_price": "26.50",
+    "discounted_price": "26.50",
+    "brand": "Mayoral",
+    "category": "Complementos",
+    "sizes_stock": {
+      "Única": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "19085.94",
+    "name": "BOLSO ESTAMPADO - ANTRACITA",
+    "description": "100% algodón",
+    "color": "Antracita",
+    "original_price": "47.99",
+    "discounted_price": "47.99",
+    "brand": "Mayoral",
+    "category": "Complementos",
+    "sizes_stock": {
+      "Única": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "62156",
+    "name": "BERMUDA FELPA BASICA - MATCHA",
+    "description": "100% algodón",
+    "color": "Matcha",
+    "original_price": "9.99",
+    "discounted_price": "9.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "18 Meses (86 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "62157",
+    "name": "BERMUDA FELPA BASICA - OCEANO",
+    "description": "100% algodón",
+    "color": "Oceano",
+    "original_price": "9.99",
+    "discounted_price": "9.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "18 Meses (86 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "62160",
+    "name": "BERMUDA FELPA BASICA - ATOLON",
+    "description": "100% algodón",
+    "color": "Atolon",
+    "original_price": "9.99",
+    "discounted_price": "9.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92cm)": 5,
+      "3 Años (98 cm)": 5,
+      "18 Meses (86 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1118.41",
+    "name": "CAMISA M/L LINO C/CAMISERO - CAÑAMO",
+    "description": "100% algodón",
+    "color": "Cañamo",
+    "original_price": "18.99",
+    "discounted_price": "18.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niño (0-4 años)",
+    "sizes_stock": {
+      "2 Años (92 cm)": 5,
+      "3 Años (98 cm)": 5,
+      "4 Años (104 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "3202.54",
+    "name": "BERMUDA LINO RELAXED - ALGA",
+    "description": "100% algodón",
+    "color": "Alga",
+    "original_price": "24.90",
+    "discounted_price": "24.90",
+    "brand": "Mayoral",
+    "category": "Niño (3-9 años)",
+    "sizes_stock": {
+      "6 Años (116 cm)": 5,
+      "8 Años (128 cm)": 5,
+      "5 Años ( 110 cm)": 5,
+      "7 Años ( 122 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "3593.58",
+    "name": "CONJ. PANTALON LARGO RAYAS - CRD-MENTA",
+    "description": "100% algodón",
+    "color": "Crd-menta",
+    "original_price": "31.99",
+    "discounted_price": "31.99",
+    "brand": "Mayoral",
+    "category": "Niña (3-9 años)",
+    "sizes_stock": {
+      "4 Años (104 cm)": 5,
+      "6 Años (116 cm)": 5,
+      "8 Años (128 cm)": 5,
+      "9 Años (134 cm)": 5,
+      "5 Años ( 110 cm)": 5,
+      "7 Años ( 122 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "3232.80",
+    "name": "CONJ. SHORT PICULINAS - PACIFICO",
+    "description": "100% algodón",
+    "color": "Pacifico",
+    "original_price": "26.90",
+    "discounted_price": "26.90",
+    "brand": "Mayoral",
+    "category": "Niña (3-9 años)",
+    "sizes_stock": {
+      "3 Años (98 cm)": 5,
+      "6 Años (116 cm)": 5,
+      "8 Años (128 cm)": 5,
+      "5 Años ( 110 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "3734.44",
+    "name": "BIKINI ESTRUCTURA ESTAMPADO - PACIFICO",
+    "description": "100% algodón",
+    "color": "Pacifico",
+    "original_price": "21.90",
+    "discounted_price": "21.90",
+    "brand": "Mayoral",
+    "category": "Baño",
+    "sizes_stock": {
+      "3 Años (98 cm)": 5,
+      "6 Años (116 cm)": 5,
+      "8 Años (128 cm)": 5,
+      "5 Años ( 110 cm)": 5,
+      "7 Años ( 122 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1642.57",
+    "name": "CONJ. PANT. CORTO 4 PIEZAS - AQUA",
+    "description": "100% algodón",
+    "color": "Aqua",
+    "original_price": "36.99",
+    "discounted_price": "36.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "12 Meses (80 cm)": 5,
+      "4-6 Meses (70 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "1803.97",
+    "name": "VESTIDO - TERRACOTA",
+    "description": "100% algodón",
+    "color": "Terracota",
+    "original_price": "26.99",
+    "discounted_price": "26.99",
+    "brand": "Mayoral",
+    "category": "Bebé Niña (0-4 años)",
+    "sizes_stock": {
+      "12 Meses (80 cm)": 5,
+      "2-4 Meses (65 cm)": 5,
+      "4-6 Meses (70 cm)": 5,
+      "6-9 Meses (75 cm)": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "19093.25",
+    "name": "NECESER MULTIFUNCION - DUSTY BLUE",
+    "description": "100% algodón",
+    "color": "Dusty blue",
+    "original_price": "18.90",
+    "discounted_price": "18.90",
+    "brand": "Mayoral",
+    "category": "Complementos",
+    "sizes_stock": {
+      "Única": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
+  },
+  {
+    "code": "19093.27",
+    "name": "NECESER MULTIFUNCION - ANTRACITA",
+    "description": "100% algodón",
+    "color": "Antracita",
+    "original_price": "18.90",
+    "discounted_price": "18.90",
+    "brand": "Mayoral",
+    "category": "Complementos",
+    "sizes_stock": {
+      "Única": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=2070&auto=format&fit=crop",
+    "created_at": "2026-03-25T13:12:30.962Z",
+    "updated_at": "2026-03-25T13:12:30.962Z"
   }
 ]

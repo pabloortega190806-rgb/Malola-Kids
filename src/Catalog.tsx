@@ -5,7 +5,7 @@ import { Product } from './hooks/useProducts';
 import { ProductCard } from './components/ProductCard';
 
 export default function Catalog() {
-  const { brandName, categoryName } = useParams<{ brandName?: string, categoryName?: string }>();
+  const { brandName, categoryName, genderName, ageName } = useParams<{ brandName?: string, categoryName?: string, genderName?: string, ageName?: string }>();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,6 +22,12 @@ export default function Catalog() {
         }
         if (categoryName) {
           url += `&category=${encodeURIComponent(categoryName)}`;
+        }
+        if (genderName) {
+          url += `&gender=${encodeURIComponent(genderName)}`;
+        }
+        if (ageName) {
+          url += `&age=${encodeURIComponent(ageName)}`;
         }
         
         const response = await fetch(url);
@@ -45,7 +51,7 @@ export default function Catalog() {
     };
 
     fetchProducts();
-  }, [brandName, categoryName]);
+  }, [brandName, categoryName, genderName, ageName]);
 
   const sortedProducts = [...products].sort((a, b) => {
     if (sortBy === 'Precio: Menor a Mayor') {
@@ -61,7 +67,11 @@ export default function Catalog() {
     ? brandName.charAt(0).toUpperCase() + brandName.slice(1) 
     : categoryName 
       ? categoryName.charAt(0).toUpperCase() + categoryName.slice(1)
-      : 'Catálogo';
+      : genderName
+        ? genderName.charAt(0).toUpperCase() + genderName.slice(1)
+        : ageName
+          ? `Edad: ${ageName}`
+          : 'Catálogo';
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
