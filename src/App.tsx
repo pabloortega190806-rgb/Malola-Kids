@@ -167,7 +167,7 @@ export default function App() {
       {/* Footer */}
       <footer className="bg-[#FAF8F5] text-[#967A70] pt-16 pb-8 border-t border-[#E5D9C5]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
             {/* About */}
             <div className="lg:col-span-2">
               <img 
@@ -215,39 +215,17 @@ export default function App() {
                 </li>
               </ul>
             </div>
-
-            {/* Newsletter */}
-            <div>
-              <h4 className="text-lg font-serif font-semibold text-[#3E2A24] mb-6">Newsletter</h4>
-              <p className="text-sm mb-4">Suscríbete para recibir novedades y ofertas exclusivas.</p>
-              <form 
-                className="flex flex-col space-y-3"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  alert('¡Gracias por suscribirte a nuestra newsletter!');
-                  (e.target as HTMLFormElement).reset();
-                }}
-              >
-                <input 
-                  type="email" 
-                  placeholder="Tu correo electrónico" 
-                  className="bg-white border border-[#E5D9C5] text-[#5D4037] px-4 py-2 rounded-md focus:outline-none focus:border-[#B89F82] transition-colors text-sm"
-                  required
-                />
-                <button 
-                  type="submit" 
-                  className="bg-[#B89F82] text-white px-4 py-2 rounded-md font-medium hover:bg-[#A38A6D] transition-colors text-sm"
-                >
-                  Suscribirse
-                </button>
-              </form>
-            </div>
           </div>
 
           {/* Bottom Footer */}
           <div className="border-t border-[#E5D9C5] pt-8 flex flex-col md:flex-row justify-between items-center text-xs">
-            <p>&copy; {new Date().getFullYear()} Malola | Moda Infantil y Mujer. Todos los derechos reservados.</p>
-            <div className="flex flex-wrap gap-4 mt-4 md:mt-0 justify-center md:justify-end">
+            <div className="flex flex-col items-center md:items-start space-y-1.5 mb-4 md:mb-0">
+              <p>&copy; {new Date().getFullYear()} Malola | Moda Infantil y Mujer. Todos los derechos reservados.</p>
+              <p className="opacity-70">
+                Diseño y desarrollo por <a href="https://www.zentioweb.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#B89F82] transition-colors font-medium">Zentio Studio</a>
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-4 justify-center md:justify-end">
               <Link to="/politica-privacidad" className="hover:text-[#B89F82] transition-colors">Política de Privacidad</Link>
               <Link to="/politica-cookies" className="hover:text-[#B89F82] transition-colors">Política de Cookies</Link>
               <Link to="/terminos-y-condiciones" className="hover:text-[#B89F82] transition-colors">Términos y Condiciones</Link>
