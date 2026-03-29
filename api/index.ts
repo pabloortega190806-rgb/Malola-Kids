@@ -4,9 +4,12 @@ import fs from "fs";
 import path from "path";
 import { v2 as cloudinary } from "cloudinary";
 import multer from "multer";
+import Stripe from "stripe";
 import "dotenv/config";
 
 const { Pool } = pg;
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_placeholder");
 
 // Configurar Cloudinary
 cloudinary.config({
@@ -493,6 +496,70 @@ app.get("/api/debug-env", (req, res) => {
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
+});
+
+app.post("/api/create-checkout-session", async (req, res) => {
+  try {
+    const { items, shippingCost, customerEmail, shippingMethod, accumulateOrder } = req.body;
+
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error("Missing STRIPE_SECRET_KEY");
+      return res.status(500).json({ error: "Configuración de Stripe incompleta (falta Secret Key). Por favor, configúrala en los Secrets de AI Studio." });
+    }
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: "No items in cart" });
+    }
+
+    const lineItems = items.map((item: any) => ({
+      price_data: {
+        currency: "eur",
+        product_data: {
+          name: `${item.product.name} (Talla: ${item.size})`,
+          images: [item.product.image_url],
+          description: item.product.description || "",
+        },
+        unit_amount: Math.round(Number(item.product.discounted_price) * 100),
+      },
+      quantity: item.quantity,
+    }));
+
+    // Add shipping as a line item if applicable
+    if (shippingCost > 0) {
+      lineItems.push({
+        price_data: {
+          currency: "eur",
+          product_data: {
+            name: "Gastos de envío",
+            images: [],
+            description: "Envío a domicilio",
+          },
+          unit_amount: Math.round(shippingCost * 100),
+        },
+        quantity: 1,
+      });
+    }
+
+    const appUrl = process.env.APP_URL || "http://localhost:3000";
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: lineItems,
+      mode: "payment",
+      customer_email: customerEmail,
+      success_url: `${appUrl}/gracias?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${appUrl}/checkout`,
+      metadata: {
+        shippingMethod,
+        accumulateOrder: String(accumulateOrder),
+      },
+    });
+
+    res.json({ id: session.id, url: session.url });
+  } catch (error: any) {
+    console.error("Stripe Error Details:", error);
+    res.status(500).json({ error: error.message || "Error al conectar con Stripe" });
+  }
 });
 
 app.get("/api/debug/images", async (req, res) => {

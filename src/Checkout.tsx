@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCart } from './context/CartContext';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, CreditCard } from 'lucide-react';
 
 export default function Checkout() {
   const { items, cartTotal, accumulateOrder, clearCart } = useCart();
@@ -40,18 +40,21 @@ export default function Checkout() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const shippingCost = accumulateOrder || shippingMethod === 'store' || cartTotal >= 80 ? 0 : 5.50;
+  const finalTotal = cartTotal + shippingCost;
+
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
     setValidationError(null);
 
     try {
-      // Validate stock
-      const response = await fetch('/api/validate-cart', {
+      console.log('Iniciando proceso de checkout...');
+      // 1. Validate stock first
+      console.log('Validando stock...');
+      const validateResponse = await fetch('/api/validate-cart', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items: items.map(item => ({
             code: item.product.code,
@@ -61,12 +64,13 @@ export default function Checkout() {
         })
       });
 
-      const data = await response.json();
+      const validateData = await validateResponse.json();
+      console.log('Resultado validación stock:', validateData);
 
-      if (!response.ok || !data.valid) {
+      if (!validateResponse.ok || !validateData.valid) {
         let errorMessage = 'Lo sentimos, hay problemas de stock con algunos productos:\n';
-        if (data.issues && Array.isArray(data.issues)) {
-          data.issues.forEach((issue: any) => {
+        if (validateData.issues && Array.isArray(validateData.issues)) {
+          validateData.issues.forEach((issue: any) => {
             if (issue.issue === 'out_of_stock') {
               errorMessage += `- ${issue.name} (Talla ${issue.size}) está agotado.\n`;
             } else if (issue.issue === 'insufficient_stock') {
@@ -76,26 +80,50 @@ export default function Checkout() {
             }
           });
         } else {
-          errorMessage = data.error || 'Error al validar el stock.';
+          errorMessage = validateData.error || 'Error al validar el stock.';
         }
         setValidationError(errorMessage);
         setIsProcessing(false);
         return;
       }
 
-      // In a real app, we would send the order to the backend here
-      alert('¡Pedido realizado con éxito!');
-      clearCart();
-      navigate('/');
-    } catch (error) {
-      setValidationError('Hubo un error al procesar el pedido. Por favor, inténtalo de nuevo.');
+      // 2. Create Stripe Checkout Session
+      console.log('Creando sesión de Stripe...');
+      const checkoutResponse = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items,
+          shippingCost,
+          customerEmail: formData.email,
+          shippingMethod,
+          accumulateOrder,
+          shippingAddress: formData
+        })
+      });
+
+      const checkoutData = await checkoutResponse.json();
+      console.log('Respuesta de sesión Stripe:', checkoutData);
+
+      if (!checkoutResponse.ok) {
+        throw new Error(checkoutData.error || 'Error al crear la sesión de pago.');
+      }
+
+      // 3. Redirect to Stripe
+      console.log('Redirigiendo a Stripe...');
+      if (checkoutData.url) {
+        window.location.href = checkoutData.url;
+      } else {
+        throw new Error('No se recibió la URL de pago de Stripe.');
+      }
+
+    } catch (error: any) {
+      console.error('Error detallado en Checkout:', error);
+      setValidationError(error.message || 'Hubo un error al procesar el pago. Por favor, inténtalo de nuevo.');
     } finally {
       setIsProcessing(false);
     }
   };
-
-  const shippingCost = accumulateOrder || shippingMethod === 'store' || cartTotal >= 80 ? 0 : 5.50;
-  const finalTotal = cartTotal + shippingCost;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

@@ -21,6 +21,7 @@ import Contacto from './Contacto';
 import SearchPage from './SearchPage';
 import ScrollToTop from './components/ScrollToTop';
 import AdminDashboard from './AdminDashboard';
+import Gracias from './Gracias';
 
 function PageTracker() {
   const location = useLocation();
@@ -161,6 +162,7 @@ export default function App() {
           <Route path="/producto/:code" element={<ProductDetails />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/gracias" element={<Gracias />} />
         </Routes>
       </main>
 
