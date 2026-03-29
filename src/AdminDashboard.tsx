@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAdmin } from './context/AdminContext';
 import { useNavigate } from 'react-router-dom';
-import { Lock, LogOut, ExternalLink, BarChart3, Eye, MousePointerClick } from 'lucide-react';
+import { Lock, LogOut, ExternalLink, BarChart3, Eye, MousePointerClick, ShoppingBag } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 
 export default function AdminDashboard() {
@@ -11,24 +11,33 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   
   const [analyticsData, setAnalyticsData] = useState<any>(null);
+  const [orders, setOrders] = useState<any[]>([]);
   const [loadingAnalytics, setLoadingAnalytics] = useState(false);
+  const [loadingOrders, setLoadingOrders] = useState(false);
 
   useEffect(() => {
     if (isAdmin && token) {
       setLoadingAnalytics(true);
       fetch('/api/admin/analytics', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       })
         .then(res => res.json())
         .then(data => {
-          if (data.success) {
-            setAnalyticsData(data.data);
-          }
+          if (data.success) setAnalyticsData(data.data);
         })
         .catch(err => console.error("Error fetching analytics:", err))
         .finally(() => setLoadingAnalytics(false));
+
+      setLoadingOrders(true);
+      fetch('/api/admin/orders', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) setOrders(data.data);
+        })
+        .catch(err => console.error("Error fetching orders:", err))
+        .finally(() => setLoadingOrders(false));
     }
   }, [isAdmin, token]);
 
@@ -90,6 +99,70 @@ export default function AdminDashboard() {
           <LogOut size={20} className="mr-2" />
           Cerrar Sesión
         </button>
+      </div>
+
+      <div className="grid grid-cols-1 gap-8 mb-12">
+        <div className="bg-white p-8 rounded-xl shadow-sm border border-[#F5F0EB]">
+          <h2 className="text-2xl font-serif font-bold text-[#3E2A24] mb-6 flex items-center">
+            <ShoppingBag className="mr-3 text-[#B89F82]" />
+            Pedidos Recientes
+          </h2>
+          {loadingOrders ? (
+            <p className="text-center py-8">Cargando pedidos...</p>
+          ) : orders.length === 0 ? (
+            <p className="text-center py-8 text-gray-500 italic">No hay pedidos registrados todavía.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-[#F5F0EB]">
+                    <th className="py-4 px-4 font-serif font-semibold text-[#5D4037]">ID</th>
+                    <th className="py-4 px-4 font-serif font-semibold text-[#5D4037]">Fecha</th>
+                    <th className="py-4 px-4 font-serif font-semibold text-[#5D4037]">Cliente</th>
+                    <th className="py-4 px-4 font-serif font-semibold text-[#5D4037]">Total</th>
+                    <th className="py-4 px-4 font-serif font-semibold text-[#5D4037]">Estado</th>
+                    <th className="py-4 px-4 font-serif font-semibold text-[#5D4037]">Detalles</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders.map((order) => (
+                    <tr key={order.id} className="border-b border-[#F5F0EB] hover:bg-[#FCFBF9] transition-colors">
+                      <td className="py-4 px-4 text-sm text-gray-600">#{order.id}</td>
+                      <td className="py-4 px-4 text-sm text-gray-600">
+                        {new Date(order.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-600">
+                        <div className="font-medium text-[#3E2A24]">{order.customer_email}</div>
+                        <div className="text-xs text-gray-400">{order.shipping_address?.name}</div>
+                      </td>
+                      <td className="py-4 px-4 text-sm font-medium text-[#3E2A24]">
+                        {Number(order.total_amount).toFixed(2)}€
+                      </td>
+                      <td className="py-4 px-4">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          order.status === 'paid' ? 'bg-green-100 text-green-700' : 
+                          order.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 
+                          'bg-gray-100 text-gray-700'
+                        }`}>
+                          {order.status === 'paid' ? 'Pagado' : 
+                           order.status === 'pending' ? 'Pendiente' : 
+                           order.status}
+                        </span>
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-600">
+                        <div className="text-xs">
+                          {order.items?.map((item: any, idx: number) => (
+                            <div key={idx}>{item.quantity}x {item.name} ({item.size})</div>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">

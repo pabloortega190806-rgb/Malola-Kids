@@ -114,7 +114,7 @@ export default function Checkout() {
       if (checkoutData.url) {
         window.location.href = checkoutData.url;
       } else {
-        throw new Error('No se recibió la URL de pago de Stripe.');
+        throw new Error('No se recibió la URL de pago de Stripe. Verifica la configuración del servidor.');
       }
 
     } catch (error: any) {

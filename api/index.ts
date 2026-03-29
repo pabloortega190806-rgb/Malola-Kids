@@ -9,14 +9,42 @@ import "dotenv/config";
 
 const { Pool } = pg;
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_placeholder");
+// Lazy initialization for Stripe
+let stripeInstance: Stripe | null = null;
 
-// Configurar Cloudinary
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME || "daom5jnck",
-  api_key: process.env.CLOUDINARY_API_KEY || "159654824825549",
-  api_secret: process.env.CLOUDINARY_API_SECRET || "mqrpVaFqzeYW9HnprvElLH39dNg",
-});
+function getStripe() {
+  if (!stripeInstance) {
+    const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+    if (!STRIPE_SECRET_KEY) {
+      throw new Error("STRIPE_SECRET_KEY is not configured in environment variables.");
+    }
+    stripeInstance = new Stripe(STRIPE_SECRET_KEY);
+  }
+  return stripeInstance;
+}
+
+// Lazy initialization for Cloudinary
+let cloudinaryConfigured = false;
+
+function configureCloudinary() {
+  if (!cloudinaryConfigured) {
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const apiKey = process.env.CLOUDINARY_API_KEY;
+    const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+    if (!cloudName || !apiKey || !apiSecret) {
+      console.warn("⚠️ Cloudinary credentials are not fully configured in environment variables.");
+      return;
+    }
+
+    cloudinary.config({
+      cloud_name: cloudName,
+      api_key: apiKey,
+      api_secret: apiSecret,
+    });
+    cloudinaryConfigured = true;
+  }
+}
 
 // Lazy initialization para la conexión a la base de datos
 let pool: pg.Pool | null = null;
@@ -43,10 +71,11 @@ let imageCacheTime = 0;
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 async function getAllCloudinaryImages() {
+  configureCloudinary();
   if (Date.now() - imageCacheTime < CACHE_TTL && imageCache.length > 0) {
     return imageCache;
   }
-  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME || "daom5jnck";
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   if (!cloudName) return [];
   
   try {
@@ -245,10 +274,11 @@ async function findBlobsForCode(code: string): Promise<{ blobs: any[], matchedVa
 }
 
 async function getProductImages(code: string | number, localFiles: string[]): Promise<{ images: string[], mainImage?: string }> {
+  configureCloudinary();
   const codeStr = String(code).trim();
   
   try {
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME || "daom5jnck";
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
     if (cloudName) {
       const { blobs: matchingBlobs, matchedVariation } = await findBlobsForCode(codeStr);
 
@@ -289,7 +319,75 @@ async function getProductImages(code: string | number, localFiles: string[]): Pr
 }
 
 const app = express();
+
+// Webhook endpoint MUST be before express.json() to handle raw body
+app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, res) => {
+  const stripe = getStripe();
+  const sig = req.headers["stripe-signature"];
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  let event;
+
+  try {
+    if (webhookSecret && sig) {
+      event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+    } else {
+      // Fallback for testing if secret is not set (not recommended for production)
+      event = JSON.parse(req.body.toString());
+    }
+  } catch (err: any) {
+    console.error(`Webhook Error: ${err.message}`);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    await handleSuccessfulPayment(session);
+  }
+
+  res.json({ received: true });
+});
+
 app.use(express.json());
+
+async function handleSuccessfulPayment(session: any) {
+  const db = getDbPool();
+  if (!db) return;
+
+  const { metadata, customer_email, amount_total, id: sessionId } = session;
+  const orderId = metadata.orderId;
+
+  try {
+    // 1. Update order status
+    const orderResult = await db.query(
+      `UPDATE orders 
+       SET status = 'paid', 
+           stripe_session_id = $1, 
+           shipping_address = $2,
+           customer_email = $3
+       WHERE id = $4 OR stripe_session_id = $1
+       RETURNING items`,
+      [sessionId, JSON.stringify(session.shipping_details), customer_email, orderId]
+    );
+
+    if (orderResult.rows.length > 0) {
+      const items = orderResult.rows[0].items;
+      // 2. Update stock
+      for (const item of items) {
+        const { code, size, quantity } = item;
+        await db.query(
+          `UPDATE products 
+           SET sizes_stock = sizes_stock || jsonb_build_object($1, (COALESCE((sizes_stock->>$1)::int, 0) - $2))
+           WHERE code = $3`,
+          [size, quantity, code]
+        );
+      }
+      console.log(`Order ${orderId || sessionId} processed successfully.`);
+    }
+  } catch (err) {
+    console.error("Error processing successful payment:", err);
+  }
+}
 
 // Analytics tracking endpoint
 app.post("/api/track-view", (req, res) => {
@@ -344,6 +442,7 @@ const requireAdmin = (req: express.Request, res: express.Response, next: express
 const upload = multer({ storage: multer.memoryStorage() });
 
 app.post("/api/admin/upload-image", requireAdmin, upload.single("image"), async (req, res) => {
+  configureCloudinary();
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, error: "No se proporcionó ninguna imagen" });
@@ -435,6 +534,19 @@ app.put("/api/products/:code", requireAdmin, async (req, res) => {
   }
 });
 
+app.get("/api/admin/orders", requireAdmin, async (req, res) => {
+  const db = getDbPool();
+  if (!db) return res.status(503).json({ error: "DB not configured" });
+
+  try {
+    const result = await db.query('SELECT * FROM orders ORDER BY created_at DESC LIMIT 100');
+    res.json({ success: true, data: result.rows });
+  } catch (err: any) {
+    console.error("Error fetching orders:", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 app.get("/api/admin/analytics", requireAdmin, async (req, res) => {
   const db = getDbPool();
   if (!db) return res.status(503).json({ error: "DB not configured" });
@@ -489,6 +601,8 @@ app.get("/api/debug-env", (req, res) => {
     hasCloudinary: !!process.env.CLOUDINARY_CLOUD_NAME,
     cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
     hasDbUrl: !!process.env.DATABASE_URL,
+    hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
+    stripeKeyPrefix: process.env.STRIPE_SECRET_KEY ? process.env.STRIPE_SECRET_KEY.substring(0, 7) : null,
     nodeEnv: process.env.NODE_ENV,
     adminPassword: process.env.ADMIN_PASSWORD || 'MALOLAKIDS2026'
   });
@@ -502,27 +616,63 @@ app.post("/api/create-checkout-session", async (req, res) => {
   try {
     const { items, shippingCost, customerEmail, shippingMethod, accumulateOrder } = req.body;
 
-    if (!process.env.STRIPE_SECRET_KEY) {
-      console.error("Missing STRIPE_SECRET_KEY");
-      return res.status(500).json({ error: "Configuración de Stripe incompleta (falta Secret Key). Por favor, configúrala en los Secrets de AI Studio." });
-    }
-
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: "No items in cart" });
     }
 
-    const lineItems = items.map((item: any) => ({
-      price_data: {
-        currency: "eur",
-        product_data: {
-          name: `${item.product.name} (Talla: ${item.size})`,
-          images: [item.product.image_url],
-          description: item.product.description || "",
+    const db = getDbPool();
+    let orderId = null;
+
+    // 1. Create a pending order in the database
+    if (db) {
+      try {
+        const orderResult = await db.query(
+          `INSERT INTO orders (customer_email, total_amount, shipping_cost, shipping_method, items, status)
+           VALUES ($1, $2, $3, $4, $5, $6)
+           RETURNING id`,
+          [
+            customerEmail, 
+            items.reduce((acc, item) => acc + (Number(item.product.discounted_price) * item.quantity), 0) + shippingCost,
+            shippingCost,
+            shippingMethod,
+            JSON.stringify(items.map(i => ({
+              code: i.product.code,
+              name: i.product.name,
+              size: i.size,
+              quantity: i.quantity,
+              price: i.product.discounted_price
+            }))),
+            'pending'
+          ]
+        );
+        orderId = orderResult.rows[0].id;
+      } catch (dbErr) {
+        console.error("Error creating pending order:", dbErr);
+      }
+    }
+
+    const appUrl = process.env.APP_URL || "http://localhost:3000";
+
+    const lineItems = items.map((item: any) => {
+      // Ensure image URL is absolute for Stripe
+      let imageUrl = item.product.image_url;
+      if (imageUrl && imageUrl.startsWith('/')) {
+        imageUrl = `${appUrl}${imageUrl}`;
+      }
+
+      return {
+        price_data: {
+          currency: "eur",
+          product_data: {
+            name: `${item.product.name} (Talla: ${item.size})`,
+            images: imageUrl ? [imageUrl] : [],
+            description: item.product.description || "",
+          },
+          unit_amount: Math.round(Number(item.product.discounted_price) * 100),
         },
-        unit_amount: Math.round(Number(item.product.discounted_price) * 100),
-      },
-      quantity: item.quantity,
-    }));
+        quantity: item.quantity,
+      };
+    });
 
     // Add shipping as a line item if applicable
     if (shippingCost > 0) {
@@ -540,8 +690,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
       });
     }
 
-    const appUrl = process.env.APP_URL || "http://localhost:3000";
-
+    const stripe = getStripe();
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: lineItems,
@@ -550,10 +699,21 @@ app.post("/api/create-checkout-session", async (req, res) => {
       success_url: `${appUrl}/gracias?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/checkout`,
       metadata: {
+        orderId: orderId ? String(orderId) : "",
         shippingMethod,
         accumulateOrder: String(accumulateOrder),
       },
+      // Optional: Allow Stripe to collect shipping address
+      billing_address_collection: 'required',
+      shipping_address_collection: {
+        allowed_countries: ['ES'], // Only Spain for now, or add more
+      },
     });
+
+    // Update order with session ID if it was created
+    if (db && orderId) {
+      await db.query('UPDATE orders SET stripe_session_id = $1 WHERE id = $2', [session.id, orderId]);
+    }
 
     res.json({ id: session.id, url: session.url });
   } catch (error: any) {
@@ -563,12 +723,13 @@ app.post("/api/create-checkout-session", async (req, res) => {
 });
 
 app.get("/api/debug/images", async (req, res) => {
+  configureCloudinary();
   try {
     const blobs = await getAllCloudinaryImages();
     res.json({ 
       count: blobs.length, 
       sample: blobs,
-      cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME || "daom5jnck"
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
     });
   } catch (e: any) {
     res.status(500).json({ error: e.message });
@@ -577,11 +738,12 @@ app.get("/api/debug/images", async (req, res) => {
 
 // Endpoint to resolve and redirect to the correct Cloudinary image
 app.get("/api/get-image/:code", async (req, res) => {
+  configureCloudinary();
   const { code } = req.params;
   const index = parseInt(req.query.index as string) || 0;
   
   try {
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME || "daom5jnck";
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
     if (cloudName) {
       const { blobs: matchingBlobs } = await findBlobsForCode(code);
 
@@ -871,7 +1033,7 @@ app.get("/api/product-images/:code", async (req, res) => {
   const code = req.params.code;
   const codeStr = String(code).trim();
   try {
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME || "daom5jnck";
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
     if (cloudName) {
       const { blobs: matchingBlobs, matchedVariation } = await findBlobsForCode(code);
 

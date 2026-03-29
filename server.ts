@@ -3,7 +3,7 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import pg from "pg";
 import "dotenv/config";
-import apiApp from "./api/index.js";
+import apiApp from "./api/index.ts";
 
 const { Pool } = pg;
 let pool: pg.Pool | null = null;
@@ -34,6 +34,20 @@ async function initDb() {
       );
       CREATE INDEX IF NOT EXISTS idx_page_views_created_at ON page_views(created_at DESC);
       CREATE INDEX IF NOT EXISTS idx_page_views_path ON page_views(path);
+      CREATE TABLE IF NOT EXISTS orders (
+        id SERIAL PRIMARY KEY,
+        stripe_session_id VARCHAR(255) UNIQUE,
+        customer_email VARCHAR(255),
+        total_amount NUMERIC(10, 2),
+        shipping_cost NUMERIC(10, 2),
+        shipping_method VARCHAR(50),
+        shipping_address JSONB,
+        items JSONB,
+        status VARCHAR(50) DEFAULT 'pending',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_orders_stripe_session_id ON orders(stripe_session_id);
+      CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at DESC);
     `);
     console.log("Database tables initialized successfully.");
   } catch (err) {
