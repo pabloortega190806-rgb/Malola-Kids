@@ -106,7 +106,11 @@ export default function Checkout() {
       console.log('Respuesta de sesión Stripe:', checkoutData);
 
       if (!checkoutResponse.ok) {
-        throw new Error(checkoutData.error || 'Error al crear la sesión de pago.');
+        let errorMsg = checkoutData.error || 'Error al crear la sesión de pago.';
+        if (errorMsg.includes('STRIPE_SECRET_KEY')) {
+          errorMsg = 'Error de configuración: La pasarela de pago no está lista. Por favor, contacta con la administración.';
+        }
+        throw new Error(errorMsg);
       }
 
       // 3. Redirect to Stripe

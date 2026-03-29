@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAdmin } from './context/AdminContext';
 import { useNavigate } from 'react-router-dom';
-import { Lock, LogOut, ExternalLink, BarChart3, Eye, MousePointerClick, ShoppingBag } from 'lucide-react';
+import { Lock, LogOut, ExternalLink, BarChart3, Eye, MousePointerClick, ShoppingBag, Settings, CheckCircle2, XCircle } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 
 export default function AdminDashboard() {
@@ -12,8 +12,10 @@ export default function AdminDashboard() {
   
   const [analyticsData, setAnalyticsData] = useState<any>(null);
   const [orders, setOrders] = useState<any[]>([]);
+  const [debugEnv, setDebugEnv] = useState<any>(null);
   const [loadingAnalytics, setLoadingAnalytics] = useState(false);
   const [loadingOrders, setLoadingOrders] = useState(false);
+  const [loadingDebug, setLoadingDebug] = useState(false);
 
   useEffect(() => {
     if (isAdmin && token) {
@@ -38,6 +40,13 @@ export default function AdminDashboard() {
         })
         .catch(err => console.error("Error fetching orders:", err))
         .finally(() => setLoadingOrders(false));
+
+      setLoadingDebug(true);
+      fetch('/api/debug-env')
+        .then(res => res.json())
+        .then(data => setDebugEnv(data))
+        .catch(err => console.error("Error fetching debug env:", err))
+        .finally(() => setLoadingDebug(false));
     }
   }, [isAdmin, token]);
 
@@ -166,6 +175,46 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div className="bg-white p-8 rounded-xl shadow-sm border border-[#F5F0EB] md:col-span-1">
+          <h2 className="text-xl font-serif font-bold text-[#3E2A24] mb-4 flex items-center">
+            <Settings className="mr-2 text-[#B89F82]" size={20} />
+            Estado del Sistema
+          </h2>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[#5D4037]">Base de Datos:</span>
+              {debugEnv?.hasDbUrl ? (
+                <CheckCircle2 size={18} className="text-green-500" />
+              ) : (
+                <XCircle size={18} className="text-red-500" />
+              )}
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[#5D4037]">Stripe (Pagos):</span>
+              {debugEnv?.hasStripeKey ? (
+                <CheckCircle2 size={18} className="text-green-500" />
+              ) : (
+                <XCircle size={18} className="text-red-500" />
+              )}
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[#5D4037]">Cloudinary (Imágenes):</span>
+              {debugEnv?.hasCloudinary ? (
+                <CheckCircle2 size={18} className="text-green-500" />
+              ) : (
+                <XCircle size={18} className="text-red-500" />
+              )}
+            </div>
+            {!debugEnv?.hasStripeKey && (
+              <div className="mt-4 p-3 bg-red-50 rounded-md border border-red-100">
+                <p className="text-xs text-red-700">
+                  <strong>Atención:</strong> Falta la clave de Stripe. Los pagos no funcionarán hasta que la añadas en las variables de entorno de tu servidor (Vercel).
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
         <div className="bg-white p-8 rounded-xl shadow-sm border border-[#F5F0EB] md:col-span-1">
           <h2 className="text-xl font-serif font-bold text-[#3E2A24] mb-4">Gestión de Productos</h2>
           <p className="text-[#5D4037] mb-6">

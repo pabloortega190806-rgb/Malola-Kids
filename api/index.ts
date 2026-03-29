@@ -16,7 +16,7 @@ function getStripe() {
   if (!stripeInstance) {
     const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
     if (!STRIPE_SECRET_KEY) {
-      throw new Error("STRIPE_SECRET_KEY is not configured in environment variables.");
+      throw new Error("Falta la configuración de Stripe (STRIPE_SECRET_KEY). Si estás en Vercel, añádela en 'Project Settings > Environment Variables'.");
     }
     stripeInstance = new Stripe(STRIPE_SECRET_KEY);
   }
