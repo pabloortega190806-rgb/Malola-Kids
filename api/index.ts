@@ -147,14 +147,18 @@ async function findBlobsForCode(code: string): Promise<{ blobs: any[], matchedVa
     cleanCodeStr = cleanCodeStr.substring(3);
   }
 
-  const baseCode = cleanCodeStr.split(/[-_]/)[0];
+  const baseCode = cleanCodeStr.split(/[-_.]/)[0];
+  const alphanumericOnly = cleanCodeStr.replace(/[^a-zA-Z0-9]/g, '');
   
   const variations = Array.from(new Set([
     `26-${cleanCodeStr}`,
     `26_${cleanCodeStr}`,
     cleanCodeStr,
-    cleanCodeStr.replace(/-/g, '_'),
-    cleanCodeStr.replace(/_/g, '-')
+    cleanCodeStr.replace(/[-.]/g, '_'),
+    cleanCodeStr.replace(/[_.]/g, '-'),
+    alphanumericOnly,
+    `26-${alphanumericOnly}`,
+    `26_${alphanumericOnly}`
   ]));
 
   // Mayoral specific variations
@@ -166,11 +170,19 @@ async function findBlobsForCode(code: string): Promise<{ blobs: any[], matchedVa
       const part2 = parts[1].padStart(3, '0');
       variations.push(`26-${part1}-${part2}`);
       variations.push(`26_${part1}_${part2}`);
+      variations.push(`26-${parts[0]}-${parts[1]}`);
+      variations.push(`${parts[0]}-${parts[1]}`);
+      variations.push(`${parts[0]}_${parts[1]}`);
+      variations.push(parts[0] + parts[1]);
     } else if (parts.length === 3) {
       const part1 = (parts[0] + parts[1]).padStart(5, '0');
       const part2 = parts[2].padStart(3, '0');
       variations.push(`26-${part1}-${part2}`);
       variations.push(`26_${part1}_${part2}`);
+      variations.push(`26-${parts[0]}${parts[1]}-${parts[2]}`);
+      variations.push(`${parts[0]}${parts[1]}-${parts[2]}`);
+      variations.push(`${parts[0]}${parts[1]}_${parts[2]}`);
+      variations.push(parts[0] + parts[1] + parts[2]);
     }
   } else if (cleanCodeStr.includes('-')) {
     const parts = cleanCodeStr.split('-');
@@ -179,6 +191,7 @@ async function findBlobsForCode(code: string): Promise<{ blobs: any[], matchedVa
       const part2 = parts[1].padStart(3, '0');
       variations.push(`26-${part1}-${part2}`);
       variations.push(`26_${part1}_${part2}`);
+      variations.push(parts[0] + parts[1]);
     }
   }
 
@@ -189,8 +202,20 @@ async function findBlobsForCode(code: string): Promise<{ blobs: any[], matchedVa
       const ext = path.extname(blob.pathname).toLowerCase();
       const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
       const nameWithoutExt = path.basename(blob.pathname, ext);
-      return isImage && nameWithoutExt.startsWith(variation) && 
-        (nameWithoutExt.substring(variation.length) === '' || /^[-_. ]/.test(nameWithoutExt.substring(variation.length)));
+      
+      // Exact match or starts with variation + separator/number
+      if (!isImage) return false;
+      if (nameWithoutExt === variation) return true;
+      
+      // Flexible matching: if the image name contains the variation
+      // e.g. "IMG_19093_27_front" contains "19093_27"
+      if (nameWithoutExt.includes(variation)) {
+        // Ensure it's not just a substring of another number (e.g. 123 inside 91234)
+        const regex = new RegExp(`(^|[^0-9a-zA-Z])${variation}([^0-9a-zA-Z]|$)`, 'i');
+        return regex.test(nameWithoutExt);
+      }
+      
+      return false;
     });
     if (matchingBlobs.length > 0) {
       return { blobs: matchingBlobs, matchedVariation: variation };
@@ -209,8 +234,15 @@ async function findBlobsForCode(code: string): Promise<{ blobs: any[], matchedVa
         const ext = path.extname(blob.pathname).toLowerCase();
         const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
         const nameWithoutExt = path.basename(blob.pathname, ext);
-        return isImage && nameWithoutExt.startsWith(variation) && 
-          (nameWithoutExt.substring(variation.length) === '' || /^[^0-9]/.test(nameWithoutExt.substring(variation.length)));
+        
+        if (!isImage) return false;
+        if (nameWithoutExt === variation) return true;
+        
+        if (nameWithoutExt.includes(variation)) {
+          const regex = new RegExp(`(^|[^0-9a-zA-Z])${variation}([^0-9a-zA-Z]|$)`, 'i');
+          return regex.test(nameWithoutExt);
+        }
+        return false;
       });
       if (matchingBlobs.length > 0) {
         return { blobs: matchingBlobs, matchedVariation: variation };
@@ -851,6 +883,28 @@ app.get("/api/categories", async (req, res) => {
   } catch (error) {
     console.error("Error fetching categories:", error);
     res.status(500).json({ error: "Error interno del servidor al obtener categorías" });
+  }
+});
+
+app.get("/api/debug-cloudinary2", async (req, res) => {
+  try {
+    configureCloudinary();
+    const result: any = await cloudinary.api.resources({
+      type: 'upload',
+      max_results: 10
+    });
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: String(err), stack: err.stack });
+  }
+});
+
+app.get("/api/debug-cloudinary", async (req, res) => {
+  try {
+    const blobs = await getAllCloudinaryImages();
+    res.json({ count: blobs.length, blobs: blobs.slice(0, 5) });
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
   }
 });
 

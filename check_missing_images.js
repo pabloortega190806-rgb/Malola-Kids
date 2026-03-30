@@ -32,7 +32,7 @@ async function main() {
     
     console.log(`\n\nTotal products without images: ${missingCount}`);
     console.log(`Total products WITH images: ${foundCount}`);
-    console.log(`Some missing codes:`, missingProducts.slice(0, 10));
+    console.log(`Missing codes:`, missingProducts);
   } catch (e) {
     console.error(e);
   }
