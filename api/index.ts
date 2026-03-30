@@ -758,7 +758,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
           product_data: {
             name: `${item.product.name} (Talla: ${item.size})`,
             images: imageUrl ? [imageUrl] : [],
-            description: item.product.description || "",
+            ...(item.product.description ? { description: item.product.description } : {}),
           },
           unit_amount: Math.round(Number(item.product.discounted_price) * 100),
         },
