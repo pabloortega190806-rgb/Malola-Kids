@@ -315,10 +315,31 @@ async function getProductImages(code: string | number, localFiles: string[]): Pr
       const { blobs: matchingBlobs, matchedVariation } = await findBlobsForCode(codeStr);
 
       if (matchingBlobs.length > 0) {
-        // Sort to ensure consistent order
+        // Sort to ensure consistent order and prioritize the main image
         matchingBlobs.sort((a, b) => {
-          const aName = path.basename(a.pathname, path.extname(a.pathname));
-          const bName = path.basename(b.pathname, path.extname(b.pathname));
+          const aName = path.basename(a.pathname, path.extname(a.pathname)).toLowerCase();
+          const bName = path.basename(b.pathname, path.extname(b.pathname)).toLowerCase();
+          
+          const getScore = (name: string) => {
+            if (name === matchedVariation.toLowerCase()) return 0;
+            if (name.includes('front') || name.includes('frontal') || name.includes('delante') || name.includes('principal')) return 1;
+            if (name.endsWith('_1') || name.endsWith('-1')) return 2;
+            if (name.includes('back') || name.includes('espalda') || name.includes('detras')) return 4;
+            if (name.includes('detail') || name.includes('detalle')) return 5;
+            return 3;
+          };
+
+          const scoreA = getScore(aName);
+          const scoreB = getScore(bName);
+
+          if (scoreA !== scoreB) {
+            return scoreA - scoreB;
+          }
+          
+          if (aName.length !== bName.length) {
+            return aName.length - bName.length;
+          }
+
           return aName.localeCompare(bName);
         });
 
@@ -818,10 +839,31 @@ app.get("/api/get-image/:code", async (req, res) => {
     if (cloudName) {
       const { blobs: matchingBlobs } = await findBlobsForCode(code);
 
-      // Sort to ensure consistent order
+      // Sort to ensure consistent order and prioritize the main image
       matchingBlobs.sort((a, b) => {
-        const aName = path.basename(a.pathname, path.extname(a.pathname));
-        const bName = path.basename(b.pathname, path.extname(b.pathname));
+        const aName = path.basename(a.pathname, path.extname(a.pathname)).toLowerCase();
+        const bName = path.basename(b.pathname, path.extname(b.pathname)).toLowerCase();
+        
+        const getScore = (name: string) => {
+          if (name === code.toLowerCase()) return 0;
+          if (name.includes('front') || name.includes('frontal') || name.includes('delante') || name.includes('principal')) return 1;
+          if (name.endsWith('_1') || name.endsWith('-1')) return 2;
+          if (name.includes('back') || name.includes('espalda') || name.includes('detras')) return 4;
+          if (name.includes('detail') || name.includes('detalle')) return 5;
+          return 3;
+        };
+
+        const scoreA = getScore(aName);
+        const scoreB = getScore(bName);
+
+        if (scoreA !== scoreB) {
+          return scoreA - scoreB;
+        }
+        
+        if (aName.length !== bName.length) {
+          return aName.length - bName.length;
+        }
+
         return aName.localeCompare(bName);
       });
 
