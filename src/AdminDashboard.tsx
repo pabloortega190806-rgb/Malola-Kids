@@ -142,7 +142,16 @@ export default function AdminDashboard() {
                       </td>
                       <td className="py-4 px-4 text-sm text-gray-600">
                         <div className="font-medium text-[#3E2A24]">{order.customer_email}</div>
-                        <div className="text-xs text-gray-400">{order.shipping_address?.name}</div>
+                        {order.shipping_method === 'store' ? (
+                          <div className="text-xs font-bold text-[#B89F82] mt-1">RECOGIDA EN TIENDA</div>
+                        ) : (
+                          <div className="text-xs text-gray-500 mt-1">
+                            {order.shipping_address?.firstName || order.shipping_address?.name} {order.shipping_address?.lastName || ''}<br/>
+                            {order.shipping_address?.address || order.shipping_address?.line1}<br/>
+                            {order.shipping_address?.postalCode || order.shipping_address?.postal_code} {order.shipping_address?.city}<br/>
+                            {order.shipping_address?.phone && <span>Tel: {order.shipping_address.phone}</span>}
+                          </div>
+                        )}
                       </td>
                       <td className="py-4 px-4 text-sm font-medium text-[#3E2A24]">
                         {Number(order.total_amount).toFixed(2)}€

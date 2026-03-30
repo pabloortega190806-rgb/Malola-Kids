@@ -363,11 +363,11 @@ async function handleSuccessfulPayment(session: any) {
       `UPDATE orders 
        SET status = 'paid', 
            stripe_session_id = $1, 
-           shipping_address = $2,
-           customer_email = $3
+           shipping_address = COALESCE(shipping_address, $2),
+           customer_email = COALESCE($3, customer_email)
        WHERE id = $4 OR stripe_session_id = $1
        RETURNING items`,
-      [sessionId, JSON.stringify(session.shipping_details), customer_email, orderId]
+      [sessionId, session.shipping_details ? JSON.stringify(session.shipping_details) : null, customer_email, orderId]
     );
 
     if (orderResult.rows.length > 0) {
@@ -383,6 +383,44 @@ async function handleSuccessfulPayment(session: any) {
         );
       }
       console.log(`Order ${orderId || sessionId} processed successfully.`);
+
+      // Enviar notificación por email usando Formspree
+      try {
+        const shippingMethod = metadata?.shippingMethod || 'standard';
+        const accumulateOrder = metadata?.accumulateOrder === 'true';
+        
+        let shippingText = 'Envío Estándar';
+        if (shippingMethod === 'store') {
+          shippingText = '🏪 RECOGIDA EN TIENDA';
+        } else if (accumulateOrder) {
+          shippingText = '📦 ACUMULAR PEDIDO (No enviar todavía)';
+        } else if (session.shipping_details) {
+          const addr = session.shipping_details.address;
+          shippingText = `${session.shipping_details.name || ''}\n${addr?.line1 || ''} ${addr?.line2 || ''}\n${addr?.postal_code || ''} ${addr?.city || ''}\n${addr?.country || ''}`;
+        }
+
+        const itemsList = items.map((i: any) => `- ${i.quantity}x ${i.name} (Talla: ${i.size})`).join('\n');
+        const totalFormatted = session.amount_total ? (session.amount_total / 100).toFixed(2) + '€' : '0.00€';
+
+        await fetch('https://formspree.io/f/xnjoprko', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            "Asunto": `✅ NUEVO PEDIDO PAGADO - #${orderId || sessionId.substring(0, 8)}`,
+            "Email_Cliente": customer_email,
+            "Total_Pagado": totalFormatted,
+            "Metodo_de_Envio": shippingText,
+            "Productos": itemsList,
+            "ID_Stripe": sessionId
+          })
+        });
+        console.log(`Notificación de Formspree enviada para el pedido ${orderId || sessionId}`);
+      } catch (emailErr) {
+        console.error("Error al enviar notificación de Formspree:", emailErr);
+      }
     }
   } catch (err) {
     console.error("Error processing successful payment:", err);
@@ -614,7 +652,7 @@ app.get("/api/health", (req, res) => {
 
 app.post("/api/create-checkout-session", async (req, res) => {
   try {
-    const { items, shippingCost, customerEmail, shippingMethod, accumulateOrder } = req.body;
+    const { items, shippingCost, customerEmail, shippingMethod, accumulateOrder, shippingAddress } = req.body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: "No items in cart" });
@@ -627,8 +665,8 @@ app.post("/api/create-checkout-session", async (req, res) => {
     if (db) {
       try {
         const orderResult = await db.query(
-          `INSERT INTO orders (customer_email, total_amount, shipping_cost, shipping_method, items, status)
-           VALUES ($1, $2, $3, $4, $5, $6)
+          `INSERT INTO orders (customer_email, total_amount, shipping_cost, shipping_method, items, status, shipping_address)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)
            RETURNING id`,
           [
             customerEmail, 
@@ -642,7 +680,8 @@ app.post("/api/create-checkout-session", async (req, res) => {
               quantity: i.quantity,
               price: i.product.discounted_price
             }))),
-            'pending'
+            'pending',
+            shippingAddress ? JSON.stringify(shippingAddress) : null
           ]
         );
         orderId = orderResult.rows[0].id;
