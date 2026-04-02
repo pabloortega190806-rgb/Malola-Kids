@@ -1,6 +1,4 @@
-import http from 'http';
-http.get('http://localhost:3000/api/debug-env', (res) => {
-  let data = '';
-  res.on('data', (chunk) => { data += chunk; });
-  res.on('end', () => { console.log(data); });
-});
+console.log("STRIPE_SECRET_KEY exists:", !!process.env.STRIPE_SECRET_KEY);
+console.log("VITE_STRIPE_PUBLISHABLE_KEY exists:", !!process.env.VITE_STRIPE_PUBLISHABLE_KEY);
+console.log("DATABASE_URL exists:", !!process.env.DATABASE_URL);
+console.log("ADMIN_PASSWORD exists:", !!process.env.ADMIN_PASSWORD);
