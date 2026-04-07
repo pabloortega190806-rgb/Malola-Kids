@@ -643,28 +643,44 @@ app.get("/api/admin/analytics", requireAdmin, async (req, res) => {
   if (!db) return res.status(503).json({ error: "DB not configured" });
 
   try {
-    // Get views by day for the last 7 days
+    const { startDate, endDate } = req.query;
+    
+    let dateFilter = "created_at > CURRENT_DATE - INTERVAL '7 days'";
+    const queryParams: any[] = [];
+    
+    if (startDate && endDate) {
+      dateFilter = "created_at >= $1 AND created_at <= $2";
+      queryParams.push(startDate, endDate + ' 23:59:59');
+    }
+
+    // Get views by day
     const viewsByDayResult = await db.query(`
       SELECT 
         TO_CHAR(DATE_TRUNC('day', created_at), 'YYYY-MM-DD') as date,
         COUNT(*) as views
       FROM page_views
-      WHERE created_at > CURRENT_DATE - INTERVAL '7 days'
+      WHERE ${dateFilter}
       GROUP BY DATE_TRUNC('day', created_at)
       ORDER BY date ASC
-    `);
+    `, queryParams);
 
-    // Get top pages
+    // Get top categories and brands
     const topPagesResult = await db.query(`
       SELECT path, COUNT(*) as views
       FROM page_views
+      WHERE ${dateFilter} AND (path LIKE '/categoria/%' OR path LIKE '/marca/%')
       GROUP BY path
       ORDER BY views DESC
       LIMIT 10
-    `);
+    `, queryParams);
 
     // Get total views
     const totalViewsResult = await db.query(`
+      SELECT COUNT(*) as total FROM page_views WHERE ${dateFilter}
+    `, queryParams);
+
+    // Get all-time total views
+    const allTimeTotalViewsResult = await db.query(`
       SELECT COUNT(*) as total FROM page_views
     `);
 
@@ -673,7 +689,8 @@ app.get("/api/admin/analytics", requireAdmin, async (req, res) => {
       data: {
         viewsByDay: viewsByDayResult.rows.map(r => ({ date: r.date, views: parseInt(r.views) })),
         topPages: topPagesResult.rows.map(r => ({ path: r.path, views: parseInt(r.views) })),
-        totalViews: parseInt(totalViewsResult.rows[0].total)
+        totalViews: parseInt(totalViewsResult.rows[0].total),
+        allTimeTotalViews: parseInt(allTimeTotalViewsResult.rows[0].total)
       }
     });
   } catch (err: any) {
