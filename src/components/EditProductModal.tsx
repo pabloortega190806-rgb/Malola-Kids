@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Product } from '../hooks/useProducts';
 import { useAdmin } from '../context/AdminContext';
-import { X } from 'lucide-react';
+import { X, ArrowUp, ArrowDown, Trash2, Upload, Link as LinkIcon } from 'lucide-react';
 
 interface EditProductModalProps {
   product: Product;
@@ -24,23 +24,20 @@ export function EditProductModal({ product, isOpen, onClose, onSave }: EditProdu
   const [sizesStock, setSizesStock] = useState<Record<string, number>>({ ...product.sizes_stock });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  // Image management state
+  const initialImages = product.local_images && product.local_images.length > 0 
+    ? [...product.local_images] 
+    : (product.image_url ? [product.image_url] : []);
+  const [images, setImages] = useState<string[]>(initialImages);
+  const [newImageUrl, setNewImageUrl] = useState('');
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(product.image_url || null);
 
   if (!isOpen) return null;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setImageFile(file);
-      setImagePreview(URL.createObjectURL(file));
-    }
   };
 
   const handleStockChange = (size: string, value: string) => {
@@ -50,36 +47,74 @@ export function EditProductModal({ product, isOpen, onClose, onSave }: EditProdu
     }));
   };
 
+  // Image management functions
+  const moveImageUp = (index: number) => {
+    if (index === 0) return;
+    const newImages = [...images];
+    [newImages[index - 1], newImages[index]] = [newImages[index], newImages[index - 1]];
+    setImages(newImages);
+  };
+
+  const moveImageDown = (index: number) => {
+    if (index === images.length - 1) return;
+    const newImages = [...images];
+    [newImages[index + 1], newImages[index]] = [newImages[index], newImages[index + 1]];
+    setImages(newImages);
+  };
+
+  const removeImage = (index: number) => {
+    setImages(images.filter((_, i) => i !== index));
+  };
+
+  const handleAddUrl = () => {
+    if (newImageUrl.trim()) {
+      setImages([...images, newImageUrl.trim()]);
+      setNewImageUrl('');
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0]) return;
+    
+    const file = e.target.files[0];
+    setUploadingImage(true);
+    setError('');
+    
+    try {
+      const formDataUpload = new FormData();
+      formDataUpload.append('image', file);
+      formDataUpload.append('code', product.code);
+
+      const uploadRes = await fetch('/api/admin/upload-image', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formDataUpload
+      });
+
+      const uploadData = await uploadRes.json();
+      if (uploadData.success) {
+        setImages([...images, uploadData.url]);
+      } else {
+        throw new Error(uploadData.error || 'Error al subir la imagen');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Error al subir la imagen');
+    } finally {
+      setUploadingImage(false);
+      // Reset input
+      e.target.value = '';
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      let finalImageUrl = product.image_url;
-
-      if (imageFile) {
-        setUploadingImage(true);
-        const formDataUpload = new FormData();
-        formDataUpload.append('image', imageFile);
-        formDataUpload.append('code', product.code);
-
-        const uploadRes = await fetch('/api/admin/upload-image', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
-          body: formDataUpload
-        });
-
-        const uploadData = await uploadRes.json();
-        if (uploadData.success) {
-          finalImageUrl = uploadData.url;
-        } else {
-          throw new Error(uploadData.error || 'Error al subir la imagen');
-        }
-        setUploadingImage(false);
-      }
+      const finalImageUrl = images.length > 0 ? images[0] : '';
 
       const res = await fetch(`/api/products/${product.code}`, {
         method: 'PUT',
@@ -92,20 +127,20 @@ export function EditProductModal({ product, isOpen, onClose, onSave }: EditProdu
           original_price: Number(formData.original_price),
           discounted_price: Number(formData.discounted_price),
           sizes_stock: sizesStock,
-          image_url: finalImageUrl
+          image_url: finalImageUrl,
+          local_images: images
         })
       });
 
       const data = await res.json();
       if (data.success) {
-        onSave({ ...data.product, image_url: finalImageUrl });
+        onSave({ ...data.product, image_url: finalImageUrl, local_images: images });
         onClose();
       } else {
         setError(data.error || 'Error al actualizar el producto');
       }
     } catch (err: any) {
       setError(err.message || 'Error de conexión');
-      setUploadingImage(false);
     } finally {
       setLoading(false);
     }
@@ -126,18 +161,80 @@ export function EditProductModal({ product, isOpen, onClose, onSave }: EditProdu
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Imagen del Producto</label>
-              <div className="flex items-center space-x-4">
-                {imagePreview && (
-                  <img src={imagePreview} alt="Preview" className="w-20 h-20 object-cover rounded-md border border-gray-200" />
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#F5F0EB] file:text-[#5D4037] hover:file:bg-[#E5D9C5]"
-                />
+              <label className="block text-sm font-medium text-gray-700 mb-2">Imágenes del Producto</label>
+              
+              {/* Image List */}
+              <div className="space-y-3 mb-4">
+                {images.map((img, index) => (
+                  <div key={index} className="flex items-center bg-gray-50 p-2 rounded-md border border-gray-200">
+                    <img src={img} alt={`Img ${index}`} className="w-12 h-12 object-cover rounded mr-3" />
+                    <div className="flex-1 truncate text-xs text-gray-500 mr-2" title={img}>
+                      {img}
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <button type="button" onClick={() => moveImageUp(index)} disabled={index === 0} className="p-1 text-gray-400 hover:text-gray-700 disabled:opacity-30">
+                        <ArrowUp size={16} />
+                      </button>
+                      <button type="button" onClick={() => moveImageDown(index)} disabled={index === images.length - 1} className="p-1 text-gray-400 hover:text-gray-700 disabled:opacity-30">
+                        <ArrowDown size={16} />
+                      </button>
+                      <button type="button" onClick={() => removeImage(index)} className="p-1 text-red-400 hover:text-red-600 ml-2">
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {images.length === 0 && <p className="text-sm text-gray-500 italic">No hay imágenes. Añade una abajo.</p>}
               </div>
+
+              {/* Add Image Controls */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex-1 flex space-x-2">
+                  <div className="relative flex-1">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <LinkIcon size={16} className="text-gray-400" />
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="URL de la imagen (ej. postimage)"
+                      value={newImageUrl}
+                      onChange={(e) => setNewImageUrl(e.target.value)}
+                      className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md focus:ring-[#B89F82] focus:border-[#B89F82] text-sm"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddUrl}
+                    disabled={!newImageUrl.trim()}
+                    className="px-3 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-200 text-sm font-medium disabled:opacity-50"
+                  >
+                    Añadir URL
+                  </button>
+                </div>
+                
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={uploadingImage}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                  />
+                  <button
+                    type="button"
+                    disabled={uploadingImage}
+                    className="w-full sm:w-auto px-4 py-2 bg-[#F5F0EB] text-[#5D4037] border border-[#E5D9C5] rounded-md hover:bg-[#E5D9C5] text-sm font-medium flex items-center justify-center disabled:opacity-50"
+                  >
+                    {uploadingImage ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#5D4037] mr-2"></div>
+                    ) : (
+                      <Upload size={16} className="mr-2" />
+                    )}
+                    Subir Archivo
+                  </button>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">La primera imagen de la lista será la imagen principal del producto.</p>
             </div>
 
             <div className="col-span-2">

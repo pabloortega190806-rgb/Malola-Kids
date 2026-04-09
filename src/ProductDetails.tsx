@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Edit } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Edit, Share2, Check } from 'lucide-react';
 import { Product } from './hooks/useProducts';
 import { useCart } from './context/CartContext';
 import { useAdmin } from './context/AdminContext';
@@ -19,6 +19,7 @@ export default function ProductDetails() {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isCopied, setIsCopied] = useState(false);
 
   useEffect(() => {
     const fetchProductAndImages = async () => {
@@ -87,6 +88,24 @@ export default function ProductDetails() {
     if (selectedSize) {
       addItem(product, selectedSize);
       setSelectedSize(null);
+    }
+  };
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: product?.name,
+          url: url
+        });
+      } catch (err) {
+        console.log('Error sharing', err);
+      }
+    } else {
+      navigator.clipboard.writeText(url);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
     }
   };
 
@@ -215,15 +234,34 @@ export default function ProductDetails() {
             {selectedSize ? 'Añadir al carrito' : 'Selecciona una talla'}
           </button>
 
-          {isAdmin && (
+          <div className="mt-4 flex gap-4">
             <button
-              onClick={() => setIsEditModalOpen(true)}
-              className="mt-4 w-full py-4 px-8 rounded-md font-medium transition-all text-lg bg-gray-100 text-gray-700 hover:bg-gray-200 flex items-center justify-center"
+              onClick={handleShare}
+              className="flex-1 py-3 px-4 rounded-md font-medium transition-all flex items-center justify-center bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 shadow-sm"
             >
-              <Edit size={20} className="mr-2" />
-              Editar Producto
+              {isCopied ? (
+                <>
+                  <Check size={18} className="mr-2 text-green-600" />
+                  <span className="text-green-600">¡Enlace copiado!</span>
+                </>
+              ) : (
+                <>
+                  <Share2 size={18} className="mr-2" />
+                  Compartir
+                </>
+              )}
             </button>
-          )}
+            
+            {isAdmin && (
+              <button
+                onClick={() => setIsEditModalOpen(true)}
+                className="flex-1 py-3 px-4 rounded-md font-medium transition-all bg-gray-100 text-gray-700 hover:bg-gray-200 flex items-center justify-center"
+              >
+                <Edit size={18} className="mr-2" />
+                Editar
+              </button>
+            )}
+          </div>
 
           <div className="mt-12 prose prose-sm text-gray-500">
             <h3 className="text-gray-900 font-medium">Detalles del producto</h3>
@@ -242,7 +280,15 @@ export default function ProductDetails() {
           product={product}
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
-          onSave={(updatedProduct) => setProduct(updatedProduct)}
+          onSave={(updatedProduct) => {
+            setProduct(updatedProduct);
+            if (updatedProduct.local_images && updatedProduct.local_images.length > 0) {
+              setImages(updatedProduct.local_images);
+            } else {
+              setImages([updatedProduct.image_url]);
+            }
+            setCurrentImageIndex(0);
+          }}
         />
       )}
     </div>

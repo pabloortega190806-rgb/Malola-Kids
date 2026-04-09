@@ -321,12 +321,23 @@ async function getProductImages(code: string | number, localFiles: string[]): Pr
           const bName = path.basename(b.pathname, path.extname(b.pathname)).toLowerCase();
           
           const getScore = (name: string) => {
-            if (name === matchedVariation.toLowerCase()) return 0;
-            if (name.includes('front') || name.includes('frontal') || name.includes('delante') || name.includes('principal')) return 1;
-            if (name.endsWith('_1') || name.endsWith('-1')) return 2;
-            if (name.includes('back') || name.includes('espalda') || name.includes('detras')) return 4;
-            if (name.includes('detail') || name.includes('detalle')) return 5;
-            return 3;
+            // Prioritize explicit front/main indicators
+            if (name.includes('front') || name.includes('frontal') || name.includes('delante') || name.includes('principal')) return 0;
+            if (name.match(/[_.-]1([_.-a-z]|$)/i)) return 1;
+            
+            // Exact match is good, but might be a back/detail if a _1 exists
+            if (name === matchedVariation.toLowerCase()) return 2;
+            
+            // Other numbers
+            if (name.match(/[_.-]2([_.-a-z]|$)/i)) return 3;
+            if (name.match(/[_.-]3([_.-a-z]|$)/i)) return 4;
+            if (name.match(/[_.-]4([_.-a-z]|$)/i)) return 5;
+            
+            // Explicit back/detail indicators should go last
+            if (name.includes('back') || name.includes('espalda') || name.includes('detras') || name.includes('trasera')) return 8;
+            if (name.includes('detail') || name.includes('detalle') || name.includes('zoom') || name.includes('cerca')) return 9;
+            
+            return 6;
           };
 
           const scoreA = getScore(aName);
@@ -504,6 +515,99 @@ app.post("/api/track-view", (req, res) => {
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'MALOLAKIDS2026';
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'malola-admin-secret-token';
 
+import { GoogleGenAI } from "@google/genai";
+
+// ... existing code ...
+
+app.post("/api/admin/run-image-analysis", async (req, res) => {
+  const db = getDbPool();
+  if (!db) return res.status(503).json({ error: "DB not configured" });
+
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const { rows: products } = await db.query('SELECT code, name FROM products');
+    
+    // Get all cloudinary images
+    const allBlobs = await getAllCloudinaryImages();
+    let analyzedCount = 0;
+    let logOutput = "";
+
+    for (const p of products) {
+      const codeStr = String(p.code).trim();
+      const { blobs: matchingBlobs } = await findBlobsForCode(codeStr);
+
+      // Remove duplicates
+      const uniqueBlobs = [];
+      const seen = new Set();
+      for (const b of matchingBlobs) {
+        if (!seen.has(b.url)) {
+          seen.add(b.url);
+          uniqueBlobs.push(b);
+        }
+      }
+
+      if (uniqueBlobs.length > 1) {
+        logOutput += `Analyzing ${uniqueBlobs.length} images for product ${p.code} (${p.name})...\n`;
+        
+        try {
+          // Fetch images as base64 to send to Gemini
+          const imageParts = await Promise.all(uniqueBlobs.map(async (blob) => {
+            const response = await fetch(blob.url);
+            const arrayBuffer = await response.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+            return {
+              inlineData: {
+                data: buffer.toString("base64"),
+                mimeType: "image/jpeg"
+              }
+            };
+          }));
+
+          const prompt = `
+            You are an expert fashion e-commerce merchandiser.
+            I am providing you with ${uniqueBlobs.length} images of the same clothing product.
+            Your task is to identify which image is the BEST primary image to show on the store catalog.
+            The best primary image is typically:
+            1. A front view of the full garment.
+            2. NOT a back view.
+            3. NOT a zoomed-in detail shot (like just the collar or a pocket).
+            4. NOT a lifestyle shot if a clean studio shot is available.
+            
+            Return ONLY the index (0-indexed) of the best image. For example, if the first image is best, return 0. If the second is best, return 1.
+            Do not return any other text.
+          `;
+
+          const response = await ai.models.generateContent({
+            model: 'gemini-1.5-flash',
+            contents: [prompt, ...imageParts],
+          });
+
+          const bestIndexStr = response.text.trim();
+          const bestIndex = parseInt(bestIndexStr);
+
+          if (!isNaN(bestIndex) && bestIndex >= 0 && bestIndex < uniqueBlobs.length) {
+            const bestImageUrl = uniqueBlobs[bestIndex].url;
+            logOutput += `  -> Best image selected: Index ${bestIndex} (${uniqueBlobs[bestIndex].pathname})\n`;
+            
+            // Save the best image URL to the database
+            await db.query('UPDATE products SET image_url = $1 WHERE code = $2', [bestImageUrl, p.code]);
+            analyzedCount++;
+          } else {
+            logOutput += `  -> Failed to parse index: ${bestIndexStr}\n`;
+          }
+        } catch (err: any) {
+          logOutput += `  -> Error analyzing images for ${p.code}: ${err.message}\n`;
+        }
+      }
+    }
+
+    fs.writeFileSync(path.join(process.cwd(), 'analysis-log.txt'), logOutput);
+    res.json({ success: true, analyzedCount, logOutput });
+  } catch (err: any) {
+    console.error("Error in image analysis:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
 app.post("/api/admin/login", (req, res) => {
   const { password } = req.body;
   
@@ -581,7 +685,7 @@ app.put("/api/products/:code", requireAdmin, async (req, res) => {
   if (!db) return res.status(503).json({ error: "DB not configured" });
   
   const { code } = req.params;
-  const { name, description, color, original_price, discounted_price, brand, category, sizes_stock } = req.body;
+  const { name, description, color, original_price, discounted_price, brand, category, sizes_stock, image_url, local_images } = req.body;
   
   try {
     const query = `
@@ -595,8 +699,10 @@ app.put("/api/products/:code", requireAdmin, async (req, res) => {
         brand = COALESCE($6, brand),
         category = COALESCE($7, category),
         sizes_stock = COALESCE($8, sizes_stock),
+        image_url = COALESCE($9, image_url),
+        local_images = COALESCE($10, local_images),
         updated_at = CURRENT_TIMESTAMP
-      WHERE code = $9
+      WHERE code = $11
       RETURNING *
     `;
     
@@ -609,6 +715,8 @@ app.put("/api/products/:code", requireAdmin, async (req, res) => {
       brand, 
       category, 
       sizes_stock ? JSON.stringify(sizes_stock) : null,
+      image_url,
+      local_images ? JSON.stringify(local_images) : null,
       code
     ];
     
@@ -712,7 +820,8 @@ app.get("/api/debug-env", (req, res) => {
     hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
     stripeKeyPrefix: process.env.STRIPE_SECRET_KEY ? process.env.STRIPE_SECRET_KEY.substring(0, 7) : null,
     nodeEnv: process.env.NODE_ENV,
-    adminPassword: process.env.ADMIN_PASSWORD || 'MALOLAKIDS2026'
+    adminPassword: process.env.ADMIN_PASSWORD || 'MALOLAKIDS2026',
+    hasGeminiKey: !!process.env.GEMINI_API_KEY
   });
 });
 
@@ -862,12 +971,23 @@ app.get("/api/get-image/:code", async (req, res) => {
         const bName = path.basename(b.pathname, path.extname(b.pathname)).toLowerCase();
         
         const getScore = (name: string) => {
-          if (name === code.toLowerCase()) return 0;
-          if (name.includes('front') || name.includes('frontal') || name.includes('delante') || name.includes('principal')) return 1;
-          if (name.endsWith('_1') || name.endsWith('-1')) return 2;
-          if (name.includes('back') || name.includes('espalda') || name.includes('detras')) return 4;
-          if (name.includes('detail') || name.includes('detalle')) return 5;
-          return 3;
+          // Prioritize explicit front/main indicators
+          if (name.includes('front') || name.includes('frontal') || name.includes('delante') || name.includes('principal')) return 0;
+          if (name.match(/[_.-]1([_.-a-z]|$)/i)) return 1;
+          
+          // Exact match is good, but might be a back/detail if a _1 exists
+          if (name === code.toLowerCase()) return 2;
+          
+          // Other numbers
+          if (name.match(/[_.-]2([_.-a-z]|$)/i)) return 3;
+          if (name.match(/[_.-]3([_.-a-z]|$)/i)) return 4;
+          if (name.match(/[_.-]4([_.-a-z]|$)/i)) return 5;
+          
+          // Explicit back/detail indicators should go last
+          if (name.includes('back') || name.includes('espalda') || name.includes('detras') || name.includes('trasera')) return 8;
+          if (name.includes('detail') || name.includes('detalle') || name.includes('zoom') || name.includes('cerca')) return 9;
+          
+          return 6;
         };
 
         const scoreA = getScore(aName);
@@ -936,8 +1056,22 @@ app.get("/api/categories", async (req, res) => {
   }
 
   try {
-    const result = await db.query('SELECT DISTINCT category FROM products WHERE category IS NOT NULL ORDER BY category');
-    const categories = result.rows.map(row => row.category);
+    const result = await db.query('SELECT DISTINCT category FROM products WHERE category IS NOT NULL');
+    const excludedCategories = ['bebe-nino', 'bebe-nina', 'bano', 'Baño'];
+    const allCategories = new Set<string>();
+    
+    result.rows.forEach(row => {
+      if (row.category) {
+        row.category.split(',').forEach((c: string) => {
+          const cat = c.trim();
+          if (cat && !excludedCategories.includes(cat)) {
+            allCategories.add(cat);
+          }
+        });
+      }
+    });
+    
+    const categories = Array.from(allCategories).sort();
     res.json(categories);
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -978,6 +1112,14 @@ app.get("/api/products", async (req, res) => {
 
   const attachBlobImages = async (products: any[]) => {
     return Promise.all(products.map(async (product) => {
+      // If the product already has manually set images in the database, use them
+      if (product.local_images && Array.isArray(product.local_images) && product.local_images.length > 0) {
+        if (!product.image_url) {
+          product.image_url = product.local_images[0];
+        }
+        return product;
+      }
+      
       const { images, mainImage } = await getProductImages(product.code, localFiles);
       if (images.length > 0) {
         product.local_images = images;
@@ -1057,8 +1199,8 @@ app.get("/api/products", async (req, res) => {
     const conditions: string[] = [];
 
     if (category) {
-      params.push(category);
-      conditions.push(`category = $${params.length}`);
+      params.push(`%${category}%`);
+      conditions.push(`category ILIKE $${params.length}`);
     }
     
     if (brand) {
@@ -1138,6 +1280,13 @@ app.get("/api/products/:code", async (req, res) => {
   }
 
   const attachBlobImages = async (product: any) => {
+    if (product.local_images && Array.isArray(product.local_images) && product.local_images.length > 0) {
+      if (!product.image_url) {
+        product.image_url = product.local_images[0];
+      }
+      return product;
+    }
+    
     const { images, mainImage } = await getProductImages(product.code, localFiles);
     if (images.length > 0) {
       product.local_images = images;

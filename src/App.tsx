@@ -179,10 +179,11 @@ export default function App() {
                 referrerPolicy="no-referrer"
               />
               <p className="text-sm leading-relaxed mb-6">
-                Especialistas en moda infantil de 0 a 9 años. Colecciones cuidadosamente seleccionadas en tonos blancos y beige para los más pequeños de la casa.
+                Especialistas en moda infantil de 0 a 9 años, desde 2022.<br/>
+                Vistiendo a los pequeños siempre con dulzura y estilo.
               </p>
               <div className="flex space-x-4">
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-[#A38A6D] hover:text-[#B89F82] transition-colors">
+                <a href="https://www.instagram.com/malola_mskids?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" className="text-[#A38A6D] hover:text-[#B89F82] transition-colors">
                   <Instagram size={20} />
                 </a>
               </div>
