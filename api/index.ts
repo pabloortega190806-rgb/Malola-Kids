@@ -147,9 +147,9 @@ async function findBlobsForCode(code: string): Promise<{ blobs: any[], matchedVa
     cleanCodeStr = cleanCodeStr.substring(3);
   }
 
-  const baseCode = cleanCodeStr.split(/[-_.]/)[0];
   const alphanumericOnly = cleanCodeStr.replace(/[^a-zA-Z0-9]/g, '');
   
+  // Only use variations of the EXACT code. No baseCode fallbacks here.
   const variations = Array.from(new Set([
     `26-${cleanCodeStr}`,
     `26_${cleanCodeStr}`,
@@ -161,8 +161,7 @@ async function findBlobsForCode(code: string): Promise<{ blobs: any[], matchedVa
     `26_${alphanumericOnly}`
   ]));
 
-  // Mayoral specific variations
-  // e.g., 1643.76 -> 26-01643-076
+  // Mayoral specific variations (still exact code, just different formatting)
   if (cleanCodeStr.includes('.')) {
     const parts = cleanCodeStr.split('.');
     if (parts.length === 2) {
@@ -203,102 +202,22 @@ async function findBlobsForCode(code: string): Promise<{ blobs: any[], matchedVa
       const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
       const nameWithoutExt = path.basename(blob.pathname, ext);
       
-      // Exact match or starts with variation + separator/number
       if (!isImage) return false;
+      
+      // Exact match is best
       if (nameWithoutExt === variation) return true;
       
-      // Flexible matching: if the image name contains the variation
-      // e.g. "IMG_19093_27_front" contains "19093_27"
-      if (nameWithoutExt.includes(variation)) {
-        // Ensure it's not just a substring of another number (e.g. 123 inside 91234)
-        const regex = new RegExp(`(^|[^0-9a-zA-Z])${variation}([^0-9a-zA-Z]|$)`, 'i');
-        return regex.test(nameWithoutExt);
+      // If it's a variation with a suffix (like _1, _front, etc)
+      if (nameWithoutExt.startsWith(variation)) {
+        const suffix = nameWithoutExt.substring(variation.length);
+        // Ensure the suffix starts with a separator or is empty
+        return suffix === '' || /^[-_. ]/.test(suffix);
       }
       
       return false;
     });
     if (matchingBlobs.length > 0) {
       return { blobs: matchingBlobs, matchedVariation: variation };
-    }
-  }
-
-  if (cleanCodeStr !== baseCode) {
-    const baseVariations = Array.from(new Set([
-      `26-${baseCode}`,
-      `26_${baseCode}`,
-      baseCode
-    ]));
-
-    for (const variation of baseVariations) {
-      const matchingBlobs = allBlobs.filter(blob => {
-        const ext = path.extname(blob.pathname).toLowerCase();
-        const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
-        const nameWithoutExt = path.basename(blob.pathname, ext);
-        
-        if (!isImage) return false;
-        if (nameWithoutExt === variation) return true;
-        
-        if (nameWithoutExt.includes(variation)) {
-          const regex = new RegExp(`(^|[^0-9a-zA-Z])${variation}([^0-9a-zA-Z]|$)`, 'i');
-          return regex.test(nameWithoutExt);
-        }
-        return false;
-      });
-      if (matchingBlobs.length > 0) {
-        return { blobs: matchingBlobs, matchedVariation: variation };
-      }
-    }
-  }
-
-  // Fallback to similar products by name
-  const similarCodes = await findSimilarProductCodes(cleanCodeStr);
-  for (const similarCode of similarCodes) {
-    let cleanSimilarCode = similarCode;
-    if (cleanSimilarCode.startsWith('26-') || cleanSimilarCode.startsWith('26_')) {
-      cleanSimilarCode = cleanSimilarCode.substring(3);
-    }
-    const similarBaseCode = cleanSimilarCode.split(/[-_]/)[0];
-    
-    const similarVariations = Array.from(new Set([
-      `26-${cleanSimilarCode}`,
-      `26_${cleanSimilarCode}`,
-      cleanSimilarCode,
-      cleanSimilarCode.replace(/-/g, '_'),
-      cleanSimilarCode.replace(/_/g, '-')
-    ]));
-
-    for (const variation of similarVariations) {
-      const matchingBlobs = allBlobs.filter(blob => {
-        const ext = path.extname(blob.pathname).toLowerCase();
-        const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
-        const nameWithoutExt = path.basename(blob.pathname, ext);
-        return isImage && nameWithoutExt.startsWith(variation) && 
-          (nameWithoutExt.substring(variation.length) === '' || /^[-_. ]/.test(nameWithoutExt.substring(variation.length)));
-      });
-      if (matchingBlobs.length > 0) {
-        return { blobs: matchingBlobs, matchedVariation: variation };
-      }
-    }
-    
-    if (cleanSimilarCode !== similarBaseCode) {
-      const similarBaseVariations = Array.from(new Set([
-        `26-${similarBaseCode}`,
-        `26_${similarBaseCode}`,
-        similarBaseCode
-      ]));
-      
-      for (const variation of similarBaseVariations) {
-        const matchingBlobs = allBlobs.filter(blob => {
-          const ext = path.extname(blob.pathname).toLowerCase();
-          const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
-          const nameWithoutExt = path.basename(blob.pathname, ext);
-          return isImage && nameWithoutExt.startsWith(variation) && 
-            (nameWithoutExt.substring(variation.length) === '' || /^[^0-9]/.test(nameWithoutExt.substring(variation.length)));
-        });
-        if (matchingBlobs.length > 0) {
-          return { blobs: matchingBlobs, matchedVariation: variation };
-        }
-      }
     }
   }
 
@@ -368,17 +287,11 @@ async function getProductImages(code: string | number, localFiles: string[]): Pr
     cleanCodeStr = cleanCodeStr.substring(3);
   }
 
-  const baseCode = cleanCodeStr.split('-')[0]; // Extract base code, e.g., '21327' from '21327-B'
-  
   // Si no tenemos Cloudinary configurado o no se encontraron imágenes, 
   // devolvemos el endpoint de resolución pero sin sobreescribir si ya hay una URL válida en attachBlobImages
   const images = [
     `/api/get-image/${cleanCodeStr}`
   ];
-  
-  if (cleanCodeStr !== baseCode) {
-    images.push(`/api/get-image/${baseCode}`);
-  }
   
   return { images, mainImage: images[0] };
 }
