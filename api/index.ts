@@ -733,6 +733,49 @@ app.put("/api/products/:code", requireAdmin, async (req, res) => {
   }
 });
 
+app.post("/api/products", requireAdmin, async (req, res) => {
+  const db = getDbPool();
+  if (!db) return res.status(503).json({ error: "DB not configured" });
+  
+  const { code, name, description, color, original_price, discounted_price, brand, category, sizes_stock, image_url, local_images } = req.body;
+  
+  if (!code || !name) {
+    return res.status(400).json({ error: "El código y el nombre son obligatorios" });
+  }
+
+  try {
+    const query = `
+      INSERT INTO products (
+        code, name, description, color, original_price, discounted_price, brand, category, sizes_stock, image_url, local_images
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      RETURNING *
+    `;
+    
+    const values = [
+      code,
+      name, 
+      description, 
+      color, 
+      original_price, 
+      discounted_price, 
+      brand, 
+      category, 
+      sizes_stock ? JSON.stringify(sizes_stock) : '{}',
+      image_url,
+      local_images ? JSON.stringify(local_images) : '[]'
+    ];
+    
+    const result = await db.query(query, values);
+    res.status(201).json({ success: true, product: result.rows[0] });
+  } catch (err: any) {
+    console.error("Error creating product:", err);
+    if (err.code === '23505') { // Unique violation
+      return res.status(400).json({ error: "Ya existe un producto con ese código" });
+    }
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get("/api/admin/orders", requireAdmin, async (req, res) => {
   const db = getDbPool();
   if (!db) return res.status(503).json({ error: "DB not configured" });

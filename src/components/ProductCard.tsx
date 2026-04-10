@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Product } from '../hooks/useProducts';
 import { useCart } from '../context/CartContext';
 import { useAdmin } from '../context/AdminContext';
-import { EditProductModal } from './EditProductModal';
+import { ProductModal } from './ProductModal';
 import { Edit } from 'lucide-react';
 
 export function ProductCard({ product: initialProduct }: { product: Product }) {
@@ -127,11 +127,12 @@ export function ProductCard({ product: initialProduct }: { product: Product }) {
       </div>
 
       {isAdmin && (
-        <EditProductModal
+        <ProductModal
           product={product}
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
           onSave={(updatedProduct) => setProduct(updatedProduct)}
+          mode="edit"
         />
       )}
     </Link>

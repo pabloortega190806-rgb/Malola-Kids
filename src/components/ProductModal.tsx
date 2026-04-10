@@ -3,32 +3,42 @@ import { Product } from '../hooks/useProducts';
 import { useAdmin } from '../context/AdminContext';
 import { X, ArrowUp, ArrowDown, Trash2, Upload, Link as LinkIcon } from 'lucide-react';
 
-interface EditProductModalProps {
-  product: Product;
+interface ProductModalProps {
+  product?: Product; // Optional for creation
   isOpen: boolean;
   onClose: () => void;
-  onSave: (updatedProduct: Product) => void;
+  onSave: (product: Product) => void;
+  mode?: 'edit' | 'create';
 }
 
-export function EditProductModal({ product, isOpen, onClose, onSave }: EditProductModalProps) {
+export function ProductModal({ product, isOpen, onClose, onSave, mode = 'edit' }: ProductModalProps) {
   const { token } = useAdmin();
   const [formData, setFormData] = useState({
-    name: product.name,
-    description: product.description || '',
-    brand: product.brand || '',
-    category: product.category || '',
-    color: product.color || '',
-    original_price: product.original_price,
-    discounted_price: product.discounted_price,
+    code: product?.code || '',
+    name: product?.name || '',
+    description: product?.description || '',
+    brand: product?.brand || '',
+    category: product?.category || '',
+    color: product?.color || '',
+    original_price: product?.original_price || '0',
+    discounted_price: product?.discounted_price || '0',
   });
-  const [sizesStock, setSizesStock] = useState<Record<string, number>>({ ...product.sizes_stock });
+  
+  const defaultSizes = {
+    '0-1M': 0, '1-3M': 0, '3-6M': 0, '6-9M': 0, '9-12M': 0, '12-18M': 0, '18-24M': 0,
+    '2A': 0, '3A': 0, '4A': 0, '5A': 0, '6A': 0, '7A': 0, '8A': 0, '9A': 0
+  };
+
+  const [sizesStock, setSizesStock] = useState<Record<string, number>>(
+    product?.sizes_stock ? { ...product.sizes_stock } : defaultSizes
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
   // Image management state
-  const initialImages = product.local_images && product.local_images.length > 0 
+  const initialImages = product?.local_images && product.local_images.length > 0 
     ? [...product.local_images] 
-    : (product.image_url ? [product.image_url] : []);
+    : (product?.image_url ? [product.image_url] : []);
   const [images, setImages] = useState<string[]>(initialImages);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -45,6 +55,19 @@ export function EditProductModal({ product, isOpen, onClose, onSave }: EditProdu
       ...prev,
       [size]: parseInt(value) || 0
     }));
+  };
+
+  const addSize = () => {
+    const size = prompt('Introduce el nombre de la talla (ej: 10A, S, M):');
+    if (size && !sizesStock[size]) {
+      setSizesStock(prev => ({ ...prev, [size]: 0 }));
+    }
+  };
+
+  const removeSize = (size: string) => {
+    const newSizes = { ...sizesStock };
+    delete newSizes[size];
+    setSizesStock(newSizes);
   };
 
   // Image management functions
@@ -83,7 +106,9 @@ export function EditProductModal({ product, isOpen, onClose, onSave }: EditProdu
     try {
       const formDataUpload = new FormData();
       formDataUpload.append('image', file);
-      formDataUpload.append('code', product.code);
+      if (formData.code) {
+        formDataUpload.append('code', formData.code);
+      }
 
       const uploadRes = await fetch('/api/admin/upload-image', {
         method: 'POST',
@@ -115,9 +140,11 @@ export function EditProductModal({ product, isOpen, onClose, onSave }: EditProdu
 
     try {
       const finalImageUrl = images.length > 0 ? images[0] : '';
+      const url = mode === 'edit' ? `/api/products/${product?.code}` : '/api/products';
+      const method = mode === 'edit' ? 'PUT' : 'POST';
 
-      const res = await fetch(`/api/products/${product.code}`, {
-        method: 'PUT',
+      const res = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -137,7 +164,7 @@ export function EditProductModal({ product, isOpen, onClose, onSave }: EditProdu
         onSave({ ...data.product, image_url: finalImageUrl, local_images: images });
         onClose();
       } else {
-        setError(data.error || 'Error al actualizar el producto');
+        setError(data.error || `Error al ${mode === 'edit' ? 'actualizar' : 'crear'} el producto`);
       }
     } catch (err: any) {
       setError(err.message || 'Error de conexión');
@@ -150,7 +177,9 @@ export function EditProductModal({ product, isOpen, onClose, onSave }: EditProdu
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-100 p-4 flex justify-between items-center z-10">
-          <h2 className="text-xl font-serif font-bold text-[#3E2A24]">Editar Producto: {product.code}</h2>
+          <h2 className="text-xl font-serif font-bold text-[#3E2A24]">
+            {mode === 'edit' ? `Editar Producto: ${product?.code}` : 'Añadir Nuevo Producto'}
+          </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X size={24} />
           </button>
@@ -160,6 +189,21 @@ export function EditProductModal({ product, isOpen, onClose, onSave }: EditProdu
           {error && <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">{error}</div>}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {mode === 'create' && (
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Código del Producto (SKU)</label>
+                <input
+                  type="text"
+                  name="code"
+                  value={formData.code}
+                  onChange={handleChange}
+                  placeholder="Ej: 21327-B"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#B89F82] focus:border-[#B89F82]"
+                  required
+                />
+              </div>
+            )}
+
             <div className="col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">Imágenes del Producto</label>
               
@@ -321,10 +365,19 @@ export function EditProductModal({ product, isOpen, onClose, onSave }: EditProdu
             </div>
 
             <div className="col-span-2">
-              <h3 className="text-sm font-medium text-gray-700 mb-3 border-b pb-2">Stock por Tallas</h3>
+              <div className="flex items-center justify-between mb-3 border-b pb-2">
+                <h3 className="text-sm font-medium text-gray-700">Stock por Tallas</h3>
+                <button 
+                  type="button" 
+                  onClick={addSize}
+                  className="text-xs bg-[#F5F0EB] text-[#5D4037] px-2 py-1 rounded border border-[#E5D9C5] hover:bg-[#E5D9C5]"
+                >
+                  + Añadir Talla
+                </button>
+              </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {Object.entries(sizesStock).map(([size, stock]) => (
-                  <div key={size} className="flex items-center space-x-2">
+                  <div key={size} className="flex items-center space-x-2 group">
                     <label className="text-sm text-gray-600 w-16 truncate" title={size}>{size}</label>
                     <input
                       type="number"
@@ -333,6 +386,13 @@ export function EditProductModal({ product, isOpen, onClose, onSave }: EditProdu
                       onChange={(e) => handleStockChange(size, e.target.value)}
                       className="w-20 px-2 py-1 border border-gray-300 rounded-md focus:ring-[#B89F82] focus:border-[#B89F82] text-sm"
                     />
+                    <button 
+                      type="button" 
+                      onClick={() => removeSize(size)}
+                      className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </div>
                 ))}
               </div>
@@ -352,7 +412,7 @@ export function EditProductModal({ product, isOpen, onClose, onSave }: EditProdu
               disabled={loading}
               className="px-6 py-2 bg-[#B89F82] text-white rounded-md font-medium hover:bg-[#967A70] transition-colors disabled:opacity-50"
             >
-              {loading ? 'Guardando...' : 'Guardar Cambios'}
+              {loading ? 'Guardando...' : (mode === 'edit' ? 'Guardar Cambios' : 'Crear Producto')}
             </button>
           </div>
         </form>

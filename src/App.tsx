@@ -102,6 +102,17 @@ export default function App() {
                   <Link to="/categoria/Niño%20(3-9%20años)" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niño</Link>
                 </div>
               </div>
+
+              {/* Dropdown Baño */}
+              <div className="relative group">
+                <button className="flex items-center text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">
+                  Baño <ChevronDown size={16} className="ml-1" />
+                </button>
+                <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-100 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left scale-95 group-hover:scale-100 z-50">
+                  <Link to="/categoria/Baño%20Niña" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Baño Niña</Link>
+                  <Link to="/categoria/Baño%20Niño" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Baño Niño</Link>
+                </div>
+              </div>
               
               <Link to="/categoria/Complementos" className="text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">Complementos</Link>
               {/* Dropdown Marcas */}

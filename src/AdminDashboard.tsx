@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAdmin } from './context/AdminContext';
 import { useNavigate } from 'react-router-dom';
-import { Lock, LogOut, ExternalLink, BarChart3, Eye, MousePointerClick, ShoppingBag, Settings, CheckCircle2, XCircle, Calendar, Filter, MapPin, ChevronDown, ChevronUp } from 'lucide-react';
+import { Lock, LogOut, ExternalLink, BarChart3, Eye, MousePointerClick, ShoppingBag, Settings, CheckCircle2, XCircle, Calendar, Filter, MapPin, ChevronDown, ChevronUp, Plus } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { ProductModal } from './components/ProductModal';
 
 export default function AdminDashboard() {
   const { isAdmin, login, logout, token } = useAdmin();
@@ -17,6 +18,7 @@ export default function AdminDashboard() {
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [loadingDebug, setLoadingDebug] = useState(false);
   const [isOrdersOpen, setIsOrdersOpen] = useState(false);
+  const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
 
   // Date range for analytics (default: last 7 days)
   const [startDate, setStartDate] = useState(() => {
@@ -434,19 +436,37 @@ export default function AdminDashboard() {
           <div className="bg-white p-8 rounded-xl shadow-sm border border-[#F5F0EB]">
             <h2 className="text-xl font-serif font-bold text-[#3E2A24] mb-4">Gestión de Productos</h2>
             <p className="text-sm text-[#5D4037] mb-6">
-              Para editar un producto, navega por la tienda como lo haría un cliente. 
-              Ahora que has iniciado sesión, verás un botón de "Editar" en la página de cada producto.
+              Puedes añadir nuevos productos directamente desde aquí o editar los existentes navegando por la tienda.
             </p>
-            <button
-              onClick={() => navigate('/')}
-              className="w-full bg-[#B89F82] text-white px-6 py-3 rounded-md font-medium hover:bg-[#967A70] transition-colors flex items-center justify-center"
-            >
-              <ExternalLink size={18} className="mr-2" />
-              Ir a la tienda
-            </button>
+            <div className="space-y-3">
+              <button
+                onClick={() => setIsAddProductModalOpen(true)}
+                className="w-full bg-[#5D4037] text-white px-6 py-3 rounded-md font-medium hover:bg-[#3E2A24] transition-colors flex items-center justify-center"
+              >
+                <Plus size={18} className="mr-2" />
+                Añadir Nuevo Producto
+              </button>
+              <button
+                onClick={() => navigate('/')}
+                className="w-full bg-[#B89F82] text-white px-6 py-3 rounded-md font-medium hover:bg-[#967A70] transition-colors flex items-center justify-center"
+              >
+                <ExternalLink size={18} className="mr-2" />
+                Ir a la tienda para editar
+              </button>
+            </div>
           </div>
         </div>
       </div>
+
+      <ProductModal
+        isOpen={isAddProductModalOpen}
+        onClose={() => setIsAddProductModalOpen(false)}
+        onSave={(newProduct) => {
+          alert(`Producto ${newProduct.name} creado correctamente.`);
+          setIsAddProductModalOpen(false);
+        }}
+        mode="create"
+      />
     </div>
   );
 }

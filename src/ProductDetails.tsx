@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight, Edit, Share2, Check } from 'lucide-react';
 import { Product } from './hooks/useProducts';
 import { useCart } from './context/CartContext';
 import { useAdmin } from './context/AdminContext';
-import { EditProductModal } from './components/EditProductModal';
+import { ProductModal } from './components/ProductModal';
 
 export default function ProductDetails() {
   const { code } = useParams<{ code: string }>();
@@ -276,7 +276,7 @@ export default function ProductDetails() {
       </div>
 
       {isAdmin && product && (
-        <EditProductModal
+        <ProductModal
           product={product}
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
@@ -289,6 +289,7 @@ export default function ProductDetails() {
             }
             setCurrentImageIndex(0);
           }}
+          mode="edit"
         />
       )}
     </div>
