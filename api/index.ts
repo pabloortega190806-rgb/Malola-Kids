@@ -849,8 +849,8 @@ app.get("/api/health", (req, res) => {
 // Helper to check if the Primavera promotion is active
 const isPromoActive = () => {
   const now = new Date();
-  // Sunday April 12 2026 23:59:59
-  const deadline = new Date("2026-04-12T23:59:59");
+  // Domingo 12 de abril de 2026 a las 23:59 (Hora de España - CEST / UTC+2)
+  const deadline = new Date("2026-04-12T23:59:59+02:00");
   return now <= deadline;
 };
 
