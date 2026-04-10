@@ -18,7 +18,9 @@ function getStripe() {
     if (!STRIPE_SECRET_KEY) {
       throw new Error("Falta la configuración de Stripe (STRIPE_SECRET_KEY). Si estás en Vercel, añádela en 'Project Settings > Environment Variables'.");
     }
-    stripeInstance = new Stripe(STRIPE_SECRET_KEY);
+    stripeInstance = new Stripe(STRIPE_SECRET_KEY, {
+      apiVersion: '2025-02-24.acacia' as any,
+    });
   }
   return stripeInstance;
 }
@@ -871,17 +873,25 @@ async function ensurePromoCoupon() {
     }
 
     // Ensure promotion codes exist
-    const codes = ['primavera', 'Primavera', 'PRIMAVERA'];
+    const codes = ['primavera', 'Primavera', 'PRIMAVERA', 'PRIMAVERA10'];
     for (const code of codes) {
       try {
         await (stripe.promotionCodes as any).create({
           coupon: 'primavera',
           code: code,
         });
+        console.log(`Successfully created promotion code: ${code}`);
       } catch (e: any) {
         // Ignore if already exists
-        if (e.raw && e.raw.code === 'resource_already_exists') continue;
-        if (e.message && e.message.includes('already exists')) continue;
+        if (e.raw && e.raw.code === 'resource_already_exists') {
+          console.log(`Promotion code ${code} already exists.`);
+          continue;
+        }
+        if (e.message && e.message.includes('already exists')) {
+          console.log(`Promotion code ${code} already exists (message).`);
+          continue;
+        }
+        console.error(`Error creating promotion code ${code}:`, e.message);
       }
     }
   } catch (err) {

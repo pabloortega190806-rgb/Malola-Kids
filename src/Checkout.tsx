@@ -308,7 +308,7 @@ export default function Checkout() {
                   🌸 ¡Promoción Primavera activa!
                 </p>
                 <p className="text-xs text-[#967A70] mt-1">
-                  Usa el código <span className="font-bold">PRIMAVERA</span> en el pago para un 10% de descuento.
+                  Usa el código <span className="font-bold">PRIMAVERA</span> (o <span className="font-bold">PRIMAVERA10</span>) en el pago para un 10% de descuento.
                   {cartTotal >= 40 && cartTotal < 80 && (
                     <span className="block mt-1 font-semibold text-[#5D4037]">
                       ¡Has conseguido ENVÍO GRATIS! (por superar los 40€)
