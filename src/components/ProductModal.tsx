@@ -42,6 +42,18 @@ export function ProductModal({ product, isOpen, onClose, onSave, mode = 'edit' }
   const [images, setImages] = useState<string[]>(initialImages);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+
+  React.useEffect(() => {
+    fetch('/api/categories')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setAvailableCategories(data);
+        }
+      })
+      .catch(err => console.error("Error fetching categories:", err));
+  }, []);
 
   if (!isOpen) return null;
 
@@ -317,13 +329,37 @@ export function ProductModal({ product, isOpen, onClose, onSave, mode = 'edit' }
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
-              <input
-                type="text"
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#B89F82] focus:border-[#B89F82]"
-              />
+              <div className="flex space-x-2">
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#B89F82] focus:border-[#B89F82] bg-white"
+                  required
+                >
+                  <option value="">Seleccionar categoría...</option>
+                  {availableCategories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                  <option value="NEW">+ Nueva categoría...</option>
+                </select>
+                {formData.category === 'NEW' && (
+                  <input
+                    type="text"
+                    placeholder="Nombre de la nueva categoría"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#B89F82] focus:border-[#B89F82]"
+                    onBlur={(e) => {
+                      const val = e.target.value.trim();
+                      if (val) {
+                        setAvailableCategories(prev => Array.from(new Set([...prev, val])).sort());
+                        setFormData(prev => ({ ...prev, category: val }));
+                      } else {
+                        setFormData(prev => ({ ...prev, category: '' }));
+                      }
+                    }}
+                  />
+                )}
+              </div>
             </div>
 
             <div>
@@ -399,21 +435,54 @@ export function ProductModal({ product, isOpen, onClose, onSave, mode = 'edit' }
             </div>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-6 border-t border-gray-100">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-6 py-2 bg-[#B89F82] text-white rounded-md font-medium hover:bg-[#967A70] transition-colors disabled:opacity-50"
-            >
-              {loading ? 'Guardando...' : (mode === 'edit' ? 'Guardar Cambios' : 'Crear Producto')}
-            </button>
+          <div className="flex justify-between items-center pt-6 border-t border-gray-100">
+            <div>
+              {mode === 'edit' && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (window.confirm('¿Estás segura de que quieres eliminar este producto? Esta acción no se puede deshacer.')) {
+                      try {
+                        const res = await fetch(`/api/products/${product?.code}`, {
+                          method: 'DELETE',
+                          headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                          alert('Producto eliminado correctamente');
+                          onClose();
+                          window.location.reload(); // Refresh to show changes
+                        } else {
+                          alert(data.error || 'Error al eliminar el producto');
+                        }
+                      } catch (err) {
+                        alert('Error de conexión');
+                      }
+                    }
+                  }}
+                  className="px-4 py-2 text-red-600 hover:text-red-800 font-medium flex items-center"
+                >
+                  <Trash2 size={18} className="mr-2" />
+                  Eliminar Producto
+                </button>
+              )}
+            </div>
+            <div className="flex space-x-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-6 py-2 bg-[#B89F82] text-white rounded-md font-medium hover:bg-[#967A70] transition-colors disabled:opacity-50"
+              >
+                {loading ? 'Guardando...' : (mode === 'edit' ? 'Guardar Cambios' : 'Crear Producto')}
+              </button>
+            </div>
           </div>
         </form>
       </div>

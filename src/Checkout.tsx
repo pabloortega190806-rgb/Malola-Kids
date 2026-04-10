@@ -40,7 +40,16 @@ export default function Checkout() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const shippingCost = accumulateOrder || shippingMethod === 'store' || cartTotal >= 80 ? 0 : 5.50;
+  const isPromoActive = () => {
+    const now = new Date();
+    // Sunday April 12 2026 23:59:59
+    const deadline = new Date("2026-04-12T23:59:59");
+    return now <= deadline;
+  };
+
+  const promoActive = isPromoActive();
+  const freeShippingThreshold = promoActive ? 40 : 80;
+  const shippingCost = accumulateOrder || shippingMethod === 'store' || cartTotal >= freeShippingThreshold ? 0 : 5.50;
   const finalTotal = cartTotal + shippingCost;
 
   const handleCheckout = async (e: React.FormEvent) => {
@@ -292,6 +301,22 @@ export default function Checkout() {
         <div className="lg:col-span-5">
           <div className="bg-gray-50 rounded-lg p-6 sticky top-32">
             <h2 className="text-xl font-serif font-semibold text-[#3E2A24] mb-6">Resumen del pedido</h2>
+            
+            {promoActive && (
+              <div className="bg-[#FDF8F3] border border-[#B89F82] rounded-md p-4 mb-6">
+                <p className="text-sm text-[#5D4037] font-medium">
+                  🌸 ¡Promoción Primavera activa!
+                </p>
+                <p className="text-xs text-[#967A70] mt-1">
+                  Usa el código <span className="font-bold">PRIMAVERA</span> en el pago para un 10% de descuento.
+                  {cartTotal >= 40 && cartTotal < 80 && (
+                    <span className="block mt-1 font-semibold text-[#5D4037]">
+                      ¡Has conseguido ENVÍO GRATIS! (por superar los 40€)
+                    </span>
+                  )}
+                </p>
+              </div>
+            )}
             
             <ul className="divide-y divide-gray-200 mb-6">
               {items.map((item) => (

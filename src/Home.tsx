@@ -20,7 +20,7 @@ export default function Home() {
       title: "Primera Postura",
       subtitle: "La mayor suavidad para sus primeros días",
       buttonText: "Descubrir",
-      link: "/categoria/Bebé%20Niña%20(0-4%20años)",
+      link: "/categoria/Primera%20Postura",
       position: "object-[center_40%]"
     },
     {
@@ -53,9 +53,9 @@ export default function Home() {
       link: "/genero/niño"
     },
     {
-      title: "Bebé",
+      title: "Primera Postura",
       image: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=800&auto=format&fit=crop",
-      link: "/genero/bebé"
+      link: "/categoria/Primera%20Postura"
     }
   ];
 

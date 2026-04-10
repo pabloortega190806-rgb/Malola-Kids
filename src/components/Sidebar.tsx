@@ -58,20 +58,64 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             {/* Categories */}
             <div>
               <h3 className="text-sm font-bold uppercase tracking-wider text-[#B89F82] mb-4">Categorías</h3>
-              <ul className="space-y-2">
-                {categories.map((category) => (
-                  <li key={category}>
-                    <Link 
-                      to={`/categoria/${encodeURIComponent(category)}`}
-                      onClick={onClose}
-                      className="flex items-center justify-between py-2 text-[#5D4037] hover:text-[#B89F82] transition-colors group"
-                    >
-                      <span className="font-medium">{category}</span>
-                      <ChevronRight size={16} className="text-[#D9C8B4] group-hover:text-[#B89F82] transition-colors" />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              
+              <div className="space-y-6">
+                {/* Primera Postura */}
+                <div>
+                  <Link 
+                    to="/categoria/Primera%20Postura"
+                    onClick={onClose}
+                    className="flex items-center justify-between py-2 text-[#5D4037] hover:text-[#B89F82] transition-colors group border-b border-[#F5F0E6]"
+                  >
+                    <span className="font-bold">Primera Postura</span>
+                    <ChevronRight size={16} className="text-[#D9C8B4] group-hover:text-[#B89F82] transition-colors" />
+                  </Link>
+                </div>
+
+                {/* Niña */}
+                <div>
+                  <h4 className="text-xs font-bold text-[#967A70] uppercase tracking-widest mb-2">Niña</h4>
+                  <ul className="pl-2 space-y-1">
+                    <li>
+                      <Link to="/categoria/Bebé%20Niña%20(0-4%20años)" onClick={onClose} className="block py-2 text-[#7A5C53] hover:text-[#B89F82] text-sm">Bebé (0-4 años)</Link>
+                    </li>
+                    <li>
+                      <Link to="/categoria/Niña%20(3-9%20años)" onClick={onClose} className="block py-2 text-[#7A5C53] hover:text-[#B89F82] text-sm">Infantil (3-9 años)</Link>
+                    </li>
+                    <li>
+                      <Link to="/categoria/Baño%20Niña" onClick={onClose} className="block py-2 text-[#7A5C53] hover:text-[#B89F82] text-sm">Baño Niña</Link>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Niño */}
+                <div>
+                  <h4 className="text-xs font-bold text-[#967A70] uppercase tracking-widest mb-2">Niño</h4>
+                  <ul className="pl-2 space-y-1">
+                    <li>
+                      <Link to="/categoria/Bebé%20Niño%20(0-4%20años)" onClick={onClose} className="block py-2 text-[#7A5C53] hover:text-[#B89F82] text-sm">Bebé (0-4 años)</Link>
+                    </li>
+                    <li>
+                      <Link to="/categoria/Niño%20(3-9%20años)" onClick={onClose} className="block py-2 text-[#7A5C53] hover:text-[#B89F82] text-sm">Infantil (3-9 años)</Link>
+                    </li>
+                    <li>
+                      <Link to="/categoria/Baño%20Niño" onClick={onClose} className="block py-2 text-[#7A5C53] hover:text-[#B89F82] text-sm">Baño Niño</Link>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Complementos */}
+                <div>
+                  <Link 
+                    to="/categoria/Complementos"
+                    onClick={onClose}
+                    className="flex items-center justify-between py-2 text-[#5D4037] hover:text-[#B89F82] transition-colors group border-t border-[#F5F0E6]"
+                  >
+                    <span className="font-medium">Complementos</span>
+                    <ChevronRight size={16} className="text-[#D9C8B4] group-hover:text-[#B89F82] transition-colors" />
+                  </Link>
+                </div>
+              </div>
             </div>
 
             <div className="w-full h-px bg-[#E5D9C5]"></div>

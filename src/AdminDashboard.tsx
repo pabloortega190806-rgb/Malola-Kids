@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAdmin } from './context/AdminContext';
 import { useNavigate } from 'react-router-dom';
-import { Lock, LogOut, ExternalLink, BarChart3, Eye, MousePointerClick, ShoppingBag, Settings, CheckCircle2, XCircle, Calendar, Filter, MapPin, ChevronDown, ChevronUp, Plus } from 'lucide-react';
+import { Lock, LogOut, ExternalLink, BarChart3, Eye, MousePointerClick, ShoppingBag, Settings, CheckCircle2, XCircle, Calendar, Filter, MapPin, ChevronDown, ChevronUp, Plus, Trash2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { ProductModal } from './components/ProductModal';
 
@@ -18,7 +18,23 @@ export default function AdminDashboard() {
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [loadingDebug, setLoadingDebug] = useState(false);
   const [isOrdersOpen, setIsOrdersOpen] = useState(false);
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+
+  useEffect(() => {
+    if (isAdmin) {
+      setLoadingCategories(true);
+      fetch('/api/categories')
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) setCategories(data);
+        })
+        .catch(err => console.error("Error fetching categories:", err))
+        .finally(() => setLoadingCategories(false));
+    }
+  }, [isAdmin]);
 
   // Date range for analytics (default: last 7 days)
   const [startDate, setStartDate] = useState(() => {
@@ -78,13 +94,14 @@ export default function AdminDashboard() {
 
   const formatPathName = (path: string) => {
     const categoryMap: Record<string, string> = {
-      'bebe-nina': 'Bebé Niña (0-4 años)',
-      'bebe-nino': 'Bebé Niño (0-4 años)',
-      'nina': 'Niña (4-16 años)',
-      'nino': 'Niño (4-16 años)',
-      'canastilla': 'Canastilla',
-      'puericultura': 'Puericultura',
-      'zapatos': 'Zapatos'
+      'Primera Postura': 'Primera Postura',
+      'Bebé Niña (0-4 años)': 'Bebé Niña',
+      'Bebé Niño (0-4 años)': 'Bebé Niño',
+      'Niña (3-9 años)': 'Niña Infantil',
+      'Niño (3-9 años)': 'Niño Infantil',
+      'Baño Niña': 'Baño Niña',
+      'Baño Niño': 'Baño Niño',
+      'Complementos': 'Complementos'
     };
 
     if (path.startsWith('/categoria/')) {
@@ -163,6 +180,97 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 gap-8 mb-12">
+        <div className="bg-white p-8 rounded-xl shadow-sm border border-[#F5F0EB]">
+          <div 
+            className="flex items-center justify-between cursor-pointer group"
+            onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
+          >
+            <div className="flex items-center">
+              <Filter className="mr-3 text-[#B89F82]" size={28} />
+              <h2 className="text-2xl font-serif font-bold text-[#3E2A24]">
+                Gestión de Categorías
+              </h2>
+              <span className="ml-4 text-sm font-medium text-[#967A70] bg-[#F5F0EB] px-3 py-1 rounded-full">
+                {categories.length} categorías
+              </span>
+            </div>
+            <div className="text-[#967A70] group-hover:text-[#5D4037] transition-colors bg-[#FCFBF9] p-2 rounded-full border border-[#E5D9C5]">
+              {isCategoriesOpen ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+            </div>
+          </div>
+          
+          {isCategoriesOpen && (
+            <div className="mt-8 border-t border-[#F5F0EB] pt-8">
+              {loadingCategories ? (
+                <div className="flex justify-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#B89F82]"></div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {categories.map((cat) => (
+                    <div key={cat} className="flex items-center justify-between p-4 bg-[#FCFBF9] rounded-lg border border-[#E5D9C5] group">
+                      <span className="font-medium text-[#5D4037]">{cat}</span>
+                      <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button 
+                          onClick={() => {
+                            const newName = prompt(`Nuevo nombre para la categoría "${cat}":`, cat);
+                            if (newName && newName !== cat) {
+                              fetch('/api/admin/categories', {
+                                method: 'PUT',
+                                headers: { 
+                                  'Content-Type': 'application/json',
+                                  'Authorization': `Bearer ${token}` 
+                                },
+                                body: JSON.stringify({ oldName: cat, newName })
+                              })
+                              .then(res => res.json())
+                              .then(data => {
+                                if (data.success) {
+                                  alert(data.message);
+                                  window.location.reload();
+                                } else {
+                                  alert(data.error || 'Error al renombrar');
+                                }
+                              });
+                            }
+                          }}
+                          className="p-1.5 text-[#B89F82] hover:bg-white rounded-md transition-colors"
+                          title="Renombrar"
+                        >
+                          <Settings size={16} />
+                        </button>
+                        <button 
+                          onClick={() => {
+                            if (window.confirm(`¿Estás segura de que quieres eliminar la categoría "${cat}"? SE ELIMINARÁN TODOS LOS PRODUCTOS ASOCIADOS.`)) {
+                              fetch(`/api/admin/categories/${encodeURIComponent(cat)}`, {
+                                method: 'DELETE',
+                                headers: { 'Authorization': `Bearer ${token}` }
+                              })
+                              .then(res => res.json())
+                              .then(data => {
+                                if (data.success) {
+                                  alert(data.message);
+                                  window.location.reload();
+                                } else {
+                                  alert(data.error || 'Error al eliminar');
+                                }
+                              });
+                            }
+                          }}
+                          className="p-1.5 text-red-400 hover:bg-white rounded-md transition-colors"
+                          title="Eliminar"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
         <div className="bg-white p-8 rounded-xl shadow-sm border border-[#F5F0EB]">
           <div 
             className="flex items-center justify-between cursor-pointer group"

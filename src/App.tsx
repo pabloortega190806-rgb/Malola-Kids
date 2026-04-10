@@ -81,40 +81,34 @@ export default function App() {
             <nav className="hidden lg:flex space-x-6">
               <Link to="/" className="text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">Inicio</Link>
               
-              {/* Dropdown Bebés */}
+              <Link to="/categoria/Primera%20Postura" className="text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82] font-semibold">Primera Postura</Link>
+
+              {/* Dropdown Niña */}
               <div className="relative group">
                 <button className="flex items-center text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">
-                  Bebés <ChevronDown size={16} className="ml-1" />
+                  Niña <ChevronDown size={16} className="ml-1" />
                 </button>
                 <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-100 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left scale-95 group-hover:scale-100 z-50">
-                  <Link to="/categoria/Bebé%20Niña%20(0-4%20años)" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niña (hasta 4 años)</Link>
-                  <Link to="/categoria/Bebé%20Niño%20(0-4%20años)" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niño (hasta 4 años)</Link>
+                  <Link to="/categoria/Bebé%20Niña%20(0-4%20años)" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Bebé (0-4 años)</Link>
+                  <Link to="/categoria/Niña%20(3-9%20años)" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Infantil (3-9 años)</Link>
+                  <Link to="/categoria/Baño%20Niña" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Baño</Link>
                 </div>
               </div>
 
-              {/* Dropdown Infantil */}
+              {/* Dropdown Niño */}
               <div className="relative group">
                 <button className="flex items-center text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">
-                  Infantil <ChevronDown size={16} className="ml-1" />
+                  Niño <ChevronDown size={16} className="ml-1" />
                 </button>
                 <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-100 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left scale-95 group-hover:scale-100 z-50">
-                  <Link to="/categoria/Niña%20(3-9%20años)" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niña</Link>
-                  <Link to="/categoria/Niño%20(3-9%20años)" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Niño</Link>
+                  <Link to="/categoria/Bebé%20Niño%20(0-4%20años)" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Bebé (0-4 años)</Link>
+                  <Link to="/categoria/Niño%20(3-9%20años)" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Infantil (3-9 años)</Link>
+                  <Link to="/categoria/Baño%20Niño" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Baño</Link>
                 </div>
               </div>
 
-              {/* Dropdown Baño */}
-              <div className="relative group">
-                <button className="flex items-center text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">
-                  Baño <ChevronDown size={16} className="ml-1" />
-                </button>
-                <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-100 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left scale-95 group-hover:scale-100 z-50">
-                  <Link to="/categoria/Baño%20Niña" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Baño Niña</Link>
-                  <Link to="/categoria/Baño%20Niño" className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82]">Baño Niño</Link>
-                </div>
-              </div>
-              
               <Link to="/categoria/Complementos" className="text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">Complementos</Link>
+              
               {/* Dropdown Marcas */}
               <div className="relative group">
                 <button className="flex items-center text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">

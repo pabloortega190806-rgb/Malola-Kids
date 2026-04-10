@@ -690,6 +690,62 @@ app.post("/api/products", requireAdmin, async (req, res) => {
   }
 });
 
+app.delete("/api/products/:code", requireAdmin, async (req, res) => {
+  const db = getDbPool();
+  if (!db) return res.status(503).json({ error: "DB not configured" });
+  
+  const { code } = req.params;
+  
+  try {
+    const result = await db.query('DELETE FROM products WHERE code = $1 RETURNING *', [code]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Producto no encontrado" });
+    }
+    
+    res.json({ success: true, message: "Producto eliminado correctamente" });
+  } catch (err: any) {
+    console.error("Error deleting product:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put("/api/admin/categories", requireAdmin, async (req, res) => {
+  const db = getDbPool();
+  if (!db) return res.status(503).json({ error: "DB not configured" });
+  
+  const { oldName, newName } = req.body;
+  
+  if (!oldName || !newName) {
+    return res.status(400).json({ error: "Se requiere el nombre antiguo y el nuevo" });
+  }
+
+  try {
+    const result = await db.query('UPDATE products SET category = $1 WHERE category = $2', [newName, oldName]);
+    res.json({ success: true, message: `Se han actualizado ${result.rowCount} productos.` });
+  } catch (err: any) {
+    console.error("Error updating category:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete("/api/admin/categories/:name", requireAdmin, async (req, res) => {
+  const db = getDbPool();
+  if (!db) return res.status(503).json({ error: "DB not configured" });
+  
+  const { name } = req.params;
+  
+  try {
+    // Por seguridad, en lugar de borrar productos, los movemos a una categoría por defecto o simplemente borramos la etiqueta
+    // Pero el usuario pidió "eliminar categorías", así que vamos a borrar los productos de esa categoría
+    const result = await db.query('DELETE FROM products WHERE category = $1', [name]);
+    res.json({ success: true, message: `Se han eliminado la categoría y ${result.rowCount} productos asociados.` });
+  } catch (err: any) {
+    console.error("Error deleting category:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get("/api/admin/orders", requireAdmin, async (req, res) => {
   const db = getDbPool();
   if (!db) return res.status(503).json({ error: "DB not configured" });
@@ -786,12 +842,57 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
+// Helper to check if the Primavera promotion is active
+const isPromoActive = () => {
+  const now = new Date();
+  // Sunday April 12 2026 23:59:59
+  const deadline = new Date("2026-04-12T23:59:59");
+  return now <= deadline;
+};
+
+async function ensurePromoCoupon() {
+  try {
+    const stripe = getStripe();
+    // Check if coupon exists
+    try {
+      await stripe.coupons.retrieve('primavera');
+    } catch (e) {
+      // Create coupon if not found
+      await stripe.coupons.create({
+        id: 'primavera',
+        percent_off: 10,
+        duration: 'once',
+        name: 'Promo Primavera',
+      });
+      // Also create promotion codes
+      await (stripe.promotionCodes as any).create({
+        coupon: 'primavera',
+        code: 'primavera',
+      });
+      await (stripe.promotionCodes as any).create({
+        coupon: 'primavera',
+        code: 'Primavera',
+      });
+      console.log("Promo Primavera coupon and codes created successfully.");
+    }
+  } catch (err) {
+    console.error("Error ensuring promo coupon:", err);
+  }
+}
+
 app.post("/api/create-checkout-session", async (req, res) => {
   try {
-    const { items, shippingCost, customerEmail, shippingMethod, accumulateOrder, shippingAddress } = req.body;
+    let { items, shippingCost, customerEmail, shippingMethod, accumulateOrder, shippingAddress } = req.body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: "No items in cart" });
+    }
+
+    const cartSubtotal = items.reduce((acc, item) => acc + (Number(item.product.discounted_price) * item.quantity), 0);
+
+    // Apply free shipping logic if promo is active and subtotal >= 40
+    if (isPromoActive() && cartSubtotal >= 40) {
+      shippingCost = 0;
     }
 
     const db = getDbPool();
@@ -806,7 +907,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
            RETURNING id`,
           [
             customerEmail, 
-            items.reduce((acc, item) => acc + (Number(item.product.discounted_price) * item.quantity), 0) + shippingCost,
+            cartSubtotal + shippingCost,
             shippingCost,
             shippingMethod,
             JSON.stringify(items.map(i => ({
@@ -866,11 +967,18 @@ app.post("/api/create-checkout-session", async (req, res) => {
     }
 
     const stripe = getStripe();
+
+    // Ensure coupon exists if promo is active
+    if (isPromoActive()) {
+      await ensurePromoCoupon();
+    }
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
       customer_email: customerEmail,
+      allow_promotion_codes: isPromoActive(), // Enable promo codes if active
       success_url: `${appUrl}/gracias?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/checkout`,
       metadata: {
