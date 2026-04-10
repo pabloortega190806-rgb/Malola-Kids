@@ -370,7 +370,8 @@ async function getProductImages(code: string | number, localFiles: string[]): Pr
 
   const baseCode = cleanCodeStr.split('-')[0]; // Extract base code, e.g., '21327' from '21327-B'
   
-  // Use the new API endpoint to resolve the correct image URL
+  // Si no tenemos Cloudinary configurado o no se encontraron imágenes, 
+  // devolvemos el endpoint de resolución pero sin sobreescribir si ya hay una URL válida en attachBlobImages
   const images = [
     `/api/get-image/${cleanCodeStr}`
   ];
@@ -1055,11 +1056,14 @@ app.get("/api/get-image/:code", async (req, res) => {
       }
     }
     
-    // Fallback if not found or no token
-    res.redirect(`https://i.postimg.cc/placeholder/${code}.jpg`);
+    // Fallback if not found or no token - Try to guess Cloudinary URL
+    const cleanCode = code.replace(/^26[-_]/, '');
+    const guessedUrl = `https://res.cloudinary.com/daom5jnck/image/upload/malola_catalog/26-${cleanCode}.jpg`;
+    res.redirect(guessedUrl);
   } catch (error) {
     console.error(`Error fetching image for ${code}:`, error);
-    res.redirect(`https://i.postimg.cc/placeholder/${code}.jpg`);
+    const cleanCode = code.replace(/^26[-_]/, '');
+    res.redirect(`https://res.cloudinary.com/daom5jnck/image/upload/malola_catalog/26-${cleanCode}.jpg`);
   }
 });
 
@@ -1155,23 +1159,36 @@ app.get("/api/products", async (req, res) => {
 
   const attachBlobImages = async (products: any[]) => {
     return Promise.all(products.map(async (product) => {
+      // Si el producto ya tiene una imagen válida que no sea el placeholder o el endpoint de resolución, la mantenemos
+      const hasValidImage = product.image_url && 
+                           product.image_url.startsWith('http') && 
+                           !product.image_url.includes('postimg.cc/placeholder') &&
+                           !product.image_url.includes('/api/get-image');
+
       // If the product already has manually set images in the database, use them
       if (product.local_images && Array.isArray(product.local_images) && product.local_images.length > 0) {
-        if (!product.image_url) {
+        if (!product.image_url || !hasValidImage) {
           product.image_url = product.local_images[0];
         }
         return product;
       }
       
       const { images, mainImage } = await getProductImages(product.code, localFiles);
-      if (images.length > 0) {
+      
+      // Solo sobreescribimos si no hay una imagen válida o si encontramos imágenes reales (no el fallback /api/get-image)
+      const foundRealImages = images.length > 0 && !images[0].startsWith('/api/get-image');
+      
+      if (foundRealImages) {
+        product.local_images = images;
+        product.image_url = mainImage;
+      } else if (!hasValidImage) {
+        // Si no hay imagen válida, usamos el fallback de resolución
         product.local_images = images;
         product.image_url = mainImage;
       } else if (product.gallery_urls && Array.isArray(product.gallery_urls) && product.gallery_urls.length > 0) {
         product.local_images = product.gallery_urls;
-      } else {
-        product.local_images = [];
       }
+      
       return product;
     }));
   };
