@@ -868,16 +868,21 @@ async function ensurePromoCoupon() {
         duration: 'once',
         name: 'Promo Primavera',
       });
-      // Also create promotion codes
-      await (stripe.promotionCodes as any).create({
-        coupon: 'primavera',
-        code: 'primavera',
-      });
-      await (stripe.promotionCodes as any).create({
-        coupon: 'primavera',
-        code: 'Primavera',
-      });
-      console.log("Promo Primavera coupon and codes created successfully.");
+    }
+
+    // Ensure promotion codes exist
+    const codes = ['primavera', 'Primavera', 'PRIMAVERA'];
+    for (const code of codes) {
+      try {
+        await (stripe.promotionCodes as any).create({
+          coupon: 'primavera',
+          code: code,
+        });
+      } catch (e: any) {
+        // Ignore if already exists
+        if (e.raw && e.raw.code === 'resource_already_exists') continue;
+        if (e.message && e.message.includes('already exists')) continue;
+      }
     }
   } catch (err) {
     console.error("Error ensuring promo coupon:", err);
