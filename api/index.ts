@@ -96,11 +96,14 @@ async function getAllCloudinaryImages() {
     // Mapear al formato que usábamos con Vercel Blob para minimizar cambios
     imageCache = allResources.map(res => {
       // Extraer solo el nombre del archivo sin las carpetas
-      const filename = res.public_id.split('/').pop();
+      const filename = res.public_id.split('/').pop() || '';
       // Eliminar el sufijo aleatorio de 6 caracteres que añade Cloudinary (ej: _cwojeb)
+      // Solo si parece ser un sufijo (empieza por _ y tiene 6 caracteres alfanuméricos al final)
       const cleanFilename = filename.replace(/_[a-z0-9]{6}$/i, '');
+      
       return {
         pathname: cleanFilename + '.' + (res.format || 'jpg'),
+        fullPathname: filename + '.' + (res.format || 'jpg'),
         url: res.secure_url
       };
     });
@@ -201,15 +204,17 @@ async function findBlobsForCode(code: string): Promise<{ blobs: any[], matchedVa
       const ext = path.extname(blob.pathname).toLowerCase();
       const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
       const nameWithoutExt = path.basename(blob.pathname, ext);
+      const fullNameWithoutExt = blob.fullPathname ? path.basename(blob.fullPathname, ext) : nameWithoutExt;
       
       if (!isImage) return false;
       
-      // Exact match is best
-      if (nameWithoutExt === variation) return true;
+      // Exact match is best (either clean or full)
+      if (nameWithoutExt === variation || fullNameWithoutExt === variation) return true;
       
       // If it's a variation with a suffix (like _1, _front, etc)
-      if (nameWithoutExt.startsWith(variation)) {
-        const suffix = nameWithoutExt.substring(variation.length);
+      if (nameWithoutExt.startsWith(variation) || fullNameWithoutExt.startsWith(variation)) {
+        const base = nameWithoutExt.startsWith(variation) ? nameWithoutExt : fullNameWithoutExt;
+        const suffix = base.substring(variation.length);
         // Ensure the suffix starts with a separator or is empty
         return suffix === '' || /^[-_. ]/.test(suffix);
       }
@@ -273,7 +278,7 @@ async function getProductImages(code: string | number, localFiles: string[]): Pr
           return aName.localeCompare(bName);
         });
 
-        const images = matchingBlobs.map((_, index) => `/api/get-image/${matchedVariation}?index=${index}`);
+        const images = matchingBlobs.map(blob => blob.url);
         return { images, mainImage: images[0] };
       }
     }
@@ -287,8 +292,7 @@ async function getProductImages(code: string | number, localFiles: string[]): Pr
     cleanCodeStr = cleanCodeStr.substring(3);
   }
 
-  // Si no tenemos Cloudinary configurado o no se encontraron imágenes, 
-  // devolvemos el endpoint de resolución pero sin sobreescribir si ya hay una URL válida en attachBlobImages
+  // Fallback to proxy URL if no images found in Cloudinary
   const images = [
     `/api/get-image/${cleanCodeStr}`
   ];
@@ -1196,8 +1200,8 @@ app.get("/api/products", async (req, res) => {
       
       const { images, mainImage } = await getProductImages(product.code, localFiles);
       
-      // Solo sobreescribimos si no hay una imagen válida o si encontramos imágenes reales (no el fallback /api/get-image)
-      const foundRealImages = images.length > 0 && !images[0].startsWith('/api/get-image');
+      // Solo sobreescribimos si no hay una imagen válida o si encontramos imágenes reales (que no sean el fallback /api/get-image)
+      const foundRealImages = images.length > 0 && !images[0].includes('/api/get-image');
       
       if (foundRealImages) {
         product.local_images = images;
@@ -1361,22 +1365,36 @@ app.get("/api/products/:code", async (req, res) => {
   }
 
   const attachBlobImages = async (product: any) => {
+    // Si el producto ya tiene una imagen válida que no sea el placeholder o el endpoint de resolución, la mantenemos
+    const hasValidImage = product.image_url && 
+                         product.image_url.startsWith('http') && 
+                         !product.image_url.includes('postimg.cc/placeholder') &&
+                         !product.image_url.includes('/api/get-image');
+
+    // If the product already has manually set images in the database, use them
     if (product.local_images && Array.isArray(product.local_images) && product.local_images.length > 0) {
-      if (!product.image_url) {
+      if (!product.image_url || !hasValidImage) {
         product.image_url = product.local_images[0];
       }
       return product;
     }
     
     const { images, mainImage } = await getProductImages(product.code, localFiles);
-    if (images.length > 0) {
+    
+    // Solo sobreescribimos si no hay una imagen válida o si encontramos imágenes reales (que no sean el fallback /api/get-image)
+    const foundRealImages = images.length > 0 && !images[0].includes('/api/get-image');
+    
+    if (foundRealImages) {
+      product.local_images = images;
+      product.image_url = mainImage;
+    } else if (!hasValidImage) {
+      // Si no hay imagen válida, usamos el fallback de resolución
       product.local_images = images;
       product.image_url = mainImage;
     } else if (product.gallery_urls && Array.isArray(product.gallery_urls) && product.gallery_urls.length > 0) {
       product.local_images = product.gallery_urls;
-    } else {
-      product.local_images = [];
     }
+    
     return product;
   };
 
