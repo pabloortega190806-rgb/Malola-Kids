@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Edit, Share2, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Edit, Share2, Check, Info } from 'lucide-react';
 import { Product } from './hooks/useProducts';
 import { useCart } from './context/CartContext';
 import { useAdmin } from './context/AdminContext';
@@ -128,56 +128,66 @@ export default function ProductDetails() {
       </button>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        {/* Image Carousel */}
-        <div className="relative aspect-[3/4] bg-gray-100 rounded-2xl overflow-hidden group">
-          <img
-            src={images[currentImageIndex]}
-            alt={`${product.name} - Imagen ${currentImageIndex + 1}`}
-            className={`w-full h-full object-center ${product.category?.toLowerCase().includes('flamenca') ? 'object-contain p-4' : 'object-cover'}`}
-            referrerPolicy="no-referrer"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
-            }}
-          />
-          
-          {images.length > 1 && (
-            <>
-              <button
-                onClick={prevImage}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <ChevronLeft className="w-6 h-6" />
-              </button>
-              <button
-                onClick={nextImage}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <ChevronRight className="w-6 h-6" />
-              </button>
-              
-              <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
-                {images.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setCurrentImageIndex(idx)}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      idx === currentImageIndex ? 'bg-[#5D4037] w-4' : 'bg-gray-400 hover:bg-gray-600'
-                    }`}
-                  />
-                ))}
-              </div>
-            </>
-          )}
+        {/* Image Section */}
+        <div className="flex flex-col">
+          {/* Image Carousel */}
+          <div className="relative aspect-[3/4] bg-gray-100 rounded-2xl overflow-hidden group">
+            <img
+              src={images[currentImageIndex]}
+              alt={`${product.name} - Imagen ${currentImageIndex + 1}`}
+              className={`w-full h-full object-center ${product.category?.toLowerCase().includes('flamenca') ? 'object-contain p-4' : 'object-cover'}`}
+              referrerPolicy="no-referrer"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+              }}
+            />
+            
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={prevImage}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  onClick={nextImage}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+                
+                <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
+                  {images.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentImageIndex(idx)}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        idx === currentImageIndex ? 'bg-[#5D4037] w-4' : 'bg-gray-400 hover:bg-gray-600'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
 
-          {discountPercentage > 0 && (
-            <div className="absolute top-4 left-4 bg-[#B89F82] text-white text-sm font-bold px-3 py-1 rounded">
-              -{discountPercentage}%
+            {discountPercentage > 0 && (
+              <div className="absolute top-4 left-4 bg-[#B89F82] text-white text-sm font-bold px-3 py-1 rounded">
+                -{discountPercentage}%
+              </div>
+            )}
+          </div>
+
+          {product.category?.toLowerCase().includes('flamenca') && images.length > 1 && (
+            <div className="mt-4 flex items-center justify-center text-[#967A70] text-sm italic bg-[#F5F0E6] py-2 px-4 rounded-full w-fit mx-auto shadow-sm">
+              <Info size={16} className="mr-2" />
+              Desliza la imagen para ver la tabla de medidas
             </div>
           )}
         </div>
 
         {/* Product Info */}
-        <div className="flex flex-col">
+        <div className="flex flex-col mt-6 md:mt-0">
           <p className="text-[#967A70] font-medium mb-2">{product.brand}</p>
           <h1 className="text-3xl font-serif font-bold text-[#3E2A24] mb-4">
             {product.name}
