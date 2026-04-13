@@ -22,6 +22,7 @@ import SearchPage from './SearchPage';
 import ScrollToTop from './components/ScrollToTop';
 import AdminDashboard from './AdminDashboard';
 import Gracias from './Gracias';
+import { useCategories } from './hooks/useCategories';
 
 function PageTracker() {
   const location = useLocation();
@@ -38,9 +39,24 @@ function PageTracker() {
   return null;
 }
 
+const hardcodedCategories = [
+  'Primera Postura',
+  'Bebé Niña (0-4 años)',
+  'Niña (3-9 años)',
+  'Baño Niña',
+  'Bebé Niño (0-4 años)',
+  'Niño (3-9 años)',
+  'Baño Niño',
+  'Complementos',
+  'Flamenca'
+];
+
 export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { cartCount, setIsCartOpen } = useCart();
+  const { categories } = useCategories();
+  
+  const dynamicCategories = categories.filter(c => !hardcodedCategories.includes(c));
 
   return (
     <div className="min-h-screen bg-[#FCFBF9] font-sans text-[#5D4037]">
@@ -111,6 +127,21 @@ export default function App() {
               
               <Link to="/categoria/Flamenca" className="text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">Flamenca</Link>
               
+              {dynamicCategories.length > 0 && (
+                <div className="relative group">
+                  <button className="flex items-center text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">
+                    Más <ChevronDown size={16} className="ml-1" />
+                  </button>
+                  <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-100 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left scale-95 group-hover:scale-100 z-50">
+                    {dynamicCategories.map(cat => (
+                      <Link key={cat} to={`/categoria/${encodeURIComponent(cat)}`} className="block px-4 py-2 text-sm text-[#7A5C53] hover:bg-[#FCFBF9] hover:text-[#B89F82] capitalize">
+                        {cat}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Dropdown Marcas */}
               <div className="relative group">
                 <button className="flex items-center text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">

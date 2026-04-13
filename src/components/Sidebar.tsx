@@ -1,25 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { X, ChevronRight } from 'lucide-react';
+import { useCategories } from '../hooks/useCategories';
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function Sidebar({ isOpen, onClose }: SidebarProps) {
-  const [categories, setCategories] = useState<string[]>([]);
+const hardcodedCategories = [
+  'Primera Postura',
+  'Bebé Niña (0-4 años)',
+  'Niña (3-9 años)',
+  'Baño Niña',
+  'Bebé Niño (0-4 años)',
+  'Niño (3-9 años)',
+  'Baño Niño',
+  'Complementos',
+  'Flamenca'
+];
 
-  useEffect(() => {
-    fetch('/api/categories')
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          setCategories(data);
-        }
-      })
-      .catch(err => console.error("Error fetching categories:", err));
-  }, []);
+export function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const { categories } = useCategories();
+  const dynamicCategories = categories.filter(c => !hardcodedCategories.includes(c));
 
   const brands = [
     { name: 'Calamaro', path: '/marca/calamaro' },
@@ -127,6 +130,26 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     <ChevronRight size={16} className="text-[#D9C8B4] group-hover:text-[#B89F82] transition-colors" />
                   </Link>
                 </div>
+
+                {/* Dynamic Categories */}
+                {dynamicCategories.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-bold text-[#967A70] uppercase tracking-widest mb-2 mt-4">Más Categorías</h4>
+                    <ul className="pl-2 space-y-1">
+                      {dynamicCategories.map(cat => (
+                        <li key={cat}>
+                          <Link 
+                            to={`/categoria/${encodeURIComponent(cat)}`} 
+                            onClick={onClose} 
+                            className="block py-2 text-[#7A5C53] hover:text-[#B89F82] text-sm capitalize"
+                          >
+                            {cat}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
 
