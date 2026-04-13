@@ -34,7 +34,7 @@ export function ProductCard({ product: initialProduct }: { product: Product }) {
         <img
           src={product.image_url}
           alt={product.name}
-          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+          className={`w-full h-full object-center group-hover:scale-105 transition-transform duration-500 ${product.category?.toLowerCase().includes('flamenca') ? 'object-contain p-2' : 'object-cover'}`}
           referrerPolicy="no-referrer"
           onError={(e) => {
             (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';

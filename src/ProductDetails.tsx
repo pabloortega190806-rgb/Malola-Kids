@@ -133,7 +133,7 @@ export default function ProductDetails() {
           <img
             src={images[currentImageIndex]}
             alt={`${product.name} - Imagen ${currentImageIndex + 1}`}
-            className="w-full h-full object-cover object-center"
+            className={`w-full h-full object-center ${product.category?.toLowerCase().includes('flamenca') ? 'object-contain p-4' : 'object-cover'}`}
             referrerPolicy="no-referrer"
             onError={(e) => {
               (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
@@ -216,7 +216,7 @@ export default function ProductDetails() {
                     <img 
                       src={variant.image_url} 
                       alt={variant.color}
-                      className="w-full h-full object-cover"
+                      className={`w-full h-full ${product.category?.toLowerCase().includes('flamenca') ? 'object-contain p-1' : 'object-cover'}`}
                       referrerPolicy="no-referrer"
                     />
                   </button>
