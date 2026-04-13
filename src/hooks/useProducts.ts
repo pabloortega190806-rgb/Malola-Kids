@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react';
 
+export interface ProductVariant {
+  code: string;
+  color: string;
+  image_url: string;
+}
+
 export interface Product {
   code: string;
   name: string;
@@ -13,6 +19,7 @@ export interface Product {
   image_url: string;
   local_images?: string[];
   created_at: string;
+  variants?: ProductVariant[];
 }
 
 interface UseProductsOptions {

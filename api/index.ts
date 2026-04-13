@@ -1436,7 +1436,18 @@ app.get("/api/products/:code", async (req, res) => {
       return res.status(404).json({ error: "Producto no encontrado" });
     }
     
-    const productWithImages = await attachBlobImages(result.rows[0]);
+    let product = result.rows[0];
+    
+    // Fetch variants (products with the same name)
+    if (product.name) {
+      const variantsResult = await db.query(
+        'SELECT code, color, image_url FROM products WHERE name = $1 ORDER BY code',
+        [product.name]
+      );
+      product.variants = variantsResult.rows;
+    }
+
+    const productWithImages = await attachBlobImages(product);
     res.json(productWithImages);
   } catch (error) {
     console.error("Error fetching product:", error);

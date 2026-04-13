@@ -109,6 +109,8 @@ export default function App() {
 
               <Link to="/categoria/Complementos" className="text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">Complementos</Link>
               
+              <Link to="/categoria/Flamenca" className="text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">Flamenca</Link>
+              
               {/* Dropdown Marcas */}
               <div className="relative group">
                 <button className="flex items-center text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">

@@ -194,6 +194,37 @@ export default function ProductDetails() {
             )}
           </div>
 
+          {product.variants && product.variants.length > 1 && (
+            <div className="mb-6">
+              <h3 className="text-sm font-medium text-gray-900 mb-3">Color: {product.color}</h3>
+              <div className="flex flex-wrap gap-3">
+                {product.variants.map((variant) => (
+                  <button
+                    key={variant.code}
+                    onClick={() => {
+                      if (variant.code !== product.code) {
+                        navigate(`/producto/${variant.code}`);
+                      }
+                    }}
+                    className={`w-16 h-16 rounded-md border-2 overflow-hidden transition-all ${
+                      variant.code === product.code 
+                        ? 'border-[#5D4037] shadow-md' 
+                        : 'border-transparent hover:border-gray-300'
+                    }`}
+                    title={variant.color}
+                  >
+                    <img 
+                      src={variant.image_url} 
+                      alt={variant.color}
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="mb-8">
             <h3 className="text-sm font-medium text-gray-900 mb-4">Selecciona tu talla</h3>
             <div className="flex flex-wrap gap-3">
