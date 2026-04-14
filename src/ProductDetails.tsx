@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Edit, Share2, Check, Info } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Product } from './hooks/useProducts';
 import { useCart } from './context/CartContext';
 import { useAdmin } from './context/AdminContext';
@@ -16,6 +17,7 @@ export default function ProductDetails() {
   const [product, setProduct] = useState<Product | null>(null);
   const [images, setImages] = useState<string[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -110,11 +112,39 @@ export default function ProductDetails() {
   };
 
   const nextImage = () => {
+    setDirection(1);
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
   };
 
   const prevImage = () => {
+    setDirection(-1);
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const swipeConfidenceThreshold = 10000;
+  const swipePower = (offset: number, velocity: number) => {
+    return Math.abs(offset) * velocity;
+  };
+
+  const variants = {
+    enter: (direction: number) => {
+      return {
+        x: direction > 0 ? 1000 : -1000,
+        opacity: 0
+      };
+    },
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1
+    },
+    exit: (direction: number) => {
+      return {
+        zIndex: 0,
+        x: direction < 0 ? 1000 : -1000,
+        opacity: 0
+      };
+    }
   };
 
   return (
@@ -131,39 +161,68 @@ export default function ProductDetails() {
         {/* Image Section */}
         <div className="flex flex-col">
           {/* Image Carousel */}
-          <div className="relative aspect-[3/4] bg-gray-100 rounded-2xl overflow-hidden group">
-            <img
-              src={images[currentImageIndex]}
-              alt={`${product.name} - Imagen ${currentImageIndex + 1}`}
-              className={`w-full h-full object-center ${product.category?.toLowerCase().includes('flamenca') ? 'object-contain p-4' : 'object-cover'}`}
-              referrerPolicy="no-referrer"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
-              }}
-            />
+          <div className="relative aspect-[3/4] bg-gray-100 rounded-2xl overflow-hidden group touch-pan-y">
+            <AnimatePresence initial={false} custom={direction}>
+              <motion.img
+                key={currentImageIndex}
+                src={images[currentImageIndex]}
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{
+                  x: { type: "spring", stiffness: 300, damping: 30 },
+                  opacity: { duration: 0.2 }
+                }}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={1}
+                onDragEnd={(e, { offset, velocity }) => {
+                  const swipe = swipePower(offset.x, velocity.x);
+
+                  if (swipe < -swipeConfidenceThreshold) {
+                    nextImage();
+                  } else if (swipe > swipeConfidenceThreshold) {
+                    prevImage();
+                  }
+                }}
+                alt={`${product.name} - Imagen ${currentImageIndex + 1}`}
+                className={`absolute inset-0 w-full h-full object-center cursor-grab active:cursor-grabbing ${product.category?.toLowerCase().includes('flamenca') ? 'object-contain p-4' : 'object-cover'}`}
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+                }}
+              />
+            </AnimatePresence>
             
             {images.length > 1 && (
               <>
                 <button
                   onClick={prevImage}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg z-10 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                  aria-label="Imagen anterior"
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
                 <button
                   onClick={nextImage}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg z-10 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                  aria-label="Siguiente imagen"
                 >
                   <ChevronRight className="w-6 h-6" />
                 </button>
                 
-                <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
+                <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2 z-10">
                   {images.map((_, idx) => (
                     <button
                       key={idx}
-                      onClick={() => setCurrentImageIndex(idx)}
+                      onClick={() => {
+                        setDirection(idx > currentImageIndex ? 1 : -1);
+                        setCurrentImageIndex(idx);
+                      }}
                       className={`w-2 h-2 rounded-full transition-all ${
-                        idx === currentImageIndex ? 'bg-[#5D4037] w-4' : 'bg-gray-400 hover:bg-gray-600'
+                        idx === currentImageIndex ? 'bg-[#5D4037] w-4' : 'bg-gray-400/80 hover:bg-gray-600'
                       }`}
                     />
                   ))}
@@ -172,7 +231,7 @@ export default function ProductDetails() {
             )}
 
             {discountPercentage > 0 && (
-              <div className="absolute top-4 left-4 bg-[#B89F82] text-white text-sm font-bold px-3 py-1 rounded">
+              <div className="absolute top-4 left-4 bg-[#B89F82] text-white text-sm font-bold px-3 py-1 rounded z-10">
                 -{discountPercentage}%
               </div>
             )}
