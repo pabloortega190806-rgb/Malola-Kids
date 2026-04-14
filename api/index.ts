@@ -757,7 +757,24 @@ app.get("/api/admin/orders", requireAdmin, async (req, res) => {
   if (!db) return res.status(503).json({ error: "DB not configured" });
 
   try {
-    const result = await db.query('SELECT * FROM orders ORDER BY created_at DESC LIMIT 100');
+    // Solo mostrar pedidos pagados o el más reciente de cada email si está pendiente
+    const query = `
+      SELECT * FROM orders 
+      WHERE status = 'paid'
+      OR (
+        status = 'pending' 
+        AND id IN (
+          SELECT MAX(id) 
+          FROM orders 
+          WHERE status = 'pending' 
+          AND customer_email IS NOT NULL 
+          GROUP BY customer_email
+        )
+      )
+      ORDER BY created_at DESC 
+      LIMIT 100
+    `;
+    const result = await db.query(query);
     res.json({ success: true, data: result.rows });
   } catch (err: any) {
     console.error("Error fetching orders:", err);
