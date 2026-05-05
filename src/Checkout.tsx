@@ -20,6 +20,11 @@ export default function Checkout() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
+  const [discountCodeInput, setDiscountCodeInput] = useState('');
+  const [appliedDiscount, setAppliedDiscount] = useState<any>(null);
+  const [discountError, setDiscountError] = useState<string | null>(null);
+  const [validatingDiscount, setValidatingDiscount] = useState(false);
+
   if (items.length === 0) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
@@ -48,9 +53,45 @@ export default function Checkout() {
   };
 
   const promoActive = isPromoActive();
-  const freeShippingThreshold = promoActive ? 40 : 80;
-  const shippingCost = accumulateOrder || shippingMethod === 'store' || cartTotal >= freeShippingThreshold ? 0 : 5.50;
-  const finalTotal = cartTotal + shippingCost;
+  const freeShippingThreshold = promoActive && !appliedDiscount ? 40 : 80;
+  let calculatedDiscount = 0;
+  if (appliedDiscount) {
+    if (appliedDiscount.discount_type === 'percentage') {
+       calculatedDiscount = cartTotal * (Number(appliedDiscount.discount_value) / 100);
+    } else if (appliedDiscount.discount_type === 'fixed') {
+       calculatedDiscount = Number(appliedDiscount.discount_value);
+    }
+    if (calculatedDiscount > cartTotal) calculatedDiscount = cartTotal;
+  }
+  
+  const subtotalAfterDiscount = cartTotal - calculatedDiscount;
+  const shippingCost = accumulateOrder || shippingMethod === 'store' || subtotalAfterDiscount >= freeShippingThreshold ? 0 : 5.50;
+  const finalTotal = subtotalAfterDiscount + shippingCost;
+
+  const handleApplyDiscount = async () => {
+    if (!discountCodeInput.trim()) return;
+    setValidatingDiscount(true);
+    setDiscountError(null);
+    try {
+      const res = await fetch('/api/discount-codes/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: discountCodeInput.trim() })
+      });
+      const data = await res.json();
+      if (data.valid) {
+        setAppliedDiscount(data.discount);
+        setDiscountError(null);
+      } else {
+        setDiscountError(data.error || 'Código inválido');
+        setAppliedDiscount(null);
+      }
+    } catch (err) {
+      setDiscountError('Error validando el código');
+    } finally {
+      setValidatingDiscount(false);
+    }
+  };
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,7 +148,8 @@ export default function Checkout() {
           customerEmail: formData.email,
           shippingMethod,
           accumulateOrder,
-          shippingAddress: formData
+          shippingAddress: formData,
+          discountCode: appliedDiscount?.code
         })
       });
 
@@ -343,11 +385,60 @@ export default function Checkout() {
               ))}
             </ul>
 
+            <div className="mb-6 border-t border-gray-200 pt-6">
+              <label htmlFor="discount" className="block text-sm font-medium text-gray-700 mb-2">Código de descuento</label>
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  id="discount"
+                  value={discountCodeInput}
+                  onChange={(e) => setDiscountCodeInput(e.target.value.toUpperCase())}
+                  disabled={!!appliedDiscount || validatingDiscount}
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#B89F82] focus:ring-[#B89F82] sm:text-sm p-2 border disabled:bg-gray-100 disabled:text-gray-500 uppercase"
+                  placeholder="Ej: VERANO20"
+                />
+                {!appliedDiscount ? (
+                  <button
+                    type="button"
+                    onClick={handleApplyDiscount}
+                    disabled={!discountCodeInput.trim() || validatingDiscount}
+                    className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 disabled:opacity-50 transition-colors text-sm font-medium whitespace-nowrap"
+                  >
+                    {validatingDiscount ? '...' : 'Aplicar'}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAppliedDiscount(null);
+                      setDiscountCodeInput('');
+                    }}
+                    className="bg-red-50 text-red-600 px-4 py-2 rounded-md hover:bg-red-100 transition-colors text-sm font-medium whitespace-nowrap"
+                  >
+                    Quitar
+                  </button>
+                )}
+              </div>
+              {discountError && <p className="mt-2 text-sm text-red-600">{discountError}</p>}
+              {appliedDiscount && (
+                <p className="mt-2 text-sm text-green-600 font-medium">
+                  ✓ Código aplicado con éxito: {appliedDiscount.discount_type === 'percentage' ? `-${Number(appliedDiscount.discount_value)}%` : `-${Number(appliedDiscount.discount_value).toFixed(2)}€`}
+                </p>
+              )}
+            </div>
+
             <div className="space-y-4 border-t border-gray-200 pt-6">
               <div className="flex items-center justify-between text-sm">
                 <p className="text-gray-600">Subtotal</p>
                 <p className="font-medium text-gray-900">{cartTotal.toFixed(2)} €</p>
               </div>
+
+              {appliedDiscount && (
+                <div className="flex items-center justify-between text-sm text-green-600">
+                  <p>Descuento ({appliedDiscount.code})</p>
+                  <p className="font-medium">-{calculatedDiscount.toFixed(2)} €</p>
+                </div>
+              )}
               
               <div className="flex items-center justify-between text-sm">
                 <p className="text-gray-600">Envío</p>

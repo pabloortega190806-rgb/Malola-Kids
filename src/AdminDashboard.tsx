@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Lock, LogOut, ExternalLink, BarChart3, Eye, MousePointerClick, ShoppingBag, Settings, CheckCircle2, XCircle, Calendar, Filter, MapPin, ChevronDown, ChevronUp, Plus, Trash2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { ProductModal } from './components/ProductModal';
+import { DiscountCodes } from './components/admin/DiscountCodes';
 
 export default function AdminDashboard() {
   const { isAdmin, login, logout, token } = useAdmin();
@@ -270,6 +271,8 @@ export default function AdminDashboard() {
             </div>
           )}
         </div>
+
+        <DiscountCodes />
 
         <div className="bg-white p-8 rounded-xl shadow-sm border border-[#F5F0EB]">
           <div 

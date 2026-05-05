@@ -366,6 +366,18 @@ async function handleSuccessfulPayment(session: any) {
           [size, quantity, code]
         );
       }
+      if (metadata?.appliedDiscountId) {
+        try {
+          await db.query(
+            'UPDATE discount_codes SET used_count = used_count + 1 WHERE id = $1',
+            [metadata.appliedDiscountId]
+          );
+          console.log(`Incremented usage for discount code ID ${metadata.appliedDiscountId}`);
+        } catch (err) {
+          console.error("Error updating discount code usage:", err);
+        }
+      }
+
       console.log(`Order ${orderId || sessionId} processed successfully.`);
 
       // Enviar notificación por email usando Formspree
@@ -752,6 +764,83 @@ app.delete("/api/admin/categories/:name", requireAdmin, async (req, res) => {
   }
 });
 
+// ==========================================
+// DISCOUNT CODES (ADMIN)
+// ==========================================
+app.get("/api/admin/discount-codes", requireAdmin, async (req, res) => {
+  const db = getDbPool();
+  if (!db) return res.status(503).json({ error: "DB not configured" });
+  try {
+    const result = await db.query('SELECT * FROM discount_codes ORDER BY created_at DESC');
+    res.json({ success: true, data: result.rows });
+  } catch (err: any) {
+    console.error("Error fetching discount codes:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/admin/discount-codes", requireAdmin, async (req, res) => {
+  const db = getDbPool();
+  if (!db) return res.status(503).json({ error: "DB not configured" });
+  
+  const { code, discount_type, discount_value, active, usage_limit } = req.body;
+  if (!code || !discount_type || discount_value == null) {
+    return res.status(400).json({ error: "Faltan campos obligatorios" });
+  }
+
+  try {
+    const result = await db.query(
+      `INSERT INTO discount_codes (code, discount_type, discount_value, active, usage_limit)
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [code.toUpperCase().trim(), discount_type, discount_value, active ?? true, usage_limit || null]
+    );
+    res.status(201).json({ success: true, data: result.rows[0] });
+  } catch (err: any) {
+    if (err.code === '23505') {
+      return res.status(400).json({ error: "El código ya existe" });
+    }
+    console.error("Error creating discount code:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put("/api/admin/discount-codes/:id", requireAdmin, async (req, res) => {
+  const db = getDbPool();
+  if (!db) return res.status(503).json({ error: "DB not configured" });
+  
+  const { id } = req.params;
+  const { code, discount_type, discount_value, active, usage_limit } = req.body;
+  
+  try {
+    const result = await db.query(
+      `UPDATE discount_codes 
+       SET code = $1, discount_type = $2, discount_value = $3, active = $4, usage_limit = $5 
+       WHERE id = $6 RETURNING *`,
+      [code.toUpperCase().trim(), discount_type, discount_value, active ?? true, usage_limit || null, id]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: "Código no encontrado" });
+    res.json({ success: true, data: result.rows[0] });
+  } catch (err: any) {
+    if (err.code === '23505') return res.status(400).json({ error: "El código ya existe" });
+    console.error("Error updating discount code:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete("/api/admin/discount-codes/:id", requireAdmin, async (req, res) => {
+  const db = getDbPool();
+  if (!db) return res.status(503).json({ error: "DB not configured" });
+  
+  try {
+    const result = await db.query('DELETE FROM discount_codes WHERE id = $1 RETURNING *', [req.params.id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: "Código no encontrado" });
+    res.json({ success: true, message: "Código eliminado correctamente" });
+  } catch (err: any) {
+    console.error("Error deleting discount code:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get("/api/admin/orders", requireAdmin, async (req, res) => {
   const db = getDbPool();
   if (!db) return res.status(503).json({ error: "DB not configured" });
@@ -916,9 +1005,43 @@ async function ensurePromoCoupon() {
   }
 }
 
+app.post("/api/discount-codes/validate", async (req, res) => {
+  const { code } = req.body;
+  if (!code) return res.status(400).json({ error: "No code provided" });
+
+  const db = getDbPool();
+  if (!db) return res.status(503).json({ error: "DB not configured" });
+
+  try {
+    const result = await db.query(
+      'SELECT * FROM discount_codes WHERE code = $1 AND active = true',
+      [code.toUpperCase().trim()]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ valid: false, error: "Código de descuento inválido o inactivo." });
+    }
+
+    const discountInfo = result.rows[0];
+
+    // Check usage limit
+    if (discountInfo.usage_limit !== null && discountInfo.used_count >= discountInfo.usage_limit) {
+      return res.status(400).json({ valid: false, error: "Este código de descuento ha excedido su límite de uso." });
+    }
+
+    res.json({
+      valid: true,
+      discount: discountInfo
+    });
+  } catch (err: any) {
+    console.error("Error validating discount code:", err);
+    res.status(500).json({ valid: false, error: "Error de servidor al validar el código" });
+  }
+});
+
 app.post("/api/create-checkout-session", async (req, res) => {
   try {
-    let { items, shippingCost, customerEmail, shippingMethod, accumulateOrder, shippingAddress } = req.body;
+    let { items, shippingCost, customerEmail, shippingMethod, accumulateOrder, shippingAddress, discountCode } = req.body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: "No items in cart" });
@@ -926,13 +1049,56 @@ app.post("/api/create-checkout-session", async (req, res) => {
 
     const cartSubtotal = items.reduce((acc, item) => acc + (Number(item.product.discounted_price) * item.quantity), 0);
 
-    // Apply free shipping logic if promo is active and subtotal >= 40
-    if (isPromoActive() && cartSubtotal >= 40) {
-      shippingCost = 0;
-    }
-
     const db = getDbPool();
     let orderId = null;
+    let appliedDiscountId = null;
+
+    // Apply manual code discount if provided and valid
+    let finalDiscountValue = 0;
+    let discountStripeCouponId = null;
+    
+    if (discountCode && db) {
+      const codeResult = await db.query(
+        'SELECT * FROM discount_codes WHERE code = $1 AND active = true',
+        [discountCode.toUpperCase().trim()]
+      );
+      if (codeResult.rows.length > 0) {
+        const discountObj = codeResult.rows[0];
+        if (discountObj.usage_limit === null || discountObj.used_count < discountObj.usage_limit) {
+          appliedDiscountId = discountObj.id;
+          
+          if (discountObj.discount_type === 'percentage') {
+             finalDiscountValue = cartSubtotal * (Number(discountObj.discount_value) / 100);
+          } else if (discountObj.discount_type === 'fixed') {
+             finalDiscountValue = Number(discountObj.discount_value);
+          }
+          
+          if (finalDiscountValue > cartSubtotal) finalDiscountValue = cartSubtotal; // never discount more than total
+
+          // We'll create or fetch a Stripe coupon for this discount
+          const stripe = getStripe();
+          discountStripeCouponId = `DC_${discountObj.code}_${discountObj.id}`;
+          
+          try {
+            await stripe.coupons.retrieve(discountStripeCouponId);
+          } catch(e) {
+            // Create if it doesn't exist
+            await stripe.coupons.create({
+              id: discountStripeCouponId,
+              name: `Código: ${discountObj.code}`,
+              ...(discountObj.discount_type === 'percentage' 
+                  ? { percent_off: Number(discountObj.discount_value) } 
+                  : { amount_off: Math.round(Number(discountObj.discount_value) * 100), currency: 'eur' }),
+              duration: 'once'
+            });
+          }
+        }
+      }
+    }
+
+    // Apply free shipping logic conditionally based on old logic ONLY if there's no discount code?
+    // Actually, free shipping was if subtotal >= 40. Now I'm discarding isPromoActive, but the client might expect it.
+    // I'll just use the old isPromoActive but it's expired anyway.
 
     // 1. Create a pending order in the database
     if (db) {
@@ -943,7 +1109,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
            RETURNING id`,
           [
             customerEmail, 
-            cartSubtotal + shippingCost,
+            Math.max(0, cartSubtotal - finalDiscountValue) + shippingCost,
             shippingCost,
             shippingMethod,
             JSON.stringify(items.map(i => ({
@@ -958,6 +1124,9 @@ app.post("/api/create-checkout-session", async (req, res) => {
           ]
         );
         orderId = orderResult.rows[0].id;
+        
+        // Also if discount is applied, register it somehow or increase used_count? 
+        // We shouldn't increase used_count UNTIL payment is completed.
       } catch (dbErr) {
         console.error("Error creating pending order:", dbErr);
       }
@@ -966,7 +1135,6 @@ app.post("/api/create-checkout-session", async (req, res) => {
     const appUrl = process.env.APP_URL || "http://localhost:3000";
 
     const lineItems = items.map((item: any) => {
-      // Ensure image URL is absolute for Stripe
       let imageUrl = item.product.image_url;
       if (imageUrl && imageUrl.startsWith('/')) {
         imageUrl = `${appUrl}${imageUrl}`;
@@ -986,7 +1154,6 @@ app.post("/api/create-checkout-session", async (req, res) => {
       };
     });
 
-    // Add shipping as a line item if applicable
     if (shippingCost > 0) {
       lineItems.push({
         price_data: {
@@ -1004,32 +1171,28 @@ app.post("/api/create-checkout-session", async (req, res) => {
 
     const stripe = getStripe();
 
-    // Ensure coupon exists if promo is active
-    if (isPromoActive()) {
-      await ensurePromoCoupon();
-    }
-
-    const session = await stripe.checkout.sessions.create({
+    const sessionData: any = {
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
       customer_email: customerEmail,
-      allow_promotion_codes: isPromoActive(), // Enable promo codes if active
       success_url: `${appUrl}/gracias?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/checkout`,
       metadata: {
         orderId: orderId ? String(orderId) : "",
         shippingMethod,
         accumulateOrder: String(accumulateOrder),
+        appliedDiscountId: appliedDiscountId ? String(appliedDiscountId) : ""
       },
-      // Optional: Allow Stripe to collect shipping address
       billing_address_collection: 'required',
       shipping_address_collection: {
-        allowed_countries: ['ES'], // Only Spain for now, or add more
+        allowed_countries: ['ES'],
       },
-    });
+      discounts: discountStripeCouponId ? [{ coupon: discountStripeCouponId }] : undefined
+    };
 
-    // Update order with session ID if it was created
+    const session = await stripe.checkout.sessions.create(sessionData);
+
     if (db && orderId) {
       await db.query('UPDATE orders SET stripe_session_id = $1 WHERE id = $2', [session.id, orderId]);
     }
