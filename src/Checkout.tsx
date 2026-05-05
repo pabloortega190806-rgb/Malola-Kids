@@ -56,12 +56,24 @@ export default function Checkout() {
   const freeShippingThreshold = promoActive && !appliedDiscount ? 40 : 80;
   let calculatedDiscount = 0;
   if (appliedDiscount) {
+    const incl = Array.isArray(appliedDiscount.included_categories) ? appliedDiscount.included_categories : [];
+    const excl = Array.isArray(appliedDiscount.excluded_categories) ? appliedDiscount.excluded_categories : [];
+    
+    const eligibleSubtotal = items.reduce((acc, item) => {
+      const isIncluded = incl.length === 0 || incl.includes(item.product.category);
+      const isExcluded = excl.length > 0 && excl.includes(item.product.category);
+      if (isIncluded && !isExcluded) {
+        return acc + (Number(item.product.discounted_price) * item.quantity);
+      }
+      return acc;
+    }, 0);
+
     if (appliedDiscount.discount_type === 'percentage') {
-       calculatedDiscount = cartTotal * (Number(appliedDiscount.discount_value) / 100);
+       calculatedDiscount = eligibleSubtotal * (Number(appliedDiscount.discount_value) / 100);
     } else if (appliedDiscount.discount_type === 'fixed') {
        calculatedDiscount = Number(appliedDiscount.discount_value);
+       if (calculatedDiscount > eligibleSubtotal) calculatedDiscount = eligibleSubtotal;
     }
-    if (calculatedDiscount > cartTotal) calculatedDiscount = cartTotal;
   }
   
   const subtotalAfterDiscount = cartTotal - calculatedDiscount;
@@ -80,8 +92,26 @@ export default function Checkout() {
       });
       const data = await res.json();
       if (data.valid) {
-        setAppliedDiscount(data.discount);
-        setDiscountError(null);
+        const discountObj = data.discount;
+        const incl = Array.isArray(discountObj.included_categories) ? discountObj.included_categories : [];
+        const excl = Array.isArray(discountObj.excluded_categories) ? discountObj.excluded_categories : [];
+        
+        const eligibleSubtotal = items.reduce((acc, item) => {
+          const isIncluded = incl.length === 0 || incl.includes(item.product.category);
+          const isExcluded = excl.length > 0 && excl.includes(item.product.category);
+          if (isIncluded && !isExcluded) {
+            return acc + (Number(item.product.discounted_price) * item.quantity);
+          }
+          return acc;
+        }, 0);
+        
+        if (eligibleSubtotal === 0) {
+           setDiscountError('El código no es aplicable a los productos de la cesta.');
+           setAppliedDiscount(null);
+        } else {
+           setAppliedDiscount(discountObj);
+           setDiscountError(null);
+        }
       } else {
         setDiscountError(data.error || 'Código inválido');
         setAppliedDiscount(null);
@@ -420,9 +450,14 @@ export default function Checkout() {
                 )}
               </div>
               {discountError && <p className="mt-2 text-sm text-red-600">{discountError}</p>}
-              {appliedDiscount && (
+              {appliedDiscount && calculatedDiscount > 0 && (
                 <p className="mt-2 text-sm text-green-600 font-medium">
                   ✓ Código aplicado con éxito: {appliedDiscount.discount_type === 'percentage' ? `-${Number(appliedDiscount.discount_value)}%` : `-${Number(appliedDiscount.discount_value).toFixed(2)}€`}
+                </p>
+              )}
+              {appliedDiscount && calculatedDiscount === 0 && (
+                <p className="mt-2 text-sm text-amber-600 font-medium">
+                  ⚠️ Atención: El código no es aplicable a ningún producto de la cesta.
                 </p>
               )}
             </div>

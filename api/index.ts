@@ -783,16 +783,24 @@ app.post("/api/admin/discount-codes", requireAdmin, async (req, res) => {
   const db = getDbPool();
   if (!db) return res.status(503).json({ error: "DB not configured" });
   
-  const { code, discount_type, discount_value, active, usage_limit } = req.body;
+  const { code, discount_type, discount_value, active, usage_limit, included_categories, excluded_categories } = req.body;
   if (!code || !discount_type || discount_value == null) {
     return res.status(400).json({ error: "Faltan campos obligatorios" });
   }
 
   try {
     const result = await db.query(
-      `INSERT INTO discount_codes (code, discount_type, discount_value, active, usage_limit)
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [code.toUpperCase().trim(), discount_type, discount_value, active ?? true, usage_limit || null]
+      `INSERT INTO discount_codes (code, discount_type, discount_value, active, usage_limit, included_categories, excluded_categories)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [
+        code.toUpperCase().trim(),
+        discount_type,
+        discount_value,
+        active ?? true,
+        usage_limit || null,
+        JSON.stringify(included_categories || []),
+        JSON.stringify(excluded_categories || [])
+      ]
     );
     res.status(201).json({ success: true, data: result.rows[0] });
   } catch (err: any) {
@@ -809,14 +817,23 @@ app.put("/api/admin/discount-codes/:id", requireAdmin, async (req, res) => {
   if (!db) return res.status(503).json({ error: "DB not configured" });
   
   const { id } = req.params;
-  const { code, discount_type, discount_value, active, usage_limit } = req.body;
+  const { code, discount_type, discount_value, active, usage_limit, included_categories, excluded_categories } = req.body;
   
   try {
     const result = await db.query(
       `UPDATE discount_codes 
-       SET code = $1, discount_type = $2, discount_value = $3, active = $4, usage_limit = $5 
-       WHERE id = $6 RETURNING *`,
-      [code.toUpperCase().trim(), discount_type, discount_value, active ?? true, usage_limit || null, id]
+       SET code = $1, discount_type = $2, discount_value = $3, active = $4, usage_limit = $5, included_categories = $6, excluded_categories = $7 
+       WHERE id = $8 RETURNING *`,
+      [
+        code.toUpperCase().trim(),
+        discount_type,
+        discount_value,
+        active ?? true,
+        usage_limit || null,
+        JSON.stringify(included_categories || []),
+        JSON.stringify(excluded_categories || []),
+        id
+      ]
     );
     if (result.rows.length === 0) return res.status(404).json({ error: "Código no encontrado" });
     res.json({ success: true, data: result.rows[0] });
@@ -1067,30 +1084,43 @@ app.post("/api/create-checkout-session", async (req, res) => {
         if (discountObj.usage_limit === null || discountObj.used_count < discountObj.usage_limit) {
           appliedDiscountId = discountObj.id;
           
+          const incl = Array.isArray(discountObj.included_categories) ? discountObj.included_categories : [];
+          const excl = Array.isArray(discountObj.excluded_categories) ? discountObj.excluded_categories : [];
+
+          const eligibleSubtotal = items.reduce((acc: number, item: any) => {
+             const isIncluded = incl.length === 0 || incl.includes(item.product.category);
+             const isExcluded = excl.length > 0 && excl.includes(item.product.category);
+             if (isIncluded && !isExcluded) {
+                return acc + (Number(item.product.discounted_price) * item.quantity);
+             }
+             return acc;
+          }, 0);
+          
           if (discountObj.discount_type === 'percentage') {
-             finalDiscountValue = cartSubtotal * (Number(discountObj.discount_value) / 100);
+             finalDiscountValue = eligibleSubtotal * (Number(discountObj.discount_value) / 100);
           } else if (discountObj.discount_type === 'fixed') {
              finalDiscountValue = Number(discountObj.discount_value);
+             if (finalDiscountValue > eligibleSubtotal) finalDiscountValue = eligibleSubtotal;
           }
-          
-          if (finalDiscountValue > cartSubtotal) finalDiscountValue = cartSubtotal; // never discount more than total
 
-          // We'll create or fetch a Stripe coupon for this discount
+          // We'll create or fetch a Stripe coupon for this exact discount amount
           const stripe = getStripe();
-          discountStripeCouponId = `DC_${discountObj.code}_${discountObj.id}`;
+          const amountInCents = Math.round(finalDiscountValue * 100);
           
-          try {
-            await stripe.coupons.retrieve(discountStripeCouponId);
-          } catch(e) {
-            // Create if it doesn't exist
-            await stripe.coupons.create({
-              id: discountStripeCouponId,
-              name: `Código: ${discountObj.code}`,
-              ...(discountObj.discount_type === 'percentage' 
-                  ? { percent_off: Number(discountObj.discount_value) } 
-                  : { amount_off: Math.round(Number(discountObj.discount_value) * 100), currency: 'eur' }),
-              duration: 'once'
-            });
+          if (amountInCents > 0) {
+            discountStripeCouponId = `DC_AMT_${amountInCents}`;
+            try {
+              await stripe.coupons.retrieve(discountStripeCouponId);
+            } catch(e) {
+              // Create if it doesn't exist
+              await stripe.coupons.create({
+                id: discountStripeCouponId,
+                name: `Descuento aplicado`,
+                amount_off: amountInCents,
+                currency: 'eur',
+                duration: 'once'
+              });
+            }
           }
         }
       }

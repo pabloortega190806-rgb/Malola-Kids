@@ -10,12 +10,15 @@ interface DiscountCode {
   active: boolean;
   usage_limit: number | null;
   used_count: number;
+  included_categories: string[] | null;
+  excluded_categories: string[] | null;
   created_at: string;
 }
 
 export function DiscountCodes() {
   const { token } = useAdmin();
   const [codes, setCodes] = useState<DiscountCode[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -25,7 +28,9 @@ export function DiscountCodes() {
     discount_type: 'percentage',
     discount_value: '',
     active: true,
-    usage_limit: ''
+    usage_limit: '',
+    included_categories: [] as string[],
+    excluded_categories: [] as string[]
   });
 
   const fetchCodes = () => {
@@ -41,8 +46,18 @@ export function DiscountCodes() {
       .finally(() => setLoading(false));
   };
 
+  const fetchCategories = () => {
+    fetch('/api/categories')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setCategories(data);
+      })
+      .catch(err => console.error(err));
+  };
+
   useEffect(() => {
     fetchCodes();
+    fetchCategories();
   }, [token]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,7 +86,7 @@ export function DiscountCodes() {
       if (data.success) {
         setIsAdding(false);
         setEditingId(null);
-        setFormData({ code: '', discount_type: 'percentage', discount_value: '', active: true, usage_limit: '' });
+        setFormData({ code: '', discount_type: 'percentage', discount_value: '', active: true, usage_limit: '', included_categories: [], excluded_categories: [] });
         fetchCodes();
       } else {
         alert(data.error || 'Error guardando el código');
@@ -100,7 +115,9 @@ export function DiscountCodes() {
       discount_type: code.discount_type,
       discount_value: code.discount_value,
       active: code.active,
-      usage_limit: code.usage_limit ? String(code.usage_limit) : ''
+      usage_limit: code.usage_limit ? String(code.usage_limit) : '',
+      included_categories: Array.isArray(code.included_categories) ? code.included_categories : [],
+      excluded_categories: Array.isArray(code.excluded_categories) ? code.excluded_categories : []
     });
     setEditingId(code.id);
     setIsAdding(true);
@@ -118,7 +135,7 @@ export function DiscountCodes() {
             setIsAdding(!isAdding);
             if (!isAdding) {
               setEditingId(null);
-              setFormData({ code: '', discount_type: 'percentage', discount_value: '', active: true, usage_limit: '' });
+              setFormData({ code: '', discount_type: 'percentage', discount_value: '', active: true, usage_limit: '', included_categories: [], excluded_categories: [] });
             }
           }}
           className="flex items-center text-sm bg-[#FCFBF9] border border-[#E5D9C5] px-3 py-1.5 rounded-md hover:bg-[#F5F0EB] transition-colors"
@@ -177,7 +194,7 @@ export function DiscountCodes() {
                 placeholder="Ilimitado"
               />
             </div>
-            <div className="flex items-end justify-between lg:justify-start lg:space-x-4">
+            <div className="flex items-end justify-between lg:justify-start lg:space-x-4 lg:col-span-1">
               <label className="flex items-center space-x-2 text-sm text-[#5D4037] cursor-pointer mb-2 lg:mb-1.5">
                 <input
                   type="checkbox"
@@ -189,10 +206,65 @@ export function DiscountCodes() {
               </label>
               <button
                 type="submit"
-                className="bg-[#B89F82] text-white px-4 py-1.5 rounded-md hover:bg-[#967A70] transition-colors flex items-center text-sm"
+                className="bg-[#B89F82] text-white px-4 py-1.5 rounded-md hover:bg-[#967A70] transition-colors flex items-center text-sm mb-1.5"
               >
                 <Check size={16} className="mr-1" /> Guardar
               </button>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-[#E5D9C5] pt-4 mt-2">
+            <div>
+              <label className="block text-xs font-medium text-[#5D4037] mb-2">
+                Categorías Incluidas (dejar vacío para aplicar a TODAS)
+              </label>
+              <div className="max-h-32 overflow-y-auto bg-white border border-[#E5D9C5] rounded-md p-2 grid grid-cols-2 gap-1 text-sm">
+                {categories.map(cat => (
+                  <label key={cat} className="flex items-center space-x-2 cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={formData.included_categories.includes(cat)}
+                      onChange={e => {
+                        const checked = e.target.checked;
+                        setFormData(prev => ({
+                          ...prev,
+                          included_categories: checked 
+                            ? [...prev.included_categories, cat] 
+                            : prev.included_categories.filter(c => c !== cat)
+                        }));
+                      }}
+                      className="rounded text-[#B89F82] focus:ring-[#B89F82]"
+                    />
+                    <span className="truncate" title={cat}>{cat}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-[#5D4037] mb-2">
+                Categorías Excluídas (no se aplicará a estas)
+              </label>
+              <div className="max-h-32 overflow-y-auto bg-white border border-[#E5D9C5] rounded-md p-2 grid grid-cols-2 gap-1 text-sm">
+                {categories.map(cat => (
+                  <label key={cat} className="flex items-center space-x-2 cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={formData.excluded_categories.includes(cat)}
+                      onChange={e => {
+                        const checked = e.target.checked;
+                        setFormData(prev => ({
+                          ...prev,
+                          excluded_categories: checked 
+                            ? [...prev.excluded_categories, cat] 
+                            : prev.excluded_categories.filter(c => c !== cat)
+                        }));
+                      }}
+                      className="rounded text-[#B89F82] focus:ring-[#B89F82]"
+                    />
+                    <span className="truncate text-red-700" title={cat}>{cat}</span>
+                  </label>
+                ))}
+              </div>
             </div>
           </div>
         </form>
