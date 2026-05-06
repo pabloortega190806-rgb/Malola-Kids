@@ -106,7 +106,8 @@ async function getAllCloudinaryImages() {
       return {
         pathname: cleanFilename + '.' + (res.format || 'jpg'),
         fullPathname: filename + '.' + (res.format || 'jpg'),
-        url: res.secure_url
+        url: res.secure_url,
+        uploadedAt: new Date(res.created_at).getTime()
       };
     });
     
@@ -268,9 +269,13 @@ async function getProductImages(code: string | number, localFiles: string[]): Pr
 
           const scoreA = getScore(aName);
           const scoreB = getScore(bName);
-
+          
           if (scoreA !== scoreB) {
             return scoreA - scoreB;
+          }
+          
+          if (a.uploadedAt && b.uploadedAt && a.uploadedAt !== b.uploadedAt) {
+            return b.uploadedAt - a.uploadedAt; // Newer first
           }
           
           if (aName.length !== bName.length) {
@@ -1289,6 +1294,10 @@ app.get("/api/get-image/:code", async (req, res) => {
 
         if (scoreA !== scoreB) {
           return scoreA - scoreB;
+        }
+
+        if (a.uploadedAt && b.uploadedAt && a.uploadedAt !== b.uploadedAt) {
+          return b.uploadedAt - a.uploadedAt; // Newer first
         }
         
         if (aName.length !== bName.length) {
