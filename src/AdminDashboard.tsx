@@ -314,7 +314,6 @@ export default function AdminDashboard() {
                         <th className="py-4 px-4 font-serif font-semibold text-[#5D4037] text-sm uppercase tracking-wider">Cliente / Envío</th>
                         <th className="py-4 px-4 font-serif font-semibold text-[#5D4037] text-sm uppercase tracking-wider">Artículos</th>
                         <th className="py-4 px-4 font-serif font-semibold text-[#5D4037] text-sm uppercase tracking-wider">Total</th>
-                        <th className="py-4 px-4 font-serif font-semibold text-[#5D4037] text-sm uppercase tracking-wider">Estado</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#F5F0EB]">
@@ -355,17 +354,6 @@ export default function AdminDashboard() {
                           </td>
                           <td className="py-5 px-4 text-sm font-bold text-[#3E2A24]">
                             {Number(order.total_amount).toFixed(2)}€
-                          </td>
-                          <td className="py-5 px-4">
-                            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${
-                              order.status === 'paid' ? 'bg-green-50 text-green-700 border-green-200' : 
-                              order.status === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : 
-                              'bg-gray-50 text-gray-700 border-gray-200'
-                            }`}>
-                              {order.status === 'paid' ? 'Pagado' : 
-                               order.status === 'pending' ? 'Pendiente' : 
-                               order.status}
-                            </span>
                           </td>
                         </tr>
                       ))}

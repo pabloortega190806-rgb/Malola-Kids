@@ -870,7 +870,7 @@ app.get("/api/admin/orders", requireAdmin, async (req, res) => {
   try {
     // Solo mostrar pedidos pagados o el más reciente de cada email si está pendiente
     const query = `
-      SELECT * FROM orders 
+      SELECT id, customer_email, total_amount, shipping_cost, shipping_method, shipping_address, items, created_at FROM orders 
       WHERE status = 'paid'
       OR (
         status = 'pending' 
