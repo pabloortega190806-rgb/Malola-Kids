@@ -144,7 +144,14 @@ export default function Checkout() {
         })
       });
 
-      const validateData = await validateResponse.json();
+      let validateData;
+      const validateText = await validateResponse.text();
+      try {
+        validateData = JSON.parse(validateText);
+      } catch (e) {
+        throw new Error('El servidor devolvió una respuesta inesperada durante la validación del carrito.');
+      }
+
       console.log('Resultado validación stock:', validateData);
 
       if (!validateResponse.ok || !validateData.valid) {
@@ -183,7 +190,14 @@ export default function Checkout() {
         })
       });
 
-      const checkoutData = await checkoutResponse.json();
+      let checkoutData;
+      const checkoutText = await checkoutResponse.text();
+      try {
+        checkoutData = JSON.parse(checkoutText);
+      } catch (e) {
+        throw new Error('El servidor devolvió una respuesta inesperada al intentar procesar el pago.');
+      }
+      
       console.log('Respuesta de sesión Stripe:', checkoutData);
 
       if (!checkoutResponse.ok) {

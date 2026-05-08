@@ -48,6 +48,36 @@ async function initDb() {
       );
       CREATE INDEX IF NOT EXISTS idx_orders_stripe_session_id ON orders(stripe_session_id);
       CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at DESC);
+
+      CREATE TABLE IF NOT EXISTS products (
+        id SERIAL PRIMARY KEY,
+        code VARCHAR(50) UNIQUE NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        price NUMERIC(10, 2) NOT NULL,
+        discounted_price NUMERIC(10, 2),
+        category VARCHAR(100),
+        brand VARCHAR(100),
+        sizes_stock JSONB DEFAULT '{}',
+        images JSONB DEFAULT '[]',
+        active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_products_code ON products(code);
+
+      CREATE TABLE IF NOT EXISTS discount_codes (
+        id SERIAL PRIMARY KEY,
+        code VARCHAR(50) UNIQUE NOT NULL,
+        discount_type VARCHAR(20) NOT NULL, -- 'percentage' or 'fixed'
+        discount_value NUMERIC(10, 2) NOT NULL,
+        active BOOLEAN DEFAULT true,
+        usage_limit INTEGER,
+        usage_count INTEGER DEFAULT 0,
+        included_categories JSONB DEFAULT '[]',
+        excluded_categories JSONB DEFAULT '[]',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_discount_codes_code ON discount_codes(code);
     `);
     console.log("Database tables initialized successfully.");
   } catch (err) {

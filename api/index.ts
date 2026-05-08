@@ -1167,7 +1167,8 @@ app.post("/api/create-checkout-session", async (req, res) => {
       }
     }
 
-    const appUrl = process.env.APP_URL || "http://localhost:3000";
+    const origin = req.get('origin') || process.env.APP_URL || "http://localhost:3000";
+    const appUrl = origin.replace(/\/$/, "");
 
     const lineItems = items.map((item: any) => {
       let imageUrl = item.product.image_url;
@@ -1206,36 +1207,50 @@ app.post("/api/create-checkout-session", async (req, res) => {
 
     const stripe = getStripe();
 
+    console.log(`[Order] Creating session for ${customerEmail}. Items: ${items.length}`);
+
     const sessionData: any = {
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      customer_email: customerEmail,
+      customer_email: customerEmail || undefined,
       success_url: `${appUrl}/gracias?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/checkout`,
       metadata: {
         orderId: orderId ? String(orderId) : "",
-        shippingMethod,
-        accumulateOrder: String(accumulateOrder),
+        shippingMethod: shippingMethod || "home",
+        accumulateOrder: String(!!accumulateOrder),
         appliedDiscountId: appliedDiscountId ? String(appliedDiscountId) : ""
       },
       billing_address_collection: 'required',
       shipping_address_collection: {
         allowed_countries: ['ES'],
       },
-      discounts: discountStripeCouponId ? [{ coupon: discountStripeCouponId }] : undefined
     };
 
+    if (discountStripeCouponId) {
+      sessionData.discounts = [{ coupon: discountStripeCouponId }];
+    }
+
     const session = await stripe.checkout.sessions.create(sessionData);
+    console.log(`[Order] Stripe session created: ${session.id}`);
 
     if (db && orderId) {
-      await db.query('UPDATE orders SET stripe_session_id = $1 WHERE id = $2', [session.id, orderId]);
+      try {
+        await db.query('UPDATE orders SET stripe_session_id = $1 WHERE id = $2', [session.id, orderId]);
+        console.log(`[Order] Order ${orderId} updated with session ID`);
+      } catch (updateErr) {
+        console.error(`[Order] Error updating order ${orderId} with session ID:`, updateErr);
+      }
     }
 
     res.json({ id: session.id, url: session.url });
   } catch (error: any) {
-    console.error("Stripe Error Details:", error);
-    res.status(500).json({ error: error.message || "Error al conectar con Stripe" });
+    console.error("Critical Stripe Error:", error);
+    res.status(500).json({ 
+      error: error.message || "Error al conectar con Stripe",
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 });
 
