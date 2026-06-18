@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useCart } from './context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, CreditCard } from 'lucide-react';
+import { useDiscount } from './context/DiscountContext';
 
 export default function Checkout() {
   const { items, cartTotal, accumulateOrder, clearCart } = useCart();
   const navigate = useNavigate();
+  const { applyDiscount } = useDiscount();
   const [shippingMethod, setShippingMethod] = useState<'home' | 'store'>('home');
   const [formData, setFormData] = useState({
     email: '',
@@ -24,32 +26,6 @@ export default function Checkout() {
   const [appliedDiscount, setAppliedDiscount] = useState<any>(null);
   const [discountError, setDiscountError] = useState<string | null>(null);
   const [validatingDiscount, setValidatingDiscount] = useState(false);
-
-  useEffect(() => {
-    fetch('/api/discount-codes/automatic')
-      .then(res => res.json())
-      .then(data => {
-        if (data.found && data.discount) {
-          const discountObj = data.discount;
-          const incl = Array.isArray(discountObj.included_categories) ? discountObj.included_categories : [];
-          const excl = Array.isArray(discountObj.excluded_categories) ? discountObj.excluded_categories : [];
-
-          const eligibleSubtotal = items.reduce((acc, item) => {
-            const isIncluded = incl.length === 0 || incl.includes(item.product.category);
-            const isExcluded = excl.length > 0 && excl.includes(item.product.category);
-            if (isIncluded && !isExcluded) {
-               return acc + (Number(item.product.discounted_price) * item.quantity);
-            }
-            return acc;
-          }, 0);
-
-          if (eligibleSubtotal > 0) {
-             setAppliedDiscount(discountObj);
-          }
-        }
-      })
-      .catch(err => console.error("Error loading automatic discount:", err));
-  }, [items]);
 
   if (items.length === 0) {
     return (
@@ -80,6 +56,17 @@ export default function Checkout() {
 
   const promoActive = isPromoActive();
   const freeShippingThreshold = promoActive && !appliedDiscount ? 40 : 80;
+
+  // 1. Calculate Base Subtotal (Sum of normal prices)
+  const baseSubtotal = items.reduce((sum, item) => sum + (Number(item.product.discounted_price) * item.quantity), 0);
+
+  // 2. Calculate Automatic Savings total
+  const autoDiscountTotal = items.reduce((sum, item) => {
+    const { hasDiscount, originalPrice, discountedPrice } = applyDiscount(item.product);
+    return sum + (hasDiscount ? (originalPrice - discountedPrice) * item.quantity : 0);
+  }, 0);
+
+  // 3. Calculate Manual Coupon Discount applied (if any)
   let calculatedDiscount = 0;
   if (appliedDiscount) {
     const incl = Array.isArray(appliedDiscount.included_categories) ? appliedDiscount.included_categories : [];
@@ -89,7 +76,9 @@ export default function Checkout() {
       const isIncluded = incl.length === 0 || incl.includes(item.product.category);
       const isExcluded = excl.length > 0 && excl.includes(item.product.category);
       if (isIncluded && !isExcluded) {
-        return acc + (Number(item.product.discounted_price) * item.quantity);
+        // Apply manual code relative to the auto-discounted price for stacking
+        const { discountedPrice } = applyDiscount(item.product);
+        return acc + (discountedPrice * item.quantity);
       }
       return acc;
     }, 0);
@@ -102,7 +91,7 @@ export default function Checkout() {
     }
   }
   
-  const subtotalAfterDiscount = cartTotal - calculatedDiscount;
+  const subtotalAfterDiscount = baseSubtotal - autoDiscountTotal - calculatedDiscount;
   const shippingCost = accumulateOrder || shippingMethod === 'store' || subtotalAfterDiscount >= freeShippingThreshold ? 0 : 5.50;
   const finalTotal = subtotalAfterDiscount + shippingCost;
 
@@ -431,28 +420,49 @@ export default function Checkout() {
             )}
             
             <ul className="divide-y divide-gray-200 mb-6">
-              {items.map((item) => (
-                <li key={`${item.product.code}-${item.size}`} className="py-4 flex">
-                  <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                    <img
-                      src={item.product.image_url}
-                      alt={item.product.name}
-                      className="h-full w-full object-cover object-center"
-                      referrerPolicy="no-referrer"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
-                      }}
-                    />
-                  </div>
-                  <div className="ml-4 flex flex-1 flex-col justify-center">
-                    <div className="flex justify-between text-sm font-medium text-gray-900">
-                      <h3 className="line-clamp-2">{item.product.name}</h3>
-                      <p className="ml-4 whitespace-nowrap">{(Number(item.product.discounted_price) * item.quantity).toFixed(2)} €</p>
+              {items.map((item) => {
+                const { hasDiscount, originalPrice, discountedPrice, discountValue } = applyDiscount(item.product);
+                return (
+                  <li key={`${item.product.code}-${item.size}`} className="py-4 flex">
+                    <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                      <img
+                        src={item.product.image_url}
+                        alt={item.product.name}
+                        className="h-full w-full object-cover object-center"
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+                        }}
+                      />
                     </div>
-                    <p className="mt-1 text-sm text-gray-500">Talla: {item.size} | Cantidad: {item.quantity}</p>
-                  </div>
-                </li>
-              ))}
+                    <div className="ml-4 flex flex-1 flex-col justify-center">
+                      <div className="flex justify-between text-sm font-medium text-gray-900">
+                        <h3 className="line-clamp-2 pr-4">{item.product.name}</h3>
+                        <div className="text-right flex-shrink-0">
+                          <p className={hasDiscount ? "text-[#9E2A2B] font-semibold" : ""}>
+                            {(discountedPrice * item.quantity).toFixed(2)} €
+                          </p>
+                          {hasDiscount && (
+                            <p className="text-xs text-gray-400 line-through">
+                              {(originalPrice * item.quantity).toFixed(2)} €
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <p className="mt-1 text-xs text-gray-500 flex items-center gap-2">
+                        <span>Talla: {item.size}</span>
+                        <span>|</span>
+                        <span>Cantidad: {item.quantity}</span>
+                        {hasDiscount && (
+                          <span className="text-[10px] text-[#9A7B56] bg-[#FCF5EC] px-1.5 py-0.5 rounded border border-[#F3E6D5] font-medium">
+                            ✨ Descuento {discountValue}% | Tiempo limitado
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
 
             <div className="mb-6 border-t border-gray-200 pt-6">
@@ -504,33 +514,40 @@ export default function Checkout() {
 
             <div className="space-y-4 border-t border-gray-200 pt-6">
               <div className="flex items-center justify-between text-sm">
-                <p className="text-gray-600">Subtotal</p>
-                <p className="font-medium text-gray-900">{cartTotal.toFixed(2)} €</p>
+                <p className="text-gray-600">Subtotal de artículos</p>
+                <p className="font-medium text-gray-900">{baseSubtotal.toFixed(2)} €</p>
               </div>
 
+              {autoDiscountTotal > 0 && (
+                <div className="flex items-center justify-between text-sm text-[#9A7B56] bg-[#FCF5EC]/65 px-2.5 py-1 rounded border border-dashed border-[#F3E6D5]">
+                  <p className="flex items-center gap-1">✨ Descuento por tiempo limitado</p>
+                  <p className="font-semibold">-{autoDiscountTotal.toFixed(2)} €</p>
+                </div>
+              )}
+
               {appliedDiscount && (
-                <div className="flex items-center justify-between text-sm text-green-600">
-                  <p>Descuento ({appliedDiscount.code})</p>
-                  <p className="font-medium">-{calculatedDiscount.toFixed(2)} €</p>
+                <div className="flex items-center justify-between text-sm text-green-700 bg-green-50/50 px-2.5 py-1 rounded border border-[#C2E7C7]">
+                  <p>Promo ({appliedDiscount.code})</p>
+                  <p className="font-semibold">-{calculatedDiscount.toFixed(2)} €</p>
                 </div>
               )}
               
               <div className="flex items-center justify-between text-sm">
                 <p className="text-gray-600">Envío</p>
-                <p className="font-medium text-gray-900">
+                <p className="font-medium text-gray-900 font-sans">
                   {shippingCost === 0 ? 'Gratis' : `${shippingCost.toFixed(2)} €`}
                 </p>
               </div>
 
               {accumulateOrder && (
-                <div className="bg-rose-50 p-3 rounded-md text-sm text-rose-700 font-medium">
-                  PEDIDO PARA ACUMULAR: Guardaremos tus prendas en tienda.
+                <div className="bg-rose-50 p-3 rounded-md text-sm text-rose-700 font-medium border border-rose-100">
+                  🚀 PEDIDO PARA ACUMULAR: Guardaremos tus prendas en tienda. Envío gratis.
                 </div>
               )}
 
               <div className="flex items-center justify-between border-t border-gray-200 pt-4">
-                <p className="text-lg font-medium text-gray-900">Total</p>
-                <p className="text-xl font-bold text-gray-900">{finalTotal.toFixed(2)} €</p>
+                <p className="text-lg font-medium text-gray-900">Total a pagar</p>
+                <p className="text-2xl font-bold text-[#9E2A2B]">{finalTotal.toFixed(2)} €</p>
               </div>
             </div>
           </div>

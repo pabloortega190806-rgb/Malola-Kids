@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Product } from '../hooks/useProducts';
 import { useCart } from '../context/CartContext';
 import { useAdmin } from '../context/AdminContext';
+import { useDiscount } from '../context/DiscountContext';
 import { ProductModal } from './ProductModal';
 import { Edit } from 'lucide-react';
 
@@ -12,12 +13,22 @@ export function ProductCard({ product: initialProduct }: { product: Product }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { addItem } = useCart();
   const { isAdmin } = useAdmin();
+  const { applyDiscount } = useDiscount();
 
   const originalPrice = Number(product.original_price);
   const discountedPrice = Number(product.discounted_price);
   const discountPercentage = originalPrice > discountedPrice 
     ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100) 
     : 0;
+
+  const { hasDiscount, discountedPrice: finalPrice, discountValue, discountType } = applyDiscount(product);
+
+  const displayPrice = hasDiscount ? finalPrice : discountedPrice;
+  const displayBeforePrice = hasDiscount ? discountedPrice : (discountPercentage > 0 ? originalPrice : null);
+
+  const totalDiscountPercentage = originalPrice > displayPrice
+    ? Math.round(((originalPrice - displayPrice) / originalPrice) * 100)
+    : (hasDiscount && discountType === 'percentage' ? Math.round(Number(discountValue)) : 0);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -40,27 +51,39 @@ export function ProductCard({ product: initialProduct }: { product: Product }) {
             (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
           }}
         />
-        {discountPercentage > 0 && (
-          <div className="absolute top-2 left-2 bg-[#B89F82] text-white text-xs font-bold px-2 py-1 rounded">
-            -{discountPercentage}%
+        {totalDiscountPercentage > 0 && (
+          <div className="absolute top-2 left-2 bg-[#B89F82] text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm flex flex-col items-center">
+            <span>-{totalDiscountPercentage}%</span>
+            {hasDiscount && discountPercentage > 0 && (
+              <span className="text-[8px] font-normal tracking-tight opacity-90 mt-0.5">Doble descuento</span>
+            )}
           </div>
         )}
+
       </div>
       
       <div className="flex-1 flex flex-col">
         <h3 className="text-sm font-medium text-[#3E2A24] mb-1 line-clamp-2">
           {product.name}
         </h3>
-        <p className="text-xs text-[#967A70] mb-2">{product.brand}</p>
+        <p className="text-xs text-[#967A70] mb-1">{product.brand}</p>
+        
+        {hasDiscount && (
+          <div className="mb-2">
+            <span className="inline-flex items-center bg-[#FCF5EC] text-[#9A7B56] text-[10px] tracking-wide font-medium px-2 py-0.5 rounded border border-[#F3E6D5]">
+              ✨ −{discountValue}% por tiempo limitado
+            </span>
+          </div>
+        )}
         
         <div className="mt-auto">
           <div className="flex items-baseline space-x-2 mb-3">
-            <span className={`text-lg font-bold ${discountPercentage > 0 ? 'text-red-600' : 'text-[#5D4037]'}`}>
-              {Number(product.discounted_price).toFixed(2)} €
+            <span className={`text-lg font-bold ${displayBeforePrice ? 'text-[#9E2A2B]' : 'text-[#5D4037]'}`}>
+              {Number(displayPrice).toFixed(2)} €
             </span>
-            {discountPercentage > 0 && (
-              <span className="text-sm text-[#967A70] line-through">
-                {Number(product.original_price).toFixed(2)} €
+            {displayBeforePrice && (
+              <span className="text-sm text-[#967A70] line-through decoration-[#967A70]/60">
+                {Number(displayBeforePrice).toFixed(2)} €
               </span>
             )}
           </div>

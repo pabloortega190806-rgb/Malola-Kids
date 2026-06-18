@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product } from '../hooks/useProducts';
+import { useDiscount } from './DiscountContext';
 
 export interface CartItem {
   product: Product;
@@ -70,7 +71,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const clearCart = () => setItems([]);
 
-  const cartTotal = items.reduce((total, item) => total + Number(item.product.discounted_price) * item.quantity, 0);
+  const { applyDiscount } = useDiscount();
+
+  const cartTotal = items.reduce((total, item) => {
+    const { discountedPrice } = applyDiscount(item.product);
+    return total + discountedPrice * item.quantity;
+  }, 0);
   const cartCount = items.reduce((count, item) => count + item.quantity, 0);
 
   return (

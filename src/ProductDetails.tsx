@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Product } from './hooks/useProducts';
 import { useCart } from './context/CartContext';
 import { useAdmin } from './context/AdminContext';
+import { useDiscount } from './context/DiscountContext';
 import { ProductModal } from './components/ProductModal';
 
 export default function ProductDetails() {
@@ -80,11 +81,22 @@ export default function ProductDetails() {
     );
   }
 
+  const { applyDiscount } = useDiscount();
+
   const originalPrice = Number(product.original_price);
   const discountedPrice = Number(product.discounted_price);
   const discountPercentage = originalPrice > discountedPrice 
     ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100) 
     : 0;
+
+  const { hasDiscount, discountedPrice: finalPrice, discountValue, discountType } = applyDiscount(product);
+
+  const displayPrice = hasDiscount ? finalPrice : discountedPrice;
+  const displayBeforePrice = hasDiscount ? discountedPrice : (discountPercentage > 0 ? originalPrice : null);
+
+  const totalDiscountPercentage = originalPrice > displayPrice
+    ? Math.round(((originalPrice - displayPrice) / originalPrice) * 100)
+    : (hasDiscount && discountType === 'percentage' ? Math.round(Number(discountValue)) : 0);
 
   const handleAddToCart = () => {
     if (selectedSize) {
@@ -230,9 +242,12 @@ export default function ProductDetails() {
               </>
             )}
 
-            {discountPercentage > 0 && (
-              <div className="absolute top-4 left-4 bg-[#B89F82] text-white text-sm font-bold px-3 py-1 rounded z-10">
-                -{discountPercentage}%
+            {totalDiscountPercentage > 0 && (
+              <div className="absolute top-4 left-4 bg-[#B89F82] text-white text-sm font-bold px-3 py-1.5 rounded z-10 shadow-md flex flex-col items-center">
+                <span>-{totalDiscountPercentage}%</span>
+                {hasDiscount && discountPercentage > 0 && (
+                  <span className="text-[9px] font-normal tracking-tight opacity-95 mt-0.5">Doble descuento</span>
+                )}
               </div>
             )}
           </div>
@@ -247,18 +262,26 @@ export default function ProductDetails() {
 
         {/* Product Info */}
         <div className="flex flex-col mt-6 md:mt-0">
-          <p className="text-[#967A70] font-medium mb-2">{product.brand}</p>
-          <h1 className="text-3xl font-serif font-bold text-[#3E2A24] mb-4">
+          <p className="text-[#967A70] font-medium mb-1">{product.brand}</p>
+          <h1 className="text-3xl font-serif font-bold text-[#3E2A24] mb-3">
             {product.name}
           </h1>
+
+          {hasDiscount && (
+            <div className="mb-4">
+              <span className="inline-flex items-center bg-[#FCF5EC] text-[#9A7B56] text-xs tracking-wide font-medium px-3.5 py-1.5 rounded-full border border-[#F3E6D5] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+                ✨ ¡Descuento especial de un {Math.round(Number(discountValue))}% — Solo por tiempo limitado!
+              </span>
+            </div>
+          )}
           
           <div className="flex items-baseline space-x-4 mb-8">
-            <span className={`text-3xl font-bold ${discountPercentage > 0 ? 'text-red-600' : 'text-[#5D4037]'}`}>
-              {discountedPrice.toFixed(2)} €
+            <span className={`text-3xl font-bold ${displayBeforePrice ? 'text-[#9E2A2B]' : 'text-[#5D4037]'}`}>
+              {displayPrice.toFixed(2)} €
             </span>
-            {discountPercentage > 0 && (
-              <span className="text-xl text-[#967A70] line-through">
-                {originalPrice.toFixed(2)} €
+            {displayBeforePrice && (
+              <span className="text-xl text-[#967A70] line-through decoration-[#967A70]/60">
+                {displayBeforePrice.toFixed(2)} €
               </span>
             )}
           </div>

@@ -2,12 +2,23 @@ import React from 'react';
 import { X, Minus, Plus, ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
+import { useDiscount } from '../context/DiscountContext';
 
 export function CartDrawer() {
   const { items, isCartOpen, setIsCartOpen, updateQuantity, removeItem, accumulateOrder, setAccumulateOrder, cartTotal } = useCart();
   const navigate = useNavigate();
+  const { applyDiscount } = useDiscount();
 
   if (!isCartOpen) return null;
+
+  // Calculate sum of savings from automatic discounts
+  const totalSavings = items.reduce((sum, item) => {
+    const { hasDiscount, originalPrice, discountedPrice } = applyDiscount(item.product);
+    if (hasDiscount) {
+      return sum + (originalPrice - discountedPrice) * item.quantity;
+    }
+    return sum;
+  }, 0);
 
   const handleCheckout = () => {
     setIsCartOpen(false);
@@ -38,54 +49,71 @@ export function CartDrawer() {
               </div>
             ) : (
               <ul className="space-y-6">
-                {items.map((item) => (
-                  <li key={`${item.product.code}-${item.size}`} className="flex py-2">
-                    <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                      <img
-                        src={item.product.image_url}
-                        alt={item.product.name}
-                        className="h-full w-full object-cover object-center"
-                        referrerPolicy="no-referrer"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
-                        }}
-                      />
-                    </div>
-                    <div className="ml-4 flex flex-1 flex-col">
-                      <div>
-                        <div className="flex justify-between text-base font-medium text-gray-900">
-                          <h3>{item.product.name}</h3>
-                          <p className="ml-4">{Number(item.product.discounted_price).toFixed(2)} €</p>
-                        </div>
-                        <p className="mt-1 text-sm text-gray-500">Talla: {item.size}</p>
+                {items.map((item) => {
+                  const { hasDiscount, originalPrice, discountedPrice, discountValue } = applyDiscount(item.product);
+                  return (
+                    <li key={`${item.product.code}-${item.size}`} className="flex py-2">
+                      <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                        <img
+                          src={item.product.image_url}
+                          alt={item.product.name}
+                          className="h-full w-full object-cover object-center"
+                          referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+                          }}
+                        />
                       </div>
-                      <div className="flex flex-1 items-end justify-between text-sm">
-                        <div className="flex items-center border rounded-md">
+                      <div className="ml-4 flex flex-1 flex-col">
+                        <div>
+                          <div className="flex justify-between text-base font-medium text-gray-900">
+                            <h3 className="line-clamp-1">{item.product.name}</h3>
+                            <div className="text-right flex-shrink-0 ml-2">
+                              <p className={hasDiscount ? "text-[#9E2A2B] font-semibold" : ""}>
+                                {(discountedPrice).toFixed(2)} €
+                              </p>
+                              {hasDiscount && (
+                                <p className="text-xs text-gray-400 line-through">
+                                  {(originalPrice).toFixed(2)} €
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <p className="mt-1 text-sm text-gray-500">Talla: {item.size}</p>
+                          {hasDiscount && (
+                            <span className="text-[10px] text-[#9A7B56] bg-[#FCF5EC] px-1.5 py-0.5 rounded border border-[#F3E6D5] font-medium inline-block mt-1">
+                              ✨ Descuento {discountValue}% | Tiempo limitado
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex flex-1 items-end justify-between text-sm mt-2">
+                          <div className="flex items-center border rounded-md">
+                            <button
+                              onClick={() => updateQuantity(item.product.code, item.size, item.quantity - 1)}
+                              className="px-2 py-1 text-gray-600 hover:text-gray-900"
+                            >
+                              <Minus className="w-4 h-4" />
+                            </button>
+                            <span className="px-2">{item.quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(item.product.code, item.size, item.quantity + 1)}
+                              className="px-2 py-1 text-gray-600 hover:text-gray-900"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </button>
+                          </div>
                           <button
-                            onClick={() => updateQuantity(item.product.code, item.size, item.quantity - 1)}
-                            className="px-2 py-1 text-gray-600 hover:text-gray-900"
+                            type="button"
+                            onClick={() => removeItem(item.product.code, item.size)}
+                            className="font-medium text-rose-600 hover:text-rose-500"
                           >
-                            <Minus className="w-4 h-4" />
-                          </button>
-                          <span className="px-2">{item.quantity}</span>
-                          <button
-                            onClick={() => updateQuantity(item.product.code, item.size, item.quantity + 1)}
-                            className="px-2 py-1 text-gray-600 hover:text-gray-900"
-                          >
-                            <Plus className="w-4 h-4" />
+                            Eliminar
                           </button>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => removeItem(item.product.code, item.size)}
-                          className="font-medium text-rose-600 hover:text-rose-500"
-                        >
-                          Eliminar
-                        </button>
                       </div>
-                    </div>
-                  </li>
-                ))}
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </div>
@@ -117,8 +145,18 @@ export function CartDrawer() {
                 </p>
               )}
 
-              <div className="flex justify-between text-base font-medium text-gray-900 mb-4">
+              <div className="flex justify-between text-base font-medium text-gray-900 mb-2">
                 <p>Subtotal</p>
+                <p>{(cartTotal + totalSavings).toFixed(2)} €</p>
+              </div>
+              {totalSavings > 0 && (
+                <div className="flex justify-between text-sm font-medium text-[#9A7B56] mb-3 bg-[#FCF5EC] px-2.5 py-1.5 rounded border border-[#F3E6D5]">
+                  <p className="flex items-center gap-1">✨ Descuento especial aplicado</p>
+                  <p>-{totalSavings.toFixed(2)} €</p>
+                </div>
+              )}
+              <div className="flex justify-between text-base font-semibold text-gray-900 mb-4 border-t border-gray-100 pt-2">
+                <p>Total cesta</p>
                 <p>{cartTotal.toFixed(2)} €</p>
               </div>
               <p className="mt-0.5 text-sm text-gray-500 mb-6">
