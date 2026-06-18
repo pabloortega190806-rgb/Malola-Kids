@@ -108,7 +108,7 @@ export default function Home() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         onClick={() => navigate('/categoria/Niña%20(3-9%20años)')}
-        className="bg-gradient-to-r from-[#9E2A2B] via-[#BD3A42] to-[#801B1D] text-white py-3.5 px-4 shadow-md flex items-center justify-center gap-3 cursor-pointer group text-center relative overflow-hidden z-25"
+        className="bg-gradient-to-r from-[#9E2A2B] via-[#BD3A42] to-[#801B1D] text-white py-5 px-6 shadow-md flex items-center justify-center gap-3 cursor-pointer group text-center relative overflow-hidden z-25"
       >
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_60%)] pointer-events-none" />
         
