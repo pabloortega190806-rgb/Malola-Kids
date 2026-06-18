@@ -16,8 +16,7 @@ const hardcodedCategories = [
   'Bebé Niño (0-4 años)',
   'Niño (3-9 años)',
   'Baño Niño',
-  'Complementos',
-  'Flamenca'
+  'Complementos'
 ];
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
@@ -115,18 +114,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     className="flex items-center justify-between py-2 text-[#5D4037] hover:text-[#B89F82] transition-colors group border-t border-[#F5F0E6]"
                   >
                     <span className="font-medium">Complementos</span>
-                    <ChevronRight size={16} className="text-[#D9C8B4] group-hover:text-[#B89F82] transition-colors" />
-                  </Link>
-                </div>
-
-                {/* Flamenca */}
-                <div>
-                  <Link 
-                    to="/categoria/Flamenca"
-                    onClick={onClose}
-                    className="flex items-center justify-between py-2 text-[#5D4037] hover:text-[#B89F82] transition-colors group border-t border-[#F5F0E6]"
-                  >
-                    <span className="font-medium">Flamenca</span>
                     <ChevronRight size={16} className="text-[#D9C8B4] group-hover:text-[#B89F82] transition-colors" />
                   </Link>
                 </div>

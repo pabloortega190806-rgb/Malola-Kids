@@ -47,8 +47,7 @@ const hardcodedCategories = [
   'Bebé Niño (0-4 años)',
   'Niño (3-9 años)',
   'Baño Niño',
-  'Complementos',
-  'Flamenca'
+  'Complementos'
 ];
 
 export default function App() {
@@ -124,8 +123,6 @@ export default function App() {
               </div>
 
               <Link to="/categoria/Complementos" className="text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">Complementos</Link>
-              
-              <Link to="/categoria/Flamenca" className="text-[#5D4037] hover:text-[#B89F82] px-2 py-2 text-sm font-medium transition-colors border-b-2 border-transparent hover:border-[#B89F82]">Flamenca</Link>
               
               {dynamicCategories.length > 0 && (
                 <div className="relative group">

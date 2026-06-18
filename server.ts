@@ -75,6 +75,7 @@ async function initDb() {
         usage_count INTEGER DEFAULT 0,
         included_categories JSONB DEFAULT '[]',
         excluded_categories JSONB DEFAULT '[]',
+        is_automatic BOOLEAN DEFAULT false,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
       CREATE INDEX IF NOT EXISTS idx_discount_codes_code ON discount_codes(code);

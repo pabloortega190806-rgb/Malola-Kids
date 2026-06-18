@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from './context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, CreditCard } from 'lucide-react';
@@ -24,6 +24,32 @@ export default function Checkout() {
   const [appliedDiscount, setAppliedDiscount] = useState<any>(null);
   const [discountError, setDiscountError] = useState<string | null>(null);
   const [validatingDiscount, setValidatingDiscount] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/discount-codes/automatic')
+      .then(res => res.json())
+      .then(data => {
+        if (data.found && data.discount) {
+          const discountObj = data.discount;
+          const incl = Array.isArray(discountObj.included_categories) ? discountObj.included_categories : [];
+          const excl = Array.isArray(discountObj.excluded_categories) ? discountObj.excluded_categories : [];
+
+          const eligibleSubtotal = items.reduce((acc, item) => {
+            const isIncluded = incl.length === 0 || incl.includes(item.product.category);
+            const isExcluded = excl.length > 0 && excl.includes(item.product.category);
+            if (isIncluded && !isExcluded) {
+               return acc + (Number(item.product.discounted_price) * item.quantity);
+            }
+            return acc;
+          }, 0);
+
+          if (eligibleSubtotal > 0) {
+             setAppliedDiscount(discountObj);
+          }
+        }
+      })
+      .catch(err => console.error("Error loading automatic discount:", err));
+  }, [items]);
 
   if (items.length === 0) {
     return (
@@ -466,7 +492,7 @@ export default function Checkout() {
               {discountError && <p className="mt-2 text-sm text-red-600">{discountError}</p>}
               {appliedDiscount && calculatedDiscount > 0 && (
                 <p className="mt-2 text-sm text-green-600 font-medium">
-                  ✓ Código aplicado con éxito: {appliedDiscount.discount_type === 'percentage' ? `-${Number(appliedDiscount.discount_value)}%` : `-${Number(appliedDiscount.discount_value).toFixed(2)}€`}
+                  ✓ {appliedDiscount.is_automatic ? 'Descuento automático aplicado:' : 'Código aplicado con éxito:'} {appliedDiscount.discount_type === 'percentage' ? `-${Number(appliedDiscount.discount_value)}%` : `-${Number(appliedDiscount.discount_value).toFixed(2)}€`}
                 </p>
               )}
               {appliedDiscount && calculatedDiscount === 0 && (

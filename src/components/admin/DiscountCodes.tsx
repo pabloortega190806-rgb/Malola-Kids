@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAdmin } from '../../context/AdminContext';
-import { Ticket, Plus, Trash2, Edit2, X, Check } from 'lucide-react';
+import { Ticket, Plus, Trash2, Edit2, X, Check, Zap } from 'lucide-react';
 
 interface DiscountCode {
   id: number;
@@ -12,6 +12,7 @@ interface DiscountCode {
   used_count: number;
   included_categories: string[] | null;
   excluded_categories: string[] | null;
+  is_automatic: boolean;
   created_at: string;
 }
 
@@ -25,12 +26,13 @@ export function DiscountCodes() {
 
   const [formData, setFormData] = useState({
     code: '',
-    discount_type: 'percentage',
+    discount_type: 'percentage' as 'percentage' | 'fixed',
     discount_value: '',
     active: true,
     usage_limit: '',
     included_categories: [] as string[],
-    excluded_categories: [] as string[]
+    excluded_categories: [] as string[],
+    is_automatic: false
   });
 
   const fetchCodes = () => {
@@ -86,7 +88,7 @@ export function DiscountCodes() {
       if (data.success) {
         setIsAdding(false);
         setEditingId(null);
-        setFormData({ code: '', discount_type: 'percentage', discount_value: '', active: true, usage_limit: '', included_categories: [], excluded_categories: [] });
+        setFormData({ code: '', discount_type: 'percentage', discount_value: '', active: true, usage_limit: '', included_categories: [], excluded_categories: [], is_automatic: false });
         fetchCodes();
       } else {
         alert(data.error || 'Error guardando el código');
@@ -111,13 +113,14 @@ export function DiscountCodes() {
 
   const startEdit = (code: DiscountCode) => {
     setFormData({
-      code: code.code,
+      code: code.code.startsWith('AUTO-') && code.is_automatic ? '' : code.code,
       discount_type: code.discount_type,
       discount_value: code.discount_value,
       active: code.active,
       usage_limit: code.usage_limit ? String(code.usage_limit) : '',
       included_categories: Array.isArray(code.included_categories) ? code.included_categories : [],
-      excluded_categories: Array.isArray(code.excluded_categories) ? code.excluded_categories : []
+      excluded_categories: Array.isArray(code.excluded_categories) ? code.excluded_categories : [],
+      is_automatic: code.is_automatic || false
     });
     setEditingId(code.id);
     setIsAdding(true);
@@ -128,36 +131,38 @@ export function DiscountCodes() {
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-serif font-bold text-[#3E2A24] flex items-center">
           <Ticket className="mr-2 text-[#B89F82]" size={24} />
-          Códigos de Descuento
+          Descuentos y Ofertas de la Web
         </h3>
         <button
           onClick={() => {
             setIsAdding(!isAdding);
             if (!isAdding) {
               setEditingId(null);
-              setFormData({ code: '', discount_type: 'percentage', discount_value: '', active: true, usage_limit: '', included_categories: [], excluded_categories: [] });
+              setFormData({ code: '', discount_type: 'percentage', discount_value: '', active: true, usage_limit: '', included_categories: [], excluded_categories: [], is_automatic: false });
             }
           }}
           className="flex items-center text-sm bg-[#FCFBF9] border border-[#E5D9C5] px-3 py-1.5 rounded-md hover:bg-[#F5F0EB] transition-colors"
         >
           {isAdding ? <X size={16} className="mr-1" /> : <Plus size={16} className="mr-1" />}
-          {isAdding ? 'Cancelar' : 'Nuevo Código'}
+          {isAdding ? 'Cancelar' : 'Nuevo Descuento'}
         </button>
       </div>
 
       {isAdding && (
         <form onSubmit={handleSubmit} className="mb-8 bg-[#FCFBF9] p-4 rounded-lg border border-[#E5D9C5] space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
             <div>
-              <label className="block text-xs font-medium text-[#5D4037] mb-1">Código</label>
+              <label className="block text-xs font-medium text-[#5D4037] mb-1">
+                Código (Opcional)
+              </label>
               <input
                 type="text"
                 value={formData.code}
                 onChange={e => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                required
                 className="w-full px-3 py-1.5 border border-[#E5D9C5] rounded-md text-sm outline-none uppercase font-mono"
-                placeholder="EJ: VERANO20"
+                placeholder="Ej: REBAJAS30"
               />
+              <span className="text-[10px] text-gray-400 mt-1 block">Vacío para aplicar automático</span>
             </div>
             <div>
               <label className="block text-xs font-medium text-[#5D4037] mb-1">Tipo</label>
@@ -180,7 +185,7 @@ export function DiscountCodes() {
                 onChange={e => setFormData({ ...formData, discount_value: e.target.value })}
                 required
                 className="w-full px-3 py-1.5 border border-[#E5D9C5] rounded-md text-sm outline-none"
-                placeholder={formData.discount_type === 'percentage' ? 'Ej: 10' : 'Ej: 5.00'}
+                placeholder={formData.discount_type === 'percentage' ? 'Ej: 30' : 'Ej: 15.00'}
               />
             </div>
             <div>
@@ -194,7 +199,19 @@ export function DiscountCodes() {
                 placeholder="Ilimitado"
               />
             </div>
-            <div className="flex items-end justify-between lg:justify-start lg:space-x-4 lg:col-span-1">
+            <div>
+              <label className="block text-xs font-medium text-[#5D4037] mb-1">Aplicación</label>
+              <label className="flex items-center space-x-2 text-sm text-[#5D4037] cursor-pointer py-1.5">
+                <input
+                  type="checkbox"
+                  checked={formData.is_automatic}
+                  onChange={e => setFormData({ ...formData, is_automatic: e.target.checked })}
+                  className="rounded text-[#B89F82] focus:ring-[#B89F82]"
+                />
+                <span className="font-semibold text-[#B89F82]">Sin código (Auto)</span>
+              </label>
+            </div>
+            <div className="flex items-end justify-between lg:justify-start lg:space-x-4">
               <label className="flex items-center space-x-2 text-sm text-[#5D4037] cursor-pointer mb-2 lg:mb-1.5">
                 <input
                   type="checkbox"
@@ -206,7 +223,7 @@ export function DiscountCodes() {
               </label>
               <button
                 type="submit"
-                className="bg-[#B89F82] text-white px-4 py-1.5 rounded-md hover:bg-[#967A70] transition-colors flex items-center text-sm mb-1.5"
+                className="bg-[#B89F82] text-white px-4 py-1.5 rounded-md hover:bg-[#967A70] transition-colors flex items-center text-sm mb-1.5 ml-auto md:ml-0"
               >
                 <Check size={16} className="mr-1" /> Guardar
               </button>
@@ -274,15 +291,15 @@ export function DiscountCodes() {
         <div className="text-center py-8 text-[#967A70]">Cargando códigos...</div>
       ) : codes.length === 0 ? (
         <div className="text-center py-8 text-[#967A70] bg-[#FCFBF9] rounded-lg border border-dashed border-[#E5D9C5]">
-          No hay códigos de descuento creados.
+          No hay descuentos creados.
         </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-[#E5D9C5] text-sm text-[#967A70]">
-                <th className="pb-2 font-medium">Código</th>
-                <th className="pb-2 font-medium">Descuento</th>
+                <th className="pb-2 font-medium">Descuento / Aplicación</th>
+                <th className="pb-2 font-medium">Valor</th>
                 <th className="pb-2 font-medium">Estado</th>
                 <th className="pb-2 font-medium">Usos</th>
                 <th className="pb-2 font-medium text-right">Acciones</th>
@@ -291,8 +308,19 @@ export function DiscountCodes() {
             <tbody>
               {codes.map(code => (
                 <tr key={code.id} className="border-b border-[#F5F0EB] text-sm group hover:bg-[#FCFBF9]">
-                  <td className="py-3 font-mono font-medium text-[#3E2A24]">{code.code}</td>
-                  <td className="py-3 text-[#5D4037]">
+                  <td className="py-3 font-mono font-medium text-[#3E2A24]">
+                    {code.is_automatic ? (
+                      <div className="flex flex-col items-start">
+                        <span className="text-xs text-[#B89F82] bg-[#F5F0E6] px-2 py-0.5 rounded font-sans font-semibold inline-flex items-center">
+                          <Zap size={10} className="mr-1 fill-[#B89F82]" /> Auto (Sin Código)
+                        </span>
+                        <span className="text-xs text-gray-400 font-mono mt-0.5">{code.code}</span>
+                      </div>
+                    ) : (
+                      code.code
+                    )}
+                  </td>
+                  <td className="py-3 text-[#5D4037] font-semibold">
                     {code.discount_type === 'percentage' 
                       ? `${Number(code.discount_value)}%` 
                       : `${Number(code.discount_value).toFixed(2)}€`}
@@ -303,7 +331,7 @@ export function DiscountCodes() {
                     </span>
                   </td>
                   <td className="py-3 text-[#5D4037]">
-                    {code.used_count} {code.usage_limit ? `/ ${code.usage_limit}` : 'uses'}
+                    {code.used_count} {code.usage_limit ? `/ ${code.usage_limit}` : 'usos'}
                   </td>
                   <td className="py-3 text-right">
                     <button 

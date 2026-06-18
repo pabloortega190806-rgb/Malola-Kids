@@ -788,29 +788,39 @@ app.post("/api/admin/discount-codes", requireAdmin, async (req, res) => {
   const db = getDbPool();
   if (!db) return res.status(503).json({ error: "DB not configured" });
   
-  const { code, discount_type, discount_value, active, usage_limit, included_categories, excluded_categories } = req.body;
-  if (!code || !discount_type || discount_value == null) {
+  const { code, discount_type, discount_value, active, usage_limit, included_categories, excluded_categories, is_automatic } = req.body;
+  if (!discount_type || discount_value == null) {
     return res.status(400).json({ error: "Faltan campos obligatorios" });
+  }
+
+  let finalCode = code ? code.toUpperCase().trim() : '';
+  let finalIsAutomatic = is_automatic ?? false;
+
+  if (!finalCode) {
+    const randomSuffix = Math.random().toString(36).substring(2, 8).toUpperCase();
+    finalCode = `AUTO-${randomSuffix}`;
+    finalIsAutomatic = true;
   }
 
   try {
     const result = await db.query(
-      `INSERT INTO discount_codes (code, discount_type, discount_value, active, usage_limit, included_categories, excluded_categories)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      `INSERT INTO discount_codes (code, discount_type, discount_value, active, usage_limit, included_categories, excluded_categories, is_automatic)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
       [
-        code.toUpperCase().trim(),
+        finalCode,
         discount_type,
         discount_value,
         active ?? true,
         usage_limit || null,
         JSON.stringify(included_categories || []),
-        JSON.stringify(excluded_categories || [])
+        JSON.stringify(excluded_categories || []),
+        finalIsAutomatic
       ]
     );
     res.status(201).json({ success: true, data: result.rows[0] });
   } catch (err: any) {
     if (err.code === '23505') {
-      return res.status(400).json({ error: "El código ya existe" });
+      return res.status(400).json({ error: "El código ya existe o es redundante" });
     }
     console.error("Error creating discount code:", err);
     res.status(500).json({ error: err.message });
@@ -822,28 +832,42 @@ app.put("/api/admin/discount-codes/:id", requireAdmin, async (req, res) => {
   if (!db) return res.status(503).json({ error: "DB not configured" });
   
   const { id } = req.params;
-  const { code, discount_type, discount_value, active, usage_limit, included_categories, excluded_categories } = req.body;
+  const { code, discount_type, discount_value, active, usage_limit, included_categories, excluded_categories, is_automatic } = req.body;
   
+  if (!discount_type || discount_value == null) {
+    return res.status(400).json({ error: "Faltan campos obligatorios" });
+  }
+
+  let finalCode = code ? code.toUpperCase().trim() : '';
+  let finalIsAutomatic = is_automatic ?? false;
+
+  if (!finalCode) {
+    const randomSuffix = Math.random().toString(36).substring(2, 8).toUpperCase();
+    finalCode = `AUTO-${randomSuffix}`;
+    finalIsAutomatic = true;
+  }
+
   try {
     const result = await db.query(
       `UPDATE discount_codes 
-       SET code = $1, discount_type = $2, discount_value = $3, active = $4, usage_limit = $5, included_categories = $6, excluded_categories = $7 
-       WHERE id = $8 RETURNING *`,
+       SET code = $1, discount_type = $2, discount_value = $3, active = $4, usage_limit = $5, included_categories = $6, excluded_categories = $7, is_automatic = $8 
+       WHERE id = $9 RETURNING *`,
       [
-        code.toUpperCase().trim(),
+        finalCode,
         discount_type,
         discount_value,
         active ?? true,
         usage_limit || null,
         JSON.stringify(included_categories || []),
         JSON.stringify(excluded_categories || []),
+        finalIsAutomatic,
         id
       ]
     );
     if (result.rows.length === 0) return res.status(404).json({ error: "Código no encontrado" });
     res.json({ success: true, data: result.rows[0] });
   } catch (err: any) {
-    if (err.code === '23505') return res.status(400).json({ error: "El código ya existe" });
+    if (err.code === '23505') return res.status(400).json({ error: "El código ya existe o es redundante" });
     console.error("Error updating discount code:", err);
     res.status(500).json({ error: err.message });
   }
@@ -1027,6 +1051,21 @@ async function ensurePromoCoupon() {
   }
 }
 
+app.get("/api/discount-codes/automatic", async (req, res) => {
+  const db = getDbPool();
+  if (!db) return res.status(503).json({ error: "DB not configured" });
+  try {
+    const result = await db.query('SELECT * FROM discount_codes WHERE active = true AND is_automatic = true LIMIT 1');
+    if (result.rows.length === 0) {
+      return res.json({ found: false });
+    }
+    res.json({ found: true, discount: result.rows[0] });
+  } catch (err: any) {
+    console.error("Error fetching automatic discount:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.post("/api/discount-codes/validate", async (req, res) => {
   const { code } = req.body;
   if (!code) return res.status(400).json({ error: "No code provided" });
@@ -1075,57 +1114,71 @@ app.post("/api/create-checkout-session", async (req, res) => {
     let orderId = null;
     let appliedDiscountId = null;
 
-    // Apply manual code discount if provided and valid
+    // Apply manual code discount or automatic discount
     let finalDiscountValue = 0;
     let discountStripeCouponId = null;
+    let discountObj = null;
     
-    if (discountCode && db) {
-      const codeResult = await db.query(
-        'SELECT * FROM discount_codes WHERE code = $1 AND active = true',
-        [discountCode.toUpperCase().trim()]
-      );
-      if (codeResult.rows.length > 0) {
-        const discountObj = codeResult.rows[0];
-        if (discountObj.usage_limit === null || discountObj.used_count < discountObj.usage_limit) {
-          appliedDiscountId = discountObj.id;
-          
-          const incl = Array.isArray(discountObj.included_categories) ? discountObj.included_categories : [];
-          const excl = Array.isArray(discountObj.excluded_categories) ? discountObj.excluded_categories : [];
+    if (db) {
+      if (discountCode) {
+        const codeResult = await db.query(
+          'SELECT * FROM discount_codes WHERE code = $1 AND active = true',
+          [discountCode.toUpperCase().trim()]
+        );
+        if (codeResult.rows.length > 0) {
+          discountObj = codeResult.rows[0];
+        }
+      } else {
+        // Look for any active automatic discount
+        const autoResult = await db.query(
+          'SELECT * FROM discount_codes WHERE active = true AND is_automatic = true LIMIT 1'
+        );
+        if (autoResult.rows.length > 0) {
+          discountObj = autoResult.rows[0];
+        }
+      }
+    }
 
-          const eligibleSubtotal = items.reduce((acc: number, item: any) => {
-             const isIncluded = incl.length === 0 || incl.includes(item.product.category);
-             const isExcluded = excl.length > 0 && excl.includes(item.product.category);
-             if (isIncluded && !isExcluded) {
-                return acc + (Number(item.product.discounted_price) * item.quantity);
-             }
-             return acc;
-          }, 0);
-          
-          if (discountObj.discount_type === 'percentage') {
-             finalDiscountValue = eligibleSubtotal * (Number(discountObj.discount_value) / 100);
-          } else if (discountObj.discount_type === 'fixed') {
-             finalDiscountValue = Number(discountObj.discount_value);
-             if (finalDiscountValue > eligibleSubtotal) finalDiscountValue = eligibleSubtotal;
-          }
+    if (discountObj) {
+      if (discountObj.usage_limit === null || discountObj.used_count < discountObj.usage_limit) {
+        appliedDiscountId = discountObj.id;
+        
+        const incl = Array.isArray(discountObj.included_categories) ? discountObj.included_categories : [];
+        const excl = Array.isArray(discountObj.excluded_categories) ? discountObj.excluded_categories : [];
 
-          // We'll create or fetch a Stripe coupon for this exact discount amount
-          const stripe = getStripe();
-          const amountInCents = Math.round(finalDiscountValue * 100);
-          
-          if (amountInCents > 0) {
-            discountStripeCouponId = `DC_AMT_${amountInCents}`;
-            try {
-              await stripe.coupons.retrieve(discountStripeCouponId);
-            } catch(e) {
-              // Create if it doesn't exist
-              await stripe.coupons.create({
-                id: discountStripeCouponId,
-                name: `Descuento aplicado`,
-                amount_off: amountInCents,
-                currency: 'eur',
-                duration: 'once'
-              });
-            }
+        const eligibleSubtotal = items.reduce((acc: number, item: any) => {
+           const isIncluded = incl.length === 0 || incl.includes(item.product.category);
+           const isExcluded = excl.length > 0 && excl.includes(item.product.category);
+           if (isIncluded && !isExcluded) {
+              return acc + (Number(item.product.discounted_price) * item.quantity);
+           }
+           return acc;
+        }, 0);
+        
+        if (discountObj.discount_type === 'percentage') {
+           finalDiscountValue = eligibleSubtotal * (Number(discountObj.discount_value) / 100);
+        } else if (discountObj.discount_type === 'fixed') {
+           finalDiscountValue = Number(discountObj.discount_value);
+           if (finalDiscountValue > eligibleSubtotal) finalDiscountValue = eligibleSubtotal;
+        }
+
+        // We'll create or fetch a Stripe coupon for this exact discount amount
+        const stripe = getStripe();
+        const amountInCents = Math.round(finalDiscountValue * 100);
+        
+        if (amountInCents > 0) {
+          discountStripeCouponId = `DC_AMT_${amountInCents}`;
+          try {
+            await stripe.coupons.retrieve(discountStripeCouponId);
+          } catch(e) {
+            // Create if it doesn't exist
+            await stripe.coupons.create({
+              id: discountStripeCouponId,
+              name: `Descuento aplicado`,
+              amount_off: amountInCents,
+              currency: 'eur',
+              duration: 'once'
+            });
           }
         }
       }
@@ -1368,7 +1421,8 @@ app.get("/api/categories", async (req, res) => {
       const path = await import("path");
       const productsData = fs.readFileSync(path.join(process.cwd(), 'products.json'), 'utf8');
       const products = JSON.parse(productsData);
-      const categories = Array.from(new Set(products.map((p: any) => p.category))).filter(Boolean);
+      const categories = Array.from(new Set(products.map((p: any) => p.category)))
+        .filter((cat: any) => cat && !cat.toLowerCase().includes('flamenca'));
       return res.json(categories);
     } catch (err) {
       console.error("Error reading fallback products.json for categories:", err);
@@ -1378,14 +1432,14 @@ app.get("/api/categories", async (req, res) => {
 
   try {
     const result = await db.query('SELECT DISTINCT category FROM products WHERE category IS NOT NULL');
-    const excludedCategories = ['bebe-nino', 'bebe-nina', 'bano', 'Baño'];
+    const excludedCategories = ['bebe-nino', 'bebe-nina', 'bano', 'Baño', 'flamenca', 'Flamenca'];
     const allCategories = new Set<string>();
     
     result.rows.forEach(row => {
       if (row.category) {
         row.category.split(',').forEach((c: string) => {
           const cat = c.trim();
-          if (cat && !excludedCategories.includes(cat)) {
+          if (cat && !excludedCategories.includes(cat) && !cat.toLowerCase().includes('flamenca')) {
             allCategories.add(cat);
           }
         });
@@ -1471,6 +1525,9 @@ app.get("/api/products", async (req, res) => {
     try {
       const productsData = fs.readFileSync(path.join(process.cwd(), 'products.json'), 'utf8');
       let products = JSON.parse(productsData);
+      if (Array.isArray(products)) {
+        products = products.filter((p: any) => p.category && !p.category.toLowerCase().includes('flamenca'));
+      }
       
       const limit = parseInt(req.query.limit as string) || 50;
       const offset = parseInt(req.query.offset as string) || 0;
@@ -1530,7 +1587,7 @@ app.get("/api/products", async (req, res) => {
 
     let query = 'SELECT * FROM products';
     const params: any[] = [];
-    const conditions: string[] = [];
+    const conditions: string[] = ["(category IS NULL OR category NOT ILIKE '%flamenca%')"];
 
     if (category) {
       params.push(`%${category}%`);
