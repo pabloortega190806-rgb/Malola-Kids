@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'motion/react';
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -101,6 +102,35 @@ export default function Home() {
 
   return (
     <>
+      {/* Pequeño anuncio elegante de rebajas (Rebajas de hasta el 50%) */}
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        onClick={() => navigate('/categoria/Niña%20(3-9%20años)')}
+        className="bg-gradient-to-r from-[#9E2A2B] via-[#BD3A42] to-[#801B1D] text-white py-3.5 px-4 shadow-md flex items-center justify-center gap-3 cursor-pointer group text-center relative overflow-hidden z-25"
+      >
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_60%)] pointer-events-none" />
+        
+        {/* Destello elegante que recorre la barra periódicamente */}
+        <motion.div 
+          animate={{ x: ["-100%", "250%"] }}
+          transition={{ repeat: Infinity, duration: 4, ease: "easeInOut", repeatDelay: 3 }}
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none skew-x-12"
+        />
+
+        <div className="relative z-10 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs sm:text-sm tracking-wide font-sans font-medium">
+          <span className="flex items-center justify-center bg-white/25 px-2.5 py-0.5 rounded text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider animate-pulse">
+            ✨ REBAJAS
+          </span>
+          <span className="font-serif italic font-semibold text-white">¡Grandes rebajas de hasta un 50% en toda la web!</span>
+          <span className="opacity-90">• Descuento directo en carrito</span>
+          <span className="underline underline-offset-4 decoration-white/50 text-[#FCF5EC] hover:text-white ml-1 font-semibold group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-1">
+            Comprar ahora <ArrowRight size={14} className="inline opacity-90 group-hover:translate-x-1 transition-transform" />
+          </span>
+        </div>
+      </motion.div>
+
       {/* Hero Carousel */}
       <div className="relative h-[600px] overflow-hidden">
         {slides.map((slide, index) => (
@@ -148,6 +178,103 @@ export default function Home() {
           ))}
         </div>
       </div>
+
+      {/* Banner de Rebajas Especiales - Altamente visual, elegante y dinámico */}
+      <motion.div 
+        initial={{ opacity: 0, y: 35, scale: 0.98 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 md:mt-20"
+      >
+        <div className="relative overflow-hidden rounded-3xl bg-[#3E2A24] bg-gradient-to-br from-[#3E2A24] via-[#523B33] to-[#2B1D19] p-8 sm:p-10 md:p-14 shadow-2xl border border-[#D9C8B4]/25">
+          
+          {/* Fondo suave y elegante de luces sutiles */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(184,159,130,0.2),transparent_55%)] pointer-events-none" />
+          <div className="absolute -left-12 -bottom-12 w-72 h-72 bg-[#B89F82]/8 rounded-full blur-3xl pointer-events-none" />
+
+          {/* Destello dorado animado con transición elegante y llamativa que recorre el banner periódicamente */}
+          <motion.div 
+            animate={{ 
+              x: ["-150%", "250%"]
+            }}
+            transition={{ 
+              repeat: Infinity, 
+              repeatDelay: 5, 
+              duration: 2.5, 
+              ease: "easeInOut" 
+            }}
+            className="absolute top-0 bottom-0 w-1/3 bg-gradient-to-r from-transparent via-[#FCF5EC]/15 to-transparent skew-x-12 pointer-events-none"
+          />
+
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 md:gap-12">
+            
+            {/* Texto y reclamo */}
+            <div className="flex-1 text-center lg:text-left">
+              <motion.span 
+                animate={{ scale: [1, 1.04, 1] }}
+                transition={{ repeat: Infinity, duration: 2.2, ease: "easeInOut" }}
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase bg-[#B89F82]/20 text-[#FCFCFC] border border-[#B89F82]/40 mb-6"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-[#B89F82] animate-ping" />
+                Colección con Descuento Especial
+              </motion.span>
+              
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-serif text-white leading-[1.12] tracking-tight mb-4">
+                Grandes Rebajas <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F3E6D5] via-[#E8D4BE] to-[#B89F82] drop-shadow-sm font-bold">
+                  de hasta un 50%
+                </span>
+                <span className="text-2xl sm:text-3xl block md:inline font-sans font-light tracking-wide text-gray-200 ml-0 md:ml-3">
+                  en toda la web
+                </span>
+              </h2>
+              
+              <p className="text-[#F3E6D5]/80 text-sm md:text-base max-w-xl mb-6 leading-relaxed font-sans">
+                Viste a los más pequeños con la dulzura, elegancia y exclusividad de siempre. 
+                <span className="block mt-2 font-medium text-white/95">
+                  ✨ Descuento especial aplicado directamente en el carrito. ¡Solo por tiempo limitado!
+                </span>
+              </p>
+              
+              {/* Información adicional con toque premium */}
+              <div className="inline-flex items-center gap-2 text-xs text-[#E8D4BE] border-t border-[#D9C8B4]/20 pt-4 w-full justify-center lg:justify-start">
+                <span className="text-sm">✨</span>
+                <p className="tracking-wide">Prendas de alta calidad con stock ultra limitado y envío rápido.</p>
+              </div>
+            </div>
+
+            {/* Llamada a la acción interactiva de alta relevancia visual */}
+            <div className="flex-shrink-0 w-full sm:w-auto flex flex-col items-center gap-4">
+              <motion.button
+                whileHover={{ scale: 1.03, boxShadow: "0 10px 30px -5px rgba(0,0,0,0.4)" }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => navigate('/categoria/Niña%20(3-9%20años)')}
+                className="w-full sm:w-auto bg-[#F3E6D5] text-[#3E2A24] hover:bg-white font-serif font-bold px-12 py-5 rounded-2xl shadow-xl transition-colors flex items-center justify-center gap-3 cursor-pointer group"
+              >
+                <span className="tracking-wider uppercase text-sm">Ver Rebajas</span>
+                <ArrowRight size={18} className="transform group-hover:translate-x-1.5 transition-transform duration-300 text-[#5D4037]" />
+              </motion.button>
+              
+              <div className="flex items-center gap-3 text-xs text-[#FCF5EC]/65">
+                <span className="hover:text-white transition-colors cursor-pointer" onClick={() => navigate('/categoria/Primera%20Postura')}>Primera Postura</span>
+                <span className="h-1 w-1 rounded-full bg-white/20" />
+                <span className="hover:text-white transition-colors cursor-pointer" onClick={() => navigate('/genero/niña')}>Niña</span>
+                <span className="h-1 w-1 rounded-full bg-white/20" />
+                <span className="hover:text-white transition-colors cursor-pointer" onClick={() => navigate('/genero/niño')}>Niño</span>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Detalles ornamentales y elegantes en las esquinas */}
+          <div className="absolute top-0 right-0 w-16 h-[1px] bg-gradient-to-l from-[#B89F82]/30 to-transparent" />
+          <div className="absolute top-0 right-0 h-16 w-[1px] bg-gradient-to-b from-[#B89F82]/30 to-transparent" />
+          <div className="absolute bottom-0 left-0 w-16 h-[1px] bg-gradient-to-r from-[#B89F82]/30 to-transparent" />
+          <div className="absolute bottom-0 left-0 h-16 w-[1px] bg-gradient-to-t from-[#B89F82]/30 to-transparent" />
+
+        </div>
+      </motion.div>
 
       {/* Comprar por Género */}
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
