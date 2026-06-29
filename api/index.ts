@@ -1204,6 +1204,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
               code: i.product.code,
               name: i.product.name,
               size: i.size,
+              color: i.product.color || '',
               quantity: i.quantity,
               price: i.product.discounted_price
             }))),

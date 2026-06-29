@@ -347,7 +347,7 @@ export default function AdminDashboard() {
                                 <div key={idx} className="flex items-center">
                                   <span className="font-medium mr-1">{item.quantity}x</span> 
                                   <span className="truncate max-w-[150px]" title={item.name}>{item.name}</span>
-                                  <span className="text-[#967A70] ml-1">({item.size})</span>
+                                  <span className="text-[#967A70] ml-1">({item.size}{item.color ? ` - ${item.color}` : ''})</span>
                                 </div>
                               ))}
                             </div>
