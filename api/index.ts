@@ -400,10 +400,11 @@ async function handleSuccessfulPayment(session: any) {
           shippingText = `${session.shipping_details.name || ''}\n${addr?.line1 || ''} ${addr?.line2 || ''}\n${addr?.postal_code || ''} ${addr?.city || ''}\n${addr?.country || ''}`;
         }
 
-        const itemsList = items.map((i: any) => `- ${i.quantity}x ${i.name} (Talla: ${i.size})`).join('\n');
+        const itemsList = items.map((i: any) => `- ${i.quantity}x ${i.name} (Talla: ${i.size}${i.color ? `, Color: ${i.color}` : ''})`).join('\n');
         const totalFormatted = session.amount_total ? (session.amount_total / 100).toFixed(2) + '€' : '0.00€';
 
-        await fetch('https://formspree.io/f/xnjoprko', {
+        const formId = process.env.FORMSPREE_FORM_ID || 'xnjoprko';
+        await fetch(`https://formspree.io/f/${formId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -418,7 +419,7 @@ async function handleSuccessfulPayment(session: any) {
             "ID_Stripe": sessionId
           })
         });
-        console.log(`Notificación de Formspree enviada para el pedido ${orderId || sessionId}`);
+        console.log(`Notificación de Formspree enviada para el pedido ${orderId || sessionId} usando formulario ${formId}`);
       } catch (emailErr) {
         console.error("Error al enviar notificación de Formspree:", emailErr);
       }
